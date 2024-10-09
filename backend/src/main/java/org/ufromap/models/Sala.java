@@ -5,9 +5,9 @@ import java.util.List;
 import org.ufromap.Clase;
 
 public class Sala{
-    private final long id;
-    private final String nombre;
-    private final List<Clase> clases;
+    private long id;
+    private String nombre;
+    private List<Clase> clases;
 
     public Sala(long id, String nombre, List<Clase> clases) {
         this.id = id;
@@ -27,4 +27,15 @@ public class Sala{
         return clases;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setClases(List<Clase> clases) {
+        this.clases = clases;
+    }
 }
