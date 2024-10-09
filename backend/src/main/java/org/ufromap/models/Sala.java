@@ -1,11 +1,13 @@
-package org.ufromap;
+package org.ufromap.models;
 
 import java.util.List;
 
-public class Sala implements InfoMostrable, ClaseMostrable {
-    private final long id;
-    private final String nombre;
-    private final List<Clase> clases;
+import org.ufromap.Clase;
+
+public class Sala{
+    private long id;
+    private String nombre;
+    private List<Clase> clases;
 
     public Sala(long id, String nombre, List<Clase> clases) {
         this.id = id;
@@ -25,13 +27,15 @@ public class Sala implements InfoMostrable, ClaseMostrable {
         return clases;
     }
 
-    @Override
-    public void mostrarClases() {
-
+    public void setId(long id) {
+        this.id = id;
     }
 
-    @Override
-    public void mostrarInformacion() {
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
+    public void setClases(List<Clase> clases) {
+        this.clases = clases;
     }
 }
