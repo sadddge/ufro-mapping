@@ -3,19 +3,22 @@ package org.ufromap.models;
 import java.util.List;
 
 import org.ufromap.Clase;
+import org.ufromap.Edificio;
 
 public class Sala{
-    private long id;
+    private int id;
     private String nombre;
+    private Edificio edificio;
     private List<Clase> clases;
 
-    public Sala(long id, String nombre, List<Clase> clases) {
+    public Sala(int id, String nombre, Edificio edificio, List<Clase> clases) {
         this.id = id;
         this.nombre = nombre;
+        this.edificio = edificio;
         this.clases = clases;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -23,16 +26,24 @@ public class Sala{
         return nombre;
     }
 
+    public Edificio getEdificio() {
+        return edificio;
+    }
+
     public List<Clase> getClases() {
         return clases;
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public void setEdificio(Edificio edificio) {
+        this.edificio = edificio;
     }
 
     public void setClases(List<Clase> clases) {
