@@ -1,9 +1,5 @@
 package org.ufromap.models;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.ufromap.Sala;
 
 public class Clase {
 
@@ -23,20 +19,6 @@ public class Clase {
         this.sala = sala;
     }
 
-    public void mostrarInformacion() {
-        List<String> infoClase = Arrays.asList(
-            "Docente: " + docente,
-            "Día de la semana: " + diaSemana,
-            "Hora de inicio: " + horaInicio,
-            "Hora de fin: " + horaFin,
-            "Módulo: " + modulo,
-            "Sala: " + (sala != null ? sala.getSala() : "No existe esta sala")
-        );
-
-        for (String info : infoClase) {
-            System.out.println(info);
-        }
-    }
 
     public String getDocente() {
         return docente;

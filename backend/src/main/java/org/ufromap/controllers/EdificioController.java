@@ -17,7 +17,7 @@ import com.google.gson.Gson;
 
 @WebServlet("/api/edificio/*")
 public class EdificioController extends HttpServlet {
-    private EdificioService edificioService;
+    private final EdificioService edificioService;
 
     public EdificioController() {
         this.edificioService = new EdificioService();

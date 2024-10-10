@@ -1,8 +1,12 @@
-package org.ufromap;
+package org.ufromap.models;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
-public class Usuario implements InfoMostrable, ClaseMostrable {
+
+public class Usuario {
     private String nombre;
     private String contrasenia;
     private String correo;
@@ -64,21 +68,5 @@ public class Usuario implements InfoMostrable, ClaseMostrable {
         Set<Asignatura> nuevasAsignaturas = new HashSet<>(asignaturas);
         nuevasAsignaturas.add(asignatura);
         return Optional.of(nuevasAsignaturas);
-    }
-    
-
-    @Override
-    public void mostrarClases() {
-        System.out.println("Clases: ");
-        for (Asignatura asignatura : asignaturas) {
-            asignatura.mostrarClases();
-        }
-    }
-
-    @Override
-    public void mostrarInformacion() {
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Correo: " + correo);
-        mostrarAsignaturas();
     }
 }

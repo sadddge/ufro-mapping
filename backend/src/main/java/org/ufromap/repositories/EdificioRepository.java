@@ -14,7 +14,7 @@ import org.ufromap.models.Sala;
 
 public class EdificioRepository {
     
-    private SalaRepository salaRepository;
+    private final SalaRepository salaRepository;
 
     public EdificioRepository() {
         this.salaRepository = new SalaRepository();
@@ -41,9 +41,9 @@ public class EdificioRepository {
                 List<Sala> salas = salaRepository.getSalasByEdificioId(id);
                 edificios.add(new Edificio(id, nombre, alias, latitud, longitud, tipo, salas));
             }
-            connection.close();
+
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return edificios;
     }
@@ -68,7 +68,7 @@ public class EdificioRepository {
             }
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return edificio;
     }
@@ -93,7 +93,7 @@ public class EdificioRepository {
             }
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return edificio;
     }
@@ -118,7 +118,7 @@ public class EdificioRepository {
             }
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return edificio;
     }
@@ -143,9 +143,57 @@ public class EdificioRepository {
             }
             connection.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return edificio;
     }
 
+
+    public boolean addEdificio(Edificio edificio) {
+        String query = "INSERT INTO edificio (edificio, alias, latitud, longitud, tipo) VALUES (?, ?, ?, ?, ?)";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setString(1, edificio.getNombre());
+            statement.setString(2, edificio.getAlias());
+            statement.setFloat(3, edificio.getLatitud());
+            statement.setFloat(4, edificio.getLongitud());
+            statement.setString(5, edificio.getTipo());
+            statement.executeUpdate();
+            connection.close();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean updateEdificio(Edificio edificio) {
+        String query = "UPDATE edificio SET edificio = ?, alias = ?, latitud = ?, longitud = ?, tipo = ? WHERE edificio_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setString(1, edificio.getNombre());
+            statement.setString(2, edificio.getAlias());
+            statement.setFloat(3, edificio.getLatitud());
+            statement.setFloat(4, edificio.getLongitud());
+            statement.setString(5, edificio.getTipo());
+            statement.setInt(6, edificio.getId());
+            statement.executeUpdate();
+            connection.close();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    public boolean deleteEdificio(int id) {
+        String query = "DELETE FROM edificio WHERE edificio_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setInt(1, id);
+            statement.executeUpdate();
+            connection.close();
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
 }

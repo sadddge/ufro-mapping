@@ -36,5 +36,17 @@ public class EdificioService {
     public Edificio getEdificioByTipo(String tipo) {
         return edificioRepository.getEdificioByTipo(tipo);
     }
+
+    public boolean addEdificio(Edificio edificio) {
+        return edificioRepository.addEdificio(edificio);
+    }
+
+    public boolean updateEdificio(Edificio edificio) {
+        return edificioRepository.updateEdificio(edificio);
+    }
+
+    public boolean deleteEdificio(int id) {
+        return edificioRepository.deleteEdificio(id);
+    }
     
 }

@@ -2,9 +2,6 @@ package org.ufromap.models;
 
 import java.util.List;
 
-import org.ufromap.Clase;
-import org.ufromap.Edificio;
-
 public class Sala{
     private int id;
     private String nombre;

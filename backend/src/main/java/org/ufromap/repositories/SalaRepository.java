@@ -7,15 +7,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ufromap.Clase;
-import org.ufromap.Edificio;
 import org.ufromap.config.DatabaseConnection;
+import org.ufromap.models.Clase;
+import org.ufromap.models.Edificio;
 import org.ufromap.models.Sala;
 
 public class SalaRepository {
 
-    private ClaseRepository claseRepository;
-    private EdificioRepository edificioRepository;
+    private final ClaseRepository claseRepository;
+    private final EdificioRepository edificioRepository;
 
     public SalaRepository() {
         this.claseRepository = new ClaseRepository();
@@ -45,7 +45,6 @@ public class SalaRepository {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             
         }
 
@@ -70,10 +69,36 @@ public class SalaRepository {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+        
         }
 
         return sala;
+    }
+
+    public List<Sala> getSalasByEdificioId(int id) throws SQLException {
+        List<Sala> salas = new ArrayList<>();
+        String query = "SELECT * FROM sala WHERE edificio_id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setLong(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    int salaId = resultSet.getInt("sala_id");
+                    String nombre = resultSet.getString("sala");
+                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
+                    List<Clase> clases = claseRepository.getClasesBySalaId(salaId);
+                    Sala sala = new Sala(salaId, nombre, edificio, clases);
+                    salas.add(sala);
+                }
+            }
+
+        } catch (SQLException e) {
+        
+        }
+
+        return salas;
     }
 
     public Sala getSalaByNombre(String nombre) throws SQLException {
@@ -94,7 +119,7 @@ public class SalaRepository {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
 
         return sala;
@@ -111,7 +136,7 @@ public class SalaRepository {
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return false;
     }
@@ -127,7 +152,7 @@ public class SalaRepository {
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return false;
     }
@@ -142,7 +167,7 @@ public class SalaRepository {
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+
         }
         return false;
     }
