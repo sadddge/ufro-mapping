@@ -1,6 +1,6 @@
 package org.ufromap.controllers;
 
-import org.ufromap.models.AsignaturaModel;
+import org.ufromap.models.Asignatura;
 import org.ufromap.services.AsignaturaService;
 
 public class AsignaturaController {
@@ -11,7 +11,7 @@ public class AsignaturaController {
         this.asignaturaService = asignaturaService;
     }
 
-    public void registrarAsignatura(AsignaturaModel asignatura) {
+    public void registrarAsignatura(Asignatura asignatura) {
         asignaturaService.registrarAsignatura(asignatura);
     }
 }

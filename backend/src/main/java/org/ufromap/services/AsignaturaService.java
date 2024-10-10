@@ -1,6 +1,8 @@
 package org.ufromap.services;
 
 
+import java.sql.SQLException;
+
 import org.ufromap.models.Asignatura;
 import org.ufromap.repositories.AsignaturaRepository;
 
@@ -24,20 +26,20 @@ public class AsignaturaService {
         return asignaturaRepository.getAsignaturaByNombre(nombre);
     }
 
-    public Asignatura getAsignaturaById(int id) {
+    public Asignatura getAsignaturaById(int id) throws SQLException {
         return asignaturaRepository.getAsignaturaById(id);
     }
 
-    public Asignatura addAsignatura(Asignatura asignatura) {
-        return asignaturaRepository.addAsignatura(asignatura);
+    public void addAsignatura(String asignatura, String codigo, String descripcion) {
+        asignaturaRepository.addAsignatura(asignatura, codigo, descripcion);
     }
 
-    public Asignatura updateAsignatura(Asignatura asignatura) {
-        return asignaturaRepository.updateAsignatura(asignatura);
+    public void updateAsignatura(String asignatura, String codigo, String descripcion, int asignatura_id) {
+        asignaturaRepository.updateAsignatura(asignatura, codigo, descripcion, asignatura_id);
     }
 
-    public void deleteAsignatura(Asignatura asignatura) {
-        asignaturaRepository.deleteAsignatura(asignatura);
+    public void deleteAsignatura(int asignatura_id) {
+        asignaturaRepository.deleteAsignatura(asignatura_id);
     }
 
 

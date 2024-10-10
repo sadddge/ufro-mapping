@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.ufromap.Clase;
 
-public class AsignaturaModel {
+public class Asignatura {
     private String nombre;
     private String codigo;
     private String descripcion;
@@ -12,7 +12,7 @@ public class AsignaturaModel {
     private List<Clase> clases;
 
 
-    public AsignaturaModel(String nombre, String codigo, String descripcion, int SCT, List<Clase> clases) {
+    public Asignatura(String nombre, String codigo, String descripcion, int SCT, List<Clase> clases) {
         this.nombre = nombre;
         this.codigo = codigo;
         this.descripcion = descripcion;
