@@ -6,9 +6,9 @@ public class Usuario implements InfoMostrable, ClaseMostrable {
     private String nombre;
     private String contrasenia;
     private String correo;
-    private List<Asignatura> asignaturas;
+    private Set<Asignatura> asignaturas;
 
-    private static final List<String> contraseniasComunes = List.of(
+    private static final Set<String> CONTRASENIAS_COMUNES = Set.of(
         "123456", "password", "123456789", "12345678", "12345", "1234567", "1234567890", "qwerty", "abc123", "password1", "jordan23"
     );
 
@@ -16,7 +16,7 @@ public class Usuario implements InfoMostrable, ClaseMostrable {
 
     }
 
-    public Usuario(String nombre, String contrasenia, String correo, List<Asignatura> asignaturas) {
+    public Usuario(String nombre, String contrasenia, String correo, Set<Asignatura> asignaturas) {
         this.nombre = nombre;
         this.contrasenia = contrasenia;
         this.correo = correo;
@@ -27,42 +27,45 @@ public class Usuario implements InfoMostrable, ClaseMostrable {
         System.out.println("Asignaturas: " + asignaturas);
     }
 
-    public boolean iniciarSesion(String correo, String contrasenia) {
-        return correo.equals(this.correo) && contrasenia.equals(this.contrasenia);
+    public Optional<String> iniciarSesion(String correo, String contrasenia, String correoAlmacenado, String contraseniaAlmacenada) {
+        if (correo.equals(correoAlmacenado) && contrasenia.equals(contraseniaAlmacenada)) {
+            return Optional.of("Inicio de sesión exitoso");
+        }
+        return Optional.empty();
     }
+    
 
     public void cerrarSesion() {
         System.out.println("Sesión cerrada");
     }
 
-    public boolean cambiarContrasenia(String contraseniaActual, String contraseniaNueva) {
-        if (validarContrasenia(contraseniaNueva)) {
-            contrasenia = contraseniaNueva;
-            return true;
-        }
-        return false;
+    public Optional<String> cambiarContrasenia(String contraseniaActual, String contraseniaNueva) {
+        return validarContrasenia(contraseniaNueva) ? Optional.of(contraseniaNueva) : Optional.empty();
     }
 
     public boolean validarContrasenia(String contrasenia) {
-        return contrasenia.length() < 10 || contraseniasComunes.contains(contrasenia);
+        Predicate<String> longitudValida = c -> c.length() >= 10;
+        Predicate<String> noEsComun = c -> !CONTRASENIAS_COMUNES.contains(c);
+    
+        return longitudValida.and(noEsComun).test(contrasenia);
     }
 
-    public boolean cambiarCorreo(String correoActual, String correoNuevo) {
-        if (correoActual.equals(correo)) {
-            correo = correoNuevo;
-            return true;
-        }
-        return false;
+    public Optional<String> cambiarCorreo(String correoActual, String correoNuevo, String correo) {
+        return correoActual.equals(correo) ? Optional.of(correoNuevo) : Optional.empty();
     }
+    
 
-    public boolean registrarAsignatura(Asignatura asignatura) {
-        if (!asignaturas.contains(asignatura)) {
-            asignaturas.add(asignatura);
-            return true;
+    public Optional<Set<Asignatura>> registrarAsignatura(Asignatura asignatura, Set<Asignatura> asignaturas) {
+        if (asignaturas.contains(asignatura)) {
+            System.out.println("La asignatura ya está registrada");
+            return Optional.empty();
         }
-        System.out.println("La asignatura ya está registrada");
-        return false;
+        
+        Set<Asignatura> nuevasAsignaturas = new HashSet<>(asignaturas);
+        nuevasAsignaturas.add(asignatura);
+        return Optional.of(nuevasAsignaturas);
     }
+    
 
     @Override
     public void mostrarClases() {
