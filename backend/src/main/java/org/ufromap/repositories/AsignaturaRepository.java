@@ -11,18 +11,36 @@ import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Asignatura;
 import org.ufromap.models.Clase;
 
+
+
+/**
+ * Clase repositorio para manejar las operaciones relacionadas con la entidad "Asignatura" en la base de datos.
+ * Proporciona métodos para recuperar, agregar, actualizar y eliminar registros de "Asignatura",
+ * así como para obtener las "Clase" relacionadas.
+ */
 public class AsignaturaRepository {
 
     private final ClaseRepository clasesRepository;
 
+    /**
+     * Constructor que inicializa el repositorio con una instancia de ClaseRepository.
+     * @param clasesRepository el repositorio para manejar las operaciones relacionadas con Clase.
+     */
     public AsignaturaRepository(ClaseRepository clasesRepository) {
         this.clasesRepository = clasesRepository;
     }
 
+    /**
+     * Constructor por defecto que inicializa el repositorio con una nueva instancia de ClaseRepository.
+     */
     public AsignaturaRepository() {
         this.clasesRepository = new ClaseRepository();
     }
 
+    /**
+     * Recupera todas las asignaturas de la base de datos.
+     * @return una lista de objetos Asignatura.
+     */
     public List<Asignatura> getAsignaturas() {
         List<Asignatura> asignaturas = new ArrayList<>();
         String query = "SELECT * FROM asignatura";
@@ -48,6 +66,12 @@ public class AsignaturaRepository {
         return asignaturas;
     }
 
+    /**
+     * Recupera una asignatura de la base de datos basándose en su ID.
+     * @param id el ID de la asignatura a recuperar.
+     * @return el objeto Asignatura si se encuentra, null en caso contrario.
+     * @throws SQLException si ocurre un error de SQL durante el proceso.
+     */
     public Asignatura getAsignaturaById(int id) throws SQLException {
         
         Asignatura asignatura = null;
@@ -80,6 +104,11 @@ public class AsignaturaRepository {
         return asignatura;
     }
 
+    /**
+     * Recupera una asignatura de la base de datos basándose en su código.
+     * @param codigo el código único de la asignatura a recuperar.
+     * @return el objeto Asignatura si se encuentra, null en caso contrario.
+     */
     public Asignatura getAsignaturaByCodigo(String codigo) {
         Asignatura asignatura = null;
         String queryAsignatura = "SELECT * FROM asignatura WHERE codigo = ?";
@@ -115,7 +144,11 @@ public class AsignaturaRepository {
 
     }
 
-
+    /**
+     * Recupera una asignatura de la base de datos basándose en su nombre.
+     * @param nombre el nombre de la asignatura a recuperar.
+     * @return el objeto Asignatura si se encuentra, null en caso contrario.
+     */
     public Asignatura getAsignaturaByNombre(String nombre) {
             
         Asignatura asignatura = null;
@@ -145,8 +178,12 @@ public class AsignaturaRepository {
         return asignatura;
     }
 
-    
-
+    /**
+     * Agrega una nueva asignatura a la base de datos.
+     * @param asignatura el nombre de la asignatura.
+     * @param codigo el código de la asignatura.
+     * @param descripcion una breve descripción de la asignatura.
+     */
     public void addAsignatura(String asignatura, String codigo, String descripcion) {
         String query = "INSERT INTO asignatura (asignatura, codigo, descripcion) VALUES (?, ?, ?)";
     
@@ -163,6 +200,13 @@ public class AsignaturaRepository {
         }
     }
 
+    /**
+     * Actualiza una asignatura existente en la base de datos.
+     * @param asignatura el nuevo nombre de la asignatura.
+     * @param codigo el nuevo código de la asignatura.
+     * @param descripcion la nueva descripción de la asignatura.
+     * @param asignatura_id el ID de la asignatura a actualizar.
+     */
     public void updateAsignatura(String asignatura, String codigo, String descripcion, int asignatura_id) {
         String query = "UPDATE asignatura SET asignatura = ?, codigo = ?, descripcion = ? WHERE asignatura_id = ?";
 
@@ -179,6 +223,10 @@ public class AsignaturaRepository {
         }
     }
 
+    /**
+     * Elimina una asignatura de la base de datos basándose en su ID.
+     * @param asignatura_id el ID de la asignatura a eliminar.
+     */
     public void deleteAsignatura(int asignatura_id) {
         String query = "DELETE FROM asignatura WHERE asignatura_id = ?";
 
