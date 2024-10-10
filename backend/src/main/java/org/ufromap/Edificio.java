@@ -2,15 +2,17 @@ package org.ufromap;
 
 import java.util.List;
 
+import org.ufromap.models.Sala;
+
 public class Edificio implements InfoMostrable, ClaseMostrable {
-    private final long id;
+    private final int id;
     private final String nombre;
     private final String alias;
     private final String ubicacion;
     private final String tipo;
     private final List<Sala> salas;
 
-    public Edificio(long id, String nombre, String alias, String ubicacion, String tipo, List<Sala> salas) {
+    public Edificio(int id, String nombre, String alias, String ubicacion, String tipo, List<Sala> salas) {
         this.id = id;
         this.nombre = nombre;
         this.alias = alias;
@@ -19,7 +21,7 @@ public class Edificio implements InfoMostrable, ClaseMostrable {
         this.salas = salas;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
