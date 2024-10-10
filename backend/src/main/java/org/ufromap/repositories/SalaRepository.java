@@ -54,7 +54,7 @@ public class SalaRepository {
 
     public Sala getSalaById(int id) throws SQLException {
         Sala sala = null;
-        String query = "SELECT * FROM salas WHERE id = ?";
+        String query = "SELECT * FROM sala WHERE sala_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -76,8 +76,32 @@ public class SalaRepository {
         return sala;
     }
 
+    public Sala getSalaByNombre(String nombre) throws SQLException {
+        Sala sala = null;
+        String query = "SELECT * FROM sala WHERE sala = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, nombre);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("sala_id");
+                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
+                    List<Clase> clases = claseRepository.getClasesBySalaId(id);
+                    sala = new Sala(id, nombre, edificio, clases);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return sala;
+    }
+
     public boolean addSala(Sala sala) throws SQLException {
-        String query = "INSERT INTO salas (edificio_id, sala) VALUES (?, ?)";
+        String query = "INSERT INTO sala (edificio_id, sala) VALUES (?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -93,7 +117,7 @@ public class SalaRepository {
     }
 
     public boolean updateSala(Sala sala) throws SQLException {
-        String query = "UPDATE sala SET nombre = ? WHERE id = ?";
+        String query = "UPDATE sala SET sala = ? WHERE sala_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
