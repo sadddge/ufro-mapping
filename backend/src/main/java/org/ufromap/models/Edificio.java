@@ -3,18 +3,20 @@ package org.ufromap.models;
 import java.util.List;
 
 public class Edificio{
-    private final int id;
-    private final String nombre;
-    private final String alias;
-    private final String ubicacion;
-    private final String tipo;
-    private final List<Sala> salas;
+    private int id;
+    private String nombre;
+    private String alias;
+    private float latitud;
+    private float longitud;
+    private String tipo;
+    private List<Sala> salas;
 
-    public Edificio(int id, String nombre, String alias, String ubicacion, String tipo, List<Sala> salas) {
+    public Edificio(int id, String nombre, String alias, float latitud, float longitud, String tipo, List<Sala> salas) {
         this.id = id;
         this.nombre = nombre;
         this.alias = alias;
-        this.ubicacion = ubicacion;
+        this.latitud = latitud;
+        this.longitud = longitud;
         this.tipo = tipo;
         this.salas = salas;
     }
@@ -31,8 +33,12 @@ public class Edificio{
         return alias;
     }
 
-    public String getUbicacion() {
-        return ubicacion;
+    public float getLatitud() {
+        return latitud;
+    }
+
+    public float getLongitud() {
+        return longitud;
     }
 
     public String getTipo() {
@@ -42,4 +48,6 @@ public class Edificio{
     public List<Sala> getSalas() {
         return salas;
     }
+
+    
 }
