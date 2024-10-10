@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.ufromap.Sala;
 
-public class ClaseModel {
+public class Clase {
 
     private String docente;
     private String diaSemana;
@@ -14,7 +14,7 @@ public class ClaseModel {
     private int modulo;
     private Sala sala;
 
-    public ClaseModel(String docente, String diaSemana, String horaInicio, String horaFin, int modulo, Sala sala) {
+    public Clase(String docente, String diaSemana, String horaInicio, String horaFin, int modulo, Sala sala) {
         this.docente = docente;
         this.diaSemana = diaSemana;
         this.horaInicio = horaInicio;
