@@ -1,8 +1,8 @@
-package org.ufromap;
+package org.ufromap.models;
 
 import java.util.List;
 
-public class Edificio implements InfoMostrable, ClaseMostrable {
+public class Edificio{
     private final long id;
     private final String nombre;
     private final String alias;
@@ -41,15 +41,5 @@ public class Edificio implements InfoMostrable, ClaseMostrable {
 
     public List<Sala> getSalas() {
         return salas;
-    }
-
-    @Override
-    public void mostrarClases() {
-
-    }
-
-    @Override
-    public void mostrarInformacion() {
-
     }
 }
