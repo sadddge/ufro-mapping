@@ -44,7 +44,7 @@ public class ClaseRepository {
 
     }
 
-    public Clase getClaseById(int id){
+    public Clase getClasesById(int id){
 
         Clase clase = null;
         String query= "SELECT * FROM clase WHERE clase_id=?";
@@ -72,7 +72,7 @@ public class ClaseRepository {
 
     }
 
-    public Clase getClaseBySalaId(int sala_id){
+    public Clase getClasesBySalaId(int sala_id){
             
         Clase clase = null;
         String query= "SELECT * FROM clase WHERE sala_id=?";
@@ -99,7 +99,7 @@ public class ClaseRepository {
         return clase;
     }
 
-    public Clase getClaseByEdificioId(int edificio_id){
+    public Clase getClasesByEdificioId(int edificio_id){
 
         Clase clase = null;
         String query= "SELECT * FROM clase WHERE edificio_id=?";
@@ -128,7 +128,7 @@ public class ClaseRepository {
 
     }
 
-    public Clase getClaseByAsignaturaId(int asignatura_id){
+    public Clase getClasesByAsignaturaId(int asignatura_id){
 
         Clase clase = null;
         String query= "SELECT * FROM clase WHERE asignatura_id=?";
