@@ -24,12 +24,11 @@ public class EdificioRepository {
         this.salaRepository = salaRepository;
     }
 
-    
-
     public List<Edificio> getEdificios() {
         List<Edificio> edificios = new ArrayList<>();
+        String query = "SELECT * FROM edificio";
         try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM edificio");
+            PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery()){
             
             while (resultSet.next()) {
@@ -47,6 +46,106 @@ public class EdificioRepository {
             e.printStackTrace();
         }
         return edificios;
+    }
+
+    public Edificio getEdificioById(int id) {
+        Edificio edificio = null;
+        String query = "SELECT * FROM edificio WHERE edificio_id = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            ){
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()){
+                if (resultSet.next()) {
+                    String nombre = resultSet.getString("edificio");
+                    String alias = resultSet.getString("alias");
+                    String tipo = resultSet.getString("tipo");
+                    float latitud = resultSet.getFloat("latitud");
+                    float longitud = resultSet.getFloat("longitud");
+                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
+                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return edificio;
+    }
+
+    public Edificio getEdificioByNombre(String nombre) {
+        Edificio edificio = null;
+        String query = "SELECT * FROM edificio WHERE edificio = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            ){
+            statement.setString(1, nombre);
+            try (ResultSet resultSet = statement.executeQuery()){
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("edificio_id");
+                    String alias = resultSet.getString("alias");
+                    String tipo = resultSet.getString("tipo");
+                    float latitud = resultSet.getFloat("latitud");
+                    float longitud = resultSet.getFloat("longitud");
+                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
+                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return edificio;
+    }
+
+    public Edificio getEdificioByAlias(String alias) {
+        Edificio edificio = null;
+        String query = "SELECT * FROM edificio WHERE alias = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            ){
+            statement.setString(1, alias);
+            try (ResultSet resultSet = statement.executeQuery()){
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("edificio_id");
+                    String nombre = resultSet.getString("edificio");
+                    String tipo = resultSet.getString("tipo");
+                    float latitud = resultSet.getFloat("latitud");
+                    float longitud = resultSet.getFloat("longitud");
+                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
+                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return edificio;
+    }
+
+    public Edificio getEdificioByTipo(String tipo) {
+        Edificio edificio = null;
+        String query = "SELECT * FROM edificio WHERE tipo = ?";
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement statement = connection.prepareStatement(query);
+            ){
+            statement.setString(1, tipo);
+            try (ResultSet resultSet = statement.executeQuery()){
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("edificio_id");
+                    String nombre = resultSet.getString("edificio");
+                    String alias = resultSet.getString("alias");
+                    float latitud = resultSet.getFloat("latitud");
+                    float longitud = resultSet.getFloat("longitud");
+                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
+                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                }
+            }
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return edificio;
     }
 
 }
