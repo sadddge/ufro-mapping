@@ -1,90 +1,200 @@
 package org.ufromap.repositories;
 
+import java.awt.List;
+
 import org.ufromap.Usuario;
-import org.ufromap.models.AsignaturaModel;
+import org.ufromap.models.Asignatura;
+
+import com.mysql.cj.xdevapi.Result;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import org.ufromap.Clase;
 
 public class AsignaturaRepository {
 
-    public void registrarAsignatura(Usuario usuario){
-        
+    private ClasesRepository clasesRepository;
+
+    public AsignaturaRepository(ClasesRepository clasesRepository) {
+        this.clasesRepository = clasesRepository;
     }
 
-    public AsignaturaModel getAsignaturaByCodigo(Usuario usuario, String codigo) {
-
-
-    String queryAsignatura = "SELECT * FROM asignaturas WHERE codigo = ?";
-    String queryClases = "SELECT * FROM clases WHERE codigo_asignatura = ?";
-
-    try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mi_base_datos", "usuario", "contrasena");
-         PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura);
-         PreparedStatement stmtClases = connection.prepareStatement(queryClases)) {
-        stmtAsignatura.setString(1, codigo);
-        try (ResultSet resultSetAsignatura = stmtAsignatura.executeQuery()) {
-            if (resultSetAsignatura.next()) {
-                String nombre = resultSetAsignatura.getString("nombre");
-                String descripcion = resultSetAsignatura.getString("descripcion");
-                int sct = resultSetAsignatura.getInt("sct");
-                System.out.println("Asignatura encontrada: " + nombre + ", Descripción: " + descripcion + ", SCT: " + sct);
-
-                stmtClases.setString(1, codigo);
-                try (ResultSet resultSetClases = stmtClases.executeQuery()) {
-                    System.out.println("Clases asociadas:");
-
-                    while (resultSetClases.next()) {
-                        String docente = resultSetClases.getString("docente");
-                        String diaSemana = resultSetClases.getString("dia_semana");
-                        String horaInicio = resultSetClases.getString("hora_inicio");
-                        String horaFin = resultSetClases.getString("hora_fin");
-                        String modulo = resultSetClases.getString("modulo");
-
-                        System.out.println("Docente: " + docente + ", Día: " + diaSemana + ", Horario: " + horaInicio + " - " + horaFin + ", Módulo: " + modulo);
-                    }
-                }
-            } else {
-                System.out.println("No se encontró una asignatura con el código: " + codigo);
-            }
-        }
-
-        } catch (SQLException e) {
-         e.printStackTrace();
-        }
+    public AsignaturaRepository() {
+        this.clasesRepository = new ClasesRepository();
     }
 
+    public Asignatura getAsignaturaByCodigo(String codigo) {
 
-    public AsignaturaModel getAsignaturaByNombre(Usuario usuario, String nombre) {
-        String queryAsignatura = "SELECT * FROM asignaturas WHERE nombre = ?";
-        String queryClases = "SELECT * FROM clases WHERE codigo_asignatura = ?";
-    
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mi_base_datos", "usuario", "contrasena");
-             PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura);
-             PreparedStatement stmtClases = connection.prepareStatement(queryClases)) {
-            stmtAsignatura.setString(1, nombre);
+        Asignatura asignatura = null;
+        String queryAsignatura = "SELECT * FROM asignatura WHERE codigo = ?";
+ 
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
+            stmtAsignatura.setString(1, codigo);
+
             try (ResultSet resultSetAsignatura = stmtAsignatura.executeQuery()) {
+
                 if (resultSetAsignatura.next()) {
+                    int id = resultSetAsignatura.getInt("id");
+                    String nombre = resultSetAsignatura.getString("nombre");
+                    String descripcion = resultSetAsignatura.getString("descripcion");
+                    int sct = resultSetAsignatura.getInt("sct");
+                    List<Clase> clases = clasesRepository.getClasesByAsignaturaID(id);
+
+                    asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases);
+
+                    
+                    
+                } 
+                
+            } catch (SQLException e) {
+            e.printStackTrace();
+            }
+
+        } catch (SQLException ex) {
+        }
+        
+
+        return asignatura;
+
+    }
+
+
+    public Asignatura getAsignaturaByNombre(String nombre) {
+            
+            Asignatura asignatura = null;
+            String queryAsignatura = "SELECT * FROM asignatura WHERE asignatura = ?";
+    
+            try (Connection connection = DatabaseConnection.getConnection();
+                PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
+                stmtAsignatura.setString(1, nombre);
+    
+                try (ResultSet resultSetAsignatura = stmtAsignatura.executeQuery()) {
+    
+                    if (resultSetAsignatura.next()) {
+                        int id = resultSetAsignatura.getInt("id");
+                        String codigo = resultSetAsignatura.getString("codigo");
+                        String descripcion = resultSetAsignatura.getString("descripcion");
+                        int sct = resultSetAsignatura.getInt("sct");
+                        List<Clase> clases = clasesRepository.getClasesByAsignaturaID(id);
+    
+                        asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases);
+    
+                        
+                        
+                    } 
+                    
+                } catch (SQLException e) {
+                e.printStackTrace();
+                }
+
+
+            } catch (SQLException ex) {
+        }
+
+        return asignatura;
+       
+    }
+
+    public Asignatura getAsignaturaById(int id) throws SQLException {
+        
+        Asignatura asignatura = null;
+        String queryAsignatura = "SELECT * FROM asignatura WHERE asignatura_id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
+            stmtAsignatura.setInt(1, id);
+
+            try (ResultSet resultSetAsignatura = stmtAsignatura.executeQuery()) {
+
+                if (resultSetAsignatura.next()) {
+                    String nombre = resultSetAsignatura.getString("nombre");
                     String codigo = resultSetAsignatura.getString("codigo");
                     String descripcion = resultSetAsignatura.getString("descripcion");
                     int sct = resultSetAsignatura.getInt("sct");
-                    System.out.println("Asignatura encontrada: " + nombre + ", Código: " + codigo + ", Descripción: " + descripcion + ", SCT: " + sct);
-    
-                    stmtClases.setString(1, codigo);
-                    try (ResultSet resultSetClases = stmtClases.executeQuery()) {
-                        System.out.println("Clases asociadas:");
-    
-                        while (resultSetClases.next()) {
-                            String docente = resultSetClases.getString("docente");
-                            String diaSemana = resultSetClases.getString("dia_semana");
-                            String horaInicio = resultSetClases.getString("hora_inicio");
-                            String horaFin = resultSetClases.getString("hora_fin");
-                            String modulo = resultSetClases.getString("modulo");
-    
-                            System.out.println("Docente: " + docente + ", Día: " + diaSemana + ", Horario: " + horaInicio + " - " + horaFin + ", Módulo: " + modulo);
-                        }
-                    }
-                } else {
-                    System.out.println("No se encontró una asignatura con el nombre: " + nombre);
-                }
+                    List<Clase> clases = clasesRepository.getClasesByAsignaturaID(id);
+
+                    asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases);
+
+                    
+                    
+                } 
+                
+            } catch (SQLException e) {
+            e.printStackTrace();
             }
+        }
+
+        return asignatura;
+    }
+
+    public void addAsignatura(Asignatura asignatura) {
+        String query = "INSERT INTO asignatura (nombre, codigo, descripcion, sct) VALUES (?, ?, ?, ?)";
     
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, asignatura.getNombre());
+            stmt.setString(2, asignatura.getCodigo());
+            stmt.setString(3, asignatura.getDescripcion());
+            stmt.setInt(4, asignatura.getSCT());
+
+            stmt.executeUpdate();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateAsignatura(Asignatura asignatura) {
+        String query = "UPDATE asignatura SET nombre = ?, codigo = ?, descripcion = ?, sct = ? WHERE asignatura_id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, asignatura.getNombre());
+            stmt.setString(2, asignatura.getCodigo());
+            stmt.setString(3, asignatura.getDescripcion());
+            stmt.setInt(4, asignatura.getSCT());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteAsignatura(Asignatura asignatura) {
+        String query = "DELETE FROM asignatura WHERE asignatura_id = ?";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, asignatura.getId());
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void getAsignaturas() {
+        String query = "SELECT * FROM asignatura";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+            PreparedStatement stmt = connection.prepareStatement(query);
+            ResultSet resultSet = stmt.executeQuery()) {
+            while (resultSet.next()) {
+                int id = resultSet.getInt("asignatura_id");
+                String nombre = resultSet.getString("nombre");
+                String codigo = resultSet.getString("codigo");
+                String descripcion = resultSet.getString("descripcion");
+                int sct = resultSet.getInt("sct");
+                List<Clase> clases = clasesRepository.getClasesByAsignaturaID(id);
+
+                Asignatura asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases);
+                asignatura.mostrarInformacion();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
