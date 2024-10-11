@@ -1,0 +1,12 @@
+# Excluir archivos de entorno o configuración
+.env
+*.env
+
+# Excluir archivos de configuración de editores
+.idea/
+.vscode/
+*.iml
+
+# Excluir archivos específicos del sistema operativo
+.DS_Store
+Thumbs.db

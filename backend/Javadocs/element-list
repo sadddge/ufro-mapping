@@ -1,0 +1,6 @@
+org.ufromap
+org.ufromap.config
+org.ufromap.controllers
+org.ufromap.models
+org.ufromap.repositories
+org.ufromap.services
