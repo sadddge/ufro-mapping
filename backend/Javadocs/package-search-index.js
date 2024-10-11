@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"org.ufromap"},{"l":"org.ufromap.config"},{"l":"org.ufromap.controllers"},{"l":"org.ufromap.models"},{"l":"org.ufromap.repositories"},{"l":"org.ufromap.services"}];updateSearchResults();
