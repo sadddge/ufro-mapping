@@ -8,8 +8,9 @@ import java.util.List;
  */
 public class Sala {
     private int id;
+    private int edificioId;
     private String nombre;
-    private Edificio edificio;
+
     private List<Clase> clases;
 
     /**
@@ -20,10 +21,10 @@ public class Sala {
      * @param edificio El edificio al que pertenece la sala.
      * @param clases   La lista de clases que se imparten en la sala.
      */
-    public Sala(int id, String nombre, Edificio edificio, List<Clase> clases) {
+    public Sala(int id, String nombre, int edificio, List<Clase> clases) {
         this.id = id;
         this.nombre = nombre;
-        this.edificio = edificio;
+        this.edificioId = edificio;
         this.clases = clases;
     }
 
@@ -46,12 +47,12 @@ public class Sala {
     }
 
     /**
-     * Obtiene el edificio al que pertenece la sala.
+     * Obtiene el la id del edificio al que pertenece la sala.
      *
      * @return El edificio asociado a la sala.
      */
-    public Edificio getEdificio() {
-        return edificio;
+    public int getEdificioId() {
+        return edificioId;
     }
 
     /**
@@ -82,12 +83,12 @@ public class Sala {
     }
 
     /**
-     * Establece el edificio al que pertenece la sala.
+     * Establece la id del edificio al que pertenece la sala.
      *
-     * @param edificio El nuevo edificio asociado a la sala.
+     * @param edificioId El nuevo edificio asociado a la sala.
      */
-    public void setEdificio(Edificio edificio) {
-        this.edificio = edificio;
+    public void setEdificioId(int edificioId) {
+        this.edificioId = edificioId;
     }
 
     /**

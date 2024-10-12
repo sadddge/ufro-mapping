@@ -10,9 +10,9 @@ public class Edificio {
     private int id;
     private String nombre;
     private String alias;
+    private String tipo;
     private float latitud;
     private float longitud;
-    private String tipo;
     private List<Sala> salas;
 
     /**
@@ -26,13 +26,13 @@ public class Edificio {
      * @param tipo El tipo de edificio (por ejemplo, "académico", "administrativo").
      * @param salas Una lista de objetos {@link Sala} que pertenecen al edificio.
      */
-    public Edificio(int id, String nombre, String alias, float latitud, float longitud, String tipo, List<Sala> salas) {
+    public Edificio(int id, String nombre, String alias, String tipo, float latitud, float longitud, List<Sala> salas) {
         this.id = id;
         this.nombre = nombre;
         this.alias = alias;
+        this.tipo = tipo;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.tipo = tipo;
         this.salas = salas;
     }
 
