@@ -128,6 +128,24 @@ public class Clase {
     }
 
     /**
+     * Obtiene el periodo en que se dicta la clase.
+     *
+     * @return El periodo.
+     */
+    public int getPeriodo() {
+        return periodo;
+    }
+
+    /**
+     * Establece el periodo en que se dicta la clase.
+     *
+     * @param periodo El periodo.
+     */
+    public void setPeriodo(int periodo) {
+        this.periodo = periodo;
+    }
+
+    /**
      * Obtiene el nombre del docente que dicta la clase.
      * 
      * @return El nombre del docente.
