@@ -8,28 +8,38 @@ import java.util.List;
  * y una lista de clases asociadas.
  */
 public class Asignatura {
+    private int id;
     private String nombre;
     private String codigo;
     private String descripcion;
-    private int SCT;
+    private int sct;
     private List<Clase> clases;
 
     /**
      * Constructor que inicializa una Asignatura con sus atributos.
+     * @param id el id único de la asignatura.
      * @param nombre el nombre de la asignatura.
      * @param codigo el código único de la asignatura.
      * @param descripcion una breve descripción de la asignatura.
-     * @param SCT los créditos SCT de la asignatura.
+     * @param sct los créditos SCT de la asignatura.
      * @param clases la lista de clases asociadas a la asignatura.
      */
-    public Asignatura(String nombre, String codigo, String descripcion, int SCT, List<Clase> clases) {
+    public Asignatura(int id, String nombre, String codigo, String descripcion, int sct, List<Clase> clases) {
+        this.id = id;
         this.nombre = nombre;
         this.codigo = codigo;
         this.descripcion = descripcion;
-        this.SCT = SCT;
+        this.sct = sct;
         this.clases = clases;
     }
 
+    /**
+     *
+     * @return el valor del atributo id.
+     */
+    public int getId() {
+        return id;
+    }
     /**
      *
      * @return el valor del atributo nombre.
@@ -49,13 +59,18 @@ public class Asignatura {
      *
      * @return el valor del atributo SCT.
      */
-    public int getSCT() { return SCT; }
+    public int getSct() { return sct; }
     /**
      *
      * @return el valor del atributo clases el cual es una lista de clases.
      */
     public List<Clase> getClases() { return clases; }
 
+    /**
+     * Establece el valor del atributo id.
+     * @param id el nuevo valor del atributo.
+     */
+    public void setId(int id) { this.id = id; }
     /**
      * Establece el valor del atributo nombre.
      * @param nombre el nuevo valor del atributo.
@@ -73,9 +88,9 @@ public class Asignatura {
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
     /**
      * Establece el valor del atributo SCT.
-     * @param SCT el nuevo valor del atributo.
+     * @param sct el nuevo valor del atributo.
      */
-    public void setSCT(int SCT) { this.SCT = SCT; }
+    public void setSct(int sct) { this.sct = sct; }
     /**
      * Establece el valor del atributo clases.
      * @param clases el nuevo valor del atributo.
