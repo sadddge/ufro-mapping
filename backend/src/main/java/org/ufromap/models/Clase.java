@@ -5,30 +5,126 @@ package org.ufromap.models;
  */
 public class Clase {
 
+    private int id;
+    private int salaId;
+    private int edificioId;
+    private int asignaturaId;
+    private int diaSemana;
+    private int periodo;
     private String docente;
-    private String diaSemana;
-    private String horaInicio;
-    private String horaFin;
     private int modulo;
-    private Sala sala;
 
     /**
      * Constructor que inicializa una clase académica con la información proporcionada.
-     * 
-     * @param docente El nombre del docente que dicta la clase.
-     * @param diaSemana El día de la semana en que se dicta la clase.
-     * @param horaInicio La hora de inicio de la clase (formato HH:MM).
-     * @param horaFin La hora de término de la clase (formato HH:MM).
-     * @param modulo El número de módulo al que pertenece la clase.
-     * @param sala El objeto {@link Sala} que representa la sala donde se dicta la clase.
+     *
+     * @param id el id único de la clase.
+     * @param salaId el id de la sala en la que se dicta la clase.
+     * @param edificioId el id del edificio en el que se dicta la clase.
+     * @param asignaturaId el id de la asignatura a la que pertenece la clase.
+     * @param diaSemana el día de la semana en que se dicta la clase.
+     * @param periodo el periodo en que se dicta la clase.
+     * @param docente el nombre del docente que dicta la clase.
+     * @param modulo el número de módulo al que pertenece la clase.
      */
-    public Clase(String docente, String diaSemana, String horaInicio, String horaFin, int modulo, Sala sala) {
-        this.docente = docente;
+    public Clase(int id, int salaId, int edificioId, int asignaturaId, int diaSemana, int periodo, String docente, int modulo) {
+        this.id = id;
+        this.salaId = salaId;
+        this.edificioId = edificioId;
+        this.asignaturaId = asignaturaId;
         this.diaSemana = diaSemana;
-        this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
+        this.periodo = periodo;
+        this.docente = docente;
         this.modulo = modulo;
-        this.sala = sala;
+    }
+
+    /**
+     * Obtiene el id único de la clase.
+     *
+     * @return El id de la clase.
+     */
+    public int getId() {
+        return id;
+    }
+
+    /**
+     * Establece el id único de la clase.
+     *
+     * @param id El id de la clase.
+     */
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    /**
+     * Obtiene el id de la sala en la que se dicta la clase.
+     *
+     * @return El id de la sala.
+     */
+    public int getSalaId() {
+        return salaId;
+    }
+
+    /**
+     * Establece el id de la sala en la que se dicta la clase.
+     *
+     * @param salaId El id de la sala.
+     */
+    public void setSalaId(int salaId) {
+        this.salaId = salaId;
+    }
+
+    /**
+     * Obtiene el id del edificio en el que se dicta la clase.
+     *
+     * @return El id del edificio.
+     */
+    public int getEdificioId() {
+        return edificioId;
+    }
+
+    /**
+     * Establece el id del edificio en el que se dicta la clase.
+     *
+     * @param edificioId El id del edificio.
+     */
+    public void setEdificioId(int edificioId) {
+        this.edificioId = edificioId;
+    }
+
+    /**
+     * Obtiene el id de la asignatura a la que pertenece la clase.
+     *
+     * @return El id de la asignatura.
+     */
+    public int getAsignaturaId() {
+        return asignaturaId;
+    }
+
+    /**
+     * Establece el id de la asignatura a la que pertenece la clase.
+     *
+     * @param asignaturaId El id de la asignatura.
+     */
+    public void setAsignaturaId(int asignaturaId) {
+        this.asignaturaId = asignaturaId;
+    }
+
+    /**
+     * Obtiene el día de la semana en que se dicta la clase.
+     *
+     * @return El día de la semana.
+     */
+    public int getDiaSemana() {
+        return diaSemana;
+    }
+
+    /**
+     * Establece el día de la semana en que se dicta la clase.
+     *
+     * @param diaSemana El día de la semana.
+     */
+    public void setDiaSemana(int diaSemana) {
+        this.diaSemana = diaSemana;
     }
 
     /**
@@ -50,60 +146,6 @@ public class Clase {
     }
 
     /**
-     * Obtiene el día de la semana en que se dicta la clase.
-     * 
-     * @return El día de la semana.
-     */
-    public String getDiaSemana() {
-        return diaSemana;
-    }
-
-    /**
-     * Establece el día de la semana en que se dicta la clase.
-     * 
-     * @param diaSemana El día de la semana.
-     */
-    public void setDiaSemana(String diaSemana) {
-        this.diaSemana = diaSemana;
-    }
-
-    /**
-     * Obtiene la hora de inicio de la clase.
-     * 
-     * @return La hora de inicio.
-     */
-    public String getHoraInicio() {
-        return horaInicio;
-    }
-
-    /**
-     * Establece la hora de inicio de la clase.
-     * 
-     * @param horaInicio La hora de inicio.
-     */
-    public void setHoraInicio(String horaInicio) {
-        this.horaInicio = horaInicio;
-    }
-
-    /**
-     * Obtiene la hora de término de la clase.
-     * 
-     * @return La hora de término.
-     */
-    public String getHoraFin() {
-        return horaFin;
-    }
-
-    /**
-     * Establece la hora de término de la clase.
-     * 
-     * @param horaFin La hora de término.
-     */
-    public void setHoraFin(String horaFin) {
-        this.horaFin = horaFin;
-    }
-
-    /**
      * Obtiene el número de módulo al que pertenece la clase.
      * 
      * @return El número de módulo.
@@ -119,23 +161,5 @@ public class Clase {
      */
     public void setModulo(int modulo) {
         this.modulo = modulo;
-    }
-
-    /**
-     * Obtiene la sala en la que se dicta la clase.
-     * 
-     * @return Un objeto {@link Sala} que representa la sala.
-     */
-    public Sala getSala() {
-        return sala;
-    }
-
-    /**
-     * Establece la sala en la que se dicta la clase.
-     * 
-     * @param sala Un objeto {@link Sala} que representa la sala.
-     */
-    public void setSala(Sala sala) {
-        this.sala = sala;
     }
 }
