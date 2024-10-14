@@ -12,7 +12,8 @@
     "frontend": "file:",
     "pinia": "^2.2.4",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "vuetify": "^3.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
