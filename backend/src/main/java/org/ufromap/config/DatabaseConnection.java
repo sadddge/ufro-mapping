@@ -35,4 +35,16 @@ public class DatabaseConnection {
         }
         return connection;
     }
+
+    public static void closeConnection() {
+        if (connection != null) {
+            try {
+                connection.close();
+                connection = null; // Asigna null para que se pueda volver a abrir si es necesario
+                System.out.println("Conexión cerrada correctamente.");
+            } catch (SQLException e) {
+                System.out.println("Error al cerrar la conexión: " + e.getMessage());
+            }
+        }
+    }
 }

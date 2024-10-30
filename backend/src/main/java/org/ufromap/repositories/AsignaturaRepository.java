@@ -45,9 +45,9 @@ public class AsignaturaRepository {
     public List<Asignatura> getAsignaturas() {
         List<Asignatura> asignaturas = new ArrayList<>();
         String query = "SELECT asignatura_id, nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura FROM asignatura";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(query);
+        Connection connection = DatabaseConnection.getConnection();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet resultSet = stmt.executeQuery()) {
             while (resultSet.next()) {
                 int id = resultSet.getInt("asignatura_id");
@@ -74,9 +74,8 @@ public class AsignaturaRepository {
         
         Optional<Asignatura> asignatura = Optional.empty();
         String queryAsignatura = "SELECT asignatura_id, nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura FROM asignatura WHERE asignatura_id = ?";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
             stmtAsignatura.setInt(1, id);
 
             try (ResultSet resultSetAsignatura = stmtAsignatura.executeQuery()) {
@@ -103,9 +102,8 @@ public class AsignaturaRepository {
     public Optional<Asignatura> getAsignaturaByCodigo(String codigo) {
         Optional<Asignatura> asignatura = Optional.empty();
         String queryAsignatura = "SELECT asignatura_id, nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura FROM asignatura WHERE codigo_asignatura = ?";
- 
-        try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
             stmtAsignatura.setString(1, codigo);
 
             try (ResultSet resultSetAsignatura = stmtAsignatura.executeQuery()) {
@@ -134,9 +132,8 @@ public class AsignaturaRepository {
 
         Optional<Asignatura> asignatura = Optional.empty();
         String queryAsignatura = "SELECT asignatura_id, nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura FROM asignatura WHERE nombre_asignatura = ?";
-    
-        try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement stmtAsignatura = connection.prepareStatement(queryAsignatura)){
 
             stmtAsignatura.setString(1, nombre);
 
@@ -163,9 +160,8 @@ public class AsignaturaRepository {
      */
     public void addAsignatura(String nombre, String codigo, String descripcion, int sct) {
         String query = "INSERT INTO asignatura (nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura) VALUES (?, ?, ?, ?)";
-    
-        try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement stmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, nombre);
             stmt.setString(2, codigo);
             stmt.setString(3, descripcion);
@@ -184,9 +180,8 @@ public class AsignaturaRepository {
      */
     public void updateAsignatura(int id, String nombre, String codigo, String descripcion, int sct) {
         String query = "UPDATE asignatura SET nombre_asignatura = ?, codigo_asignatura = ?, descripcion_asignatura = ?, sct_asignatura = ? WHERE asignatura_id = ?";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, nombre);
             stmt.setString(2, codigo);
             stmt.setString(3, descripcion);
@@ -202,9 +197,8 @@ public class AsignaturaRepository {
      */
     public void deleteAsignatura(int id) {
         String query = "DELETE FROM asignatura WHERE asignatura_id = ?";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) { }

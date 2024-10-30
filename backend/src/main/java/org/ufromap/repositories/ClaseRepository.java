@@ -24,9 +24,9 @@ public class ClaseRepository {
     public List<Clase> getClases(){
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase";
+        Connection connection = DatabaseConnection.getConnection();
 
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query);
+        try(PreparedStatement stmt= connection.prepareStatement(query);
             ResultSet resultSet= stmt.executeQuery()){
             while(resultSet.next()){
                 int id = resultSet.getInt("clase_id");
@@ -51,12 +51,11 @@ public class ClaseRepository {
      * @return Un objeto {@link Clase} si se encuentra, o {@code null} si no existe.
      */
     public Optional<Clase> getClaseById(int id){
-
         Optional<Clase> clase = Optional.empty();
         String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE clase_id=?";
+        Connection connection = DatabaseConnection.getConnection();
 
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, id);
             ResultSet resultSet= stmt.executeQuery();
 
@@ -84,9 +83,8 @@ public class ClaseRepository {
     public List<Clase> getClasesBySalaId(int sala_id){
         List<Clase> clase = new ArrayList<>();
         String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE sala_id=?";
-    
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, sala_id);
             ResultSet resultSet= stmt.executeQuery();
 
@@ -115,9 +113,8 @@ public class ClaseRepository {
 
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE edificio_id=?";
-    
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, edificio_id);
             ResultSet resultSet= stmt.executeQuery();
     
@@ -145,9 +142,8 @@ public class ClaseRepository {
     public List<Clase> getClasesByAsignaturaId(int asignatura_id){
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE asignatura_id=?";
-    
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, asignatura_id);
             ResultSet resultSet= stmt.executeQuery();
     
@@ -175,9 +171,8 @@ public class ClaseRepository {
     public List<Clase> getClasesByDiaSemana(int diaSemana){
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT * FROM clase WHERE dia_semana=?";
-    
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, diaSemana);
             ResultSet resultSet= stmt.executeQuery();
     
@@ -203,9 +198,8 @@ public class ClaseRepository {
      */
     public void addClase(Clase clase){
         String query= "INSERT INTO clase(sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo) VALUES(?,?,?,?,?,?,?)";
-
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, clase.getSalaId());
             stmt.setInt(2, clase.getEdificioId());
             stmt.setInt(3, clase.getAsignaturaId());
@@ -224,9 +218,8 @@ public class ClaseRepository {
      */
     public void updateClase(Clase clase){
         String query= "UPDATE clase SET sala_id=?, edificio_id=?, asignatura_id=?, dia_semana=?, periodo_clase=?, docente_nombre=?, modulo=? WHERE clase_id=?";
-
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, clase.getSalaId());
             stmt.setInt(2, clase.getEdificioId());
             stmt.setInt(3, clase.getAsignaturaId());
@@ -246,9 +239,8 @@ public class ClaseRepository {
     */
     public void deleteClase(int id){
         String query= "DELETE FROM clase WHERE clase_id=?";
-
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, id);
             stmt.executeUpdate();
         }catch(SQLException e){ }

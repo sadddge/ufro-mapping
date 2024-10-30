@@ -82,8 +82,8 @@ public class EdificioRepository {
     public Edificio getEdificioById(int id) {
         Edificio edificio = null;
         String query = "SELECT * FROM edificio WHERE edificio_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -111,8 +111,8 @@ public class EdificioRepository {
     public Edificio getEdificioByNombre(String nombre) {
         Edificio edificio = null;
         String query = "SELECT * FROM edificio WHERE edificio = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, nombre);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -140,8 +140,8 @@ public class EdificioRepository {
     public Edificio getEdificioByAlias(String alias) {
         Edificio edificio = null;
         String query = "SELECT * FROM edificio WHERE alias = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, alias);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -169,8 +169,8 @@ public class EdificioRepository {
     public Edificio getEdificioByTipo(String tipo) {
         Edificio edificio = null;
         String query = "SELECT * FROM edificio WHERE tipo = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, tipo);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -197,8 +197,8 @@ public class EdificioRepository {
      */
     public boolean addEdificio(Edificio edificio) {
         String query = "INSERT INTO edificio (edificio, alias, latitud, longitud, tipo) VALUES (?, ?, ?, ?, ?)";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, edificio.getNombre());
             statement.setString(2, edificio.getAlias());
             statement.setFloat(3, edificio.getLatitud());
@@ -220,8 +220,8 @@ public class EdificioRepository {
      */
     public boolean updateEdificio(Edificio edificio) {
         String query = "UPDATE edificio SET edificio = ?, alias = ?, latitud = ?, longitud = ?, tipo = ? WHERE edificio_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, edificio.getNombre());
             statement.setString(2, edificio.getAlias());
             statement.setFloat(3, edificio.getLatitud());
@@ -244,8 +244,8 @@ public class EdificioRepository {
      */
     public boolean deleteEdificio(int id) {
         String query = "DELETE FROM edificio WHERE edificio_id = ?";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             statement.executeUpdate();
             return true;
