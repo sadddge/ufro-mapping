@@ -42,12 +42,11 @@ public class EdificioController extends HttpServlet {
     }
 
     /**
-     * Maneja las solicitudes GET para obtener uno o varios edificios.
+     * Maneja las solicitudes GET para obtener información sobre los edificios.
+     * Si la solicitud contiene un ID de edificio, se devolverá la información detallada de ese edificio.
+     * De lo contrario, se devolverá una lista de todos los edificios registrados en la base de datos.
      *
-     * - Si no se proporciona un ID, devuelve la lista completa de edificios.
-     * - Si se proporciona un ID en la URL, devuelve los detalles del edificio correspondiente.
-     *
-     * @param request  La solicitud HTTP entrante.
+     * @param request  La solicitud HTTP entrante que contiene los parámetros de filtrado.
      * @param response La respuesta HTTP que se enviará de vuelta.
      * @throws ServletException Si ocurre un error en la solicitud del servlet.
      * @throws IOException      Si ocurre un error de entrada/salida.
@@ -64,13 +63,13 @@ public class EdificioController extends HttpServlet {
         Float longitud = request.getParameter("longitud") == null ? null : Float.parseFloat(request.getParameter("longitud"));
 
         if (nombre != null || alias != null || tipo != null || latitud != null || longitud != null) {
-            List<Edificio> edificios = edificioService.getEdificiosByFilter(nombre, alias, tipo, latitud, longitud);
+            List<Edificio> edificios = edificioService.findByFilter(nombre, alias, tipo, latitud, longitud);
             response.getWriter().print(new Gson().toJson(edificios));
             return;
         }
 
         if (pathInfo == null || pathInfo.equals("/")) {
-            List<Edificio> edificios = edificioService.getEdificios();
+            List<Edificio> edificios = edificioService.findAll();
             response.getWriter().print(new Gson().toJson(edificios));
             return;
         }
@@ -79,7 +78,11 @@ public class EdificioController extends HttpServlet {
 
         try {
             int edificioId = Integer.parseInt(id);
-            Edificio edificio = edificioService.getEdificioById(edificioId);
+            Edificio edificio = edificioService.findById(edificioId);
+            if (edificio == null) {
+                response.setStatus(404);
+                return;
+            }
             response.getWriter().print(new Gson().toJson(edificio));
         } catch (NumberFormatException e) {
             response.setStatus(400);
@@ -88,7 +91,6 @@ public class EdificioController extends HttpServlet {
 
     /**
      * Maneja las solicitudes POST para crear un nuevo edificio.
-     *
      * Lee el cuerpo de la solicitud en formato JSON, convierte los datos a un objeto {@link Edificio},
      * y luego lo agrega a la base de datos a través del servicio.
      *
@@ -130,7 +132,7 @@ public class EdificioController extends HttpServlet {
 
 
         Edificio edificio = new Edificio(0, nombre, alias, tipo, Float.parseFloat(latitud), Float.parseFloat(longitud), null);
-        edificioService.addEdificio(edificio);
+        edificioService.add(edificio);
         response.getWriter().print(new Gson().toJson(edificio));
         response.setStatus(HttpServletResponse.SC_CREATED);
     }

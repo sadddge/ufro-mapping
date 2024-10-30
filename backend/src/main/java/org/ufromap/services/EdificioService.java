@@ -1,6 +1,8 @@
 package org.ufromap.services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ufromap.models.Edificio;
 import org.ufromap.repositories.EdificioRepository;
@@ -36,8 +38,8 @@ public class EdificioService {
      *
      * @return Una lista de objetos {@link Edificio} que contiene todos los edificios.
      */
-    public List<Edificio> getEdificios() {
-        return edificioRepository.getEdificios();
+    public List<Edificio> findAll() {
+        return edificioRepository.findAll();
     }
 
     /**
@@ -46,43 +48,29 @@ public class EdificioService {
      * @param id El ID del edificio a buscar.
      * @return El objeto {@link Edificio} correspondiente al ID proporcionado, o {@code null} si no se encuentra.
      */
-    public Edificio getEdificioById(int id) {
-        return edificioRepository.getEdificioById(id);
+    public Edificio findById(int id) {
+        return edificioRepository.findById(id);
     }
+
 
     /**
-     * Busca un edificio por su nombre.
+     * Obtiene una lista de edificios filtrados por los parámetros proporcionados.
      *
-     * @param nombre El nombre del edificio.
-     * @return El objeto {@link Edificio} correspondiente al nombre proporcionado, o {@code null} si no se encuentra.
+     * @param nombre   El nombre del edificio a buscar.
+     * @param alias    El alias del edificio a buscar.
+     * @param tipo     El tipo de edificio a buscar.
+     * @param latitud  La latitud del edificio a buscar.
+     * @param longitud La longitud del edificio a buscar.
+     * @return Una lista de objetos {@link Edificio} que coinciden con los parámetros de búsqueda.
      */
-    public Edificio getEdificioByNombre(String nombre) {
-        return edificioRepository.getEdificioByNombre(nombre);
-    }
-
-    /**
-     * Busca un edificio por su alias.
-     *
-     * @param alias El alias del edificio.
-     * @return El objeto {@link Edificio} correspondiente al alias proporcionado, o {@code null} si no se encuentra.
-     */
-    public Edificio getEdificioByAlias(String alias) {
-        return edificioRepository.getEdificioByAlias(alias);
-    }
-
-    /**
-     * Busca un edificio por su tipo.
-     *
-     * @param tipo El tipo de edificio (por ejemplo, académico, administrativo, etc.).
-     * @return El objeto {@link Edificio} correspondiente al tipo proporcionado, o {@code null} si no se encuentra.
-     */
-    public Edificio getEdificioByTipo(String tipo) {
-        return edificioRepository.getEdificioByTipo(tipo);
-    }
-
-
-    public List<Edificio> getEdificiosByFilter(String nombre, String alias, String tipo, Float latitud, Float longitud) {
-        return edificioRepository.getEdificiosByFilter(nombre, alias, tipo, latitud, longitud);
+    public List<Edificio> findByFilter(String nombre, String alias, String tipo, Float latitud, Float longitud) {
+        Map<String, Object> filters = new HashMap<>();
+        if (nombre != null) filters.put("nombre", nombre);
+        if (alias != null) filters.put("alias", alias);
+        if (tipo != null) filters.put("tipo", tipo);
+        if (latitud != null) filters.put("latitud", latitud);
+        if (longitud != null) filters.put("longitud", longitud);
+        return edificioRepository.findByFilter(filters);
     }
 
 
@@ -90,30 +78,27 @@ public class EdificioService {
      * Agrega un nuevo edificio a la base de datos.
      *
      * @param edificio El objeto {@link Edificio} con los datos del nuevo edificio.
-     * @return {@code true} si la operación fue exitosa, {@code false} si ocurrió algún error.
      */
-    public boolean addEdificio(Edificio edificio) {
-        return edificioRepository.addEdificio(edificio);
+    public void add(Edificio edificio) {
+         edificioRepository.add(edificio);
     }
 
     /**
      * Actualiza los datos de un edificio existente.
      *
      * @param edificio El objeto {@link Edificio} con los datos actualizados.
-     * @return {@code true} si la operación fue exitosa, {@code false} si ocurrió algún error.
      */
-    public boolean updateEdificio(Edificio edificio) {
-        return edificioRepository.updateEdificio(edificio);
+    public void update(Edificio edificio) {
+        edificioRepository.update(edificio);
     }
 
     /**
      * Elimina un edificio de la base de datos por su ID.
      *
      * @param id El ID del edificio a eliminar.
-     * @return {@code true} si la operación fue exitosa, {@code false} si ocurrió algún error.
      */
-    public boolean deleteEdificio(int id) {
-        return edificioRepository.deleteEdificio(id);
+    public void delete(int id) {
+        edificioRepository.delete(id);
     }
     
 }

@@ -67,7 +67,7 @@ public class EdificioRepository implements IRepository {
     @Override
     public Edificio findById(int id) {
         Edificio edificio = null;
-        String query = "SELECT nombre_edificio, alias_edificio, tipo_edificio, latitud, longitud FROM edificio WHERE edificio_id = ?";
+        String query = "SELECT edificio_id, nombre_edificio, alias_edificio, tipo_edificio, latitud, longitud FROM edificio WHERE edificio_id = ?";
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
