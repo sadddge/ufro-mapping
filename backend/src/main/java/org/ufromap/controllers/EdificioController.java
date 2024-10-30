@@ -54,19 +54,29 @@ public class EdificioController extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String pathInfo = request.getPathInfo();
         response.setContentType("application/json");
-        if (pathInfo == null || pathInfo.equals("/")) {
-            List<Edificio> edificios = edificioService.getEdificios();
-            System.out.println("edificios length: " + edificios.size());
-            if (edificios.isEmpty()) {
-                response.getWriter().print("[]");
-                return;
-            }
+        String pathInfo = request.getPathInfo();
+
+        String nombre = request.getParameter("nombre");
+        String alias = request.getParameter("alias");
+        String tipo = request.getParameter("tipo");
+        Float latitud = request.getParameter("latitud") == null ? null : Float.parseFloat(request.getParameter("latitud"));
+        Float longitud = request.getParameter("longitud") == null ? null : Float.parseFloat(request.getParameter("longitud"));
+
+        if (nombre != null || alias != null || tipo != null || latitud != null || longitud != null) {
+            List<Edificio> edificios = edificioService.getEdificiosByFilter(nombre, alias, tipo, latitud, longitud);
             response.getWriter().print(new Gson().toJson(edificios));
             return;
         }
+
+        if (pathInfo == null || pathInfo.equals("/")) {
+            List<Edificio> edificios = edificioService.getEdificios();
+            response.getWriter().print(new Gson().toJson(edificios));
+            return;
+        }
+
         String id = pathInfo.substring(1);
+
         try {
             int edificioId = Integer.parseInt(id);
             Edificio edificio = edificioService.getEdificioById(edificioId);
@@ -112,12 +122,6 @@ public class EdificioController extends HttpServlet {
 
         alias = alias == null ? "" : alias;
         tipo = tipo == null ? "" : tipo;
-
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Alias: " + alias);
-        System.out.println("Tipo: " + tipo);
-        System.out.println("Latitud: " + latitud);
-        System.out.println("Longitud: " + longitud);
 
         if (nombre == null || latitud == null || longitud == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

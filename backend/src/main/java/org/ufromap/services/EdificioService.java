@@ -80,6 +80,12 @@ public class EdificioService {
         return edificioRepository.getEdificioByTipo(tipo);
     }
 
+
+    public List<Edificio> getEdificiosByFilter(String nombre, String alias, String tipo, Float latitud, Float longitud) {
+        return edificioRepository.getEdificiosByFilter(nombre, alias, tipo, latitud, longitud);
+    }
+
+
     /**
      * Agrega un nuevo edificio a la base de datos.
      *
