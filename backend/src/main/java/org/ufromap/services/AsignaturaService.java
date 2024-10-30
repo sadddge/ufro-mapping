@@ -2,8 +2,12 @@ package org.ufromap.services;
 
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.ufromap.models.Asignatura;
 import org.ufromap.repositories.AsignaturaRepository;
 
@@ -24,69 +28,42 @@ public class AsignaturaService {
     }
 
     /**
-     * Método para registrar una nueva asignatura. (Lógica de negocio aún no implementada).
-     * @param asignatura el objeto Asignatura que se desea registrar.
+     * Constructor por defecto que inicializa el servicio con un nuevo repositorio de Asignatura.
      */
-    public void registrarAsignatura(Asignatura asignatura) {
-
+    public AsignaturaService() {
+        this.asignaturaRepository = new AsignaturaRepository();
     }
 
-    /**
-     * Recupera una asignatura desde el repositorio basándose en su código.
-     * @param codigo el código único de la asignatura.
-     * @return el objeto Asignatura si se encuentra, null en caso contrario.
-     */
-    public Optional<Asignatura> getAsignaturaByCodigo(String codigo) {
-        return asignaturaRepository.getAsignaturaByCodigo(codigo);
+
+    public List<Asignatura> findAll() {
+        return asignaturaRepository.findAll();
     }
 
-    /**
-     * Recupera una asignatura desde el repositorio basándose en su nombre.
-     * @param nombre el nombre de la asignatura.
-     * @return el objeto Asignatura si se encuentra, null en caso contrario.
-     */
-    public Optional<Asignatura> getAsignaturaByNombre( String nombre) {
-        return asignaturaRepository.getAsignaturaByNombre(nombre);
+    public Asignatura findById(int id) {
+        return asignaturaRepository.findById(id);
     }
 
-    /**
-     * Recupera una asignatura desde el repositorio basándose en su ID.
-     * @param id el ID de la asignatura.
-     * @return el objeto Asignatura si se encuentra, null en caso contrario.
-     * @throws SQLException si ocurre algún error durante la ejecución de la consulta SQL.
-     */
-    public Optional<Asignatura> getAsignaturaById(int id) throws SQLException {
-        return asignaturaRepository.getAsignaturaById(id);
+    public List<Asignatura> findByFilter(String nombre_asignatura, String codigo_asignatura, String descripcion_asignatura, Integer sct_asignatura) {
+        Map<String, Object> filter = new HashMap<>();
+
+        if (nombre_asignatura != null) filter.put("nombre_asignatura", nombre_asignatura);
+        if (codigo_asignatura != null) filter.put("codigo_asignatura", codigo_asignatura);
+        if (descripcion_asignatura != null) filter.put("descripcion_asignatura", descripcion_asignatura);
+        if (sct_asignatura != null) filter.put("sct_asignatura", sct_asignatura);
+
+        return asignaturaRepository.findByFilter(filter);
     }
 
-    /**
-     * Agrega una nueva asignatura utilizando el repositorio.
-     * @param asignatura el nombre de la asignatura.
-     * @param codigo el código de la asignatura.
-     * @param descripcion una breve descripción de la asignatura.
-     */
-    public void addAsignatura(String asignatura, String codigo, String descripcion, int sct) {
-        asignaturaRepository.addAsignatura(asignatura, codigo, descripcion, sct);
+    public Asignatura add(Asignatura asignatura) {
+        return asignaturaRepository.add(asignatura);
     }
 
-    /**
-     * Actualiza una asignatura existente en el repositorio.
-     * @param asignatura el nuevo nombre de la asignatura.
-     * @param codigo el nuevo código de la asignatura.
-     * @param descripcion la nueva descripción de la asignatura.
-     * @param asignatura_id el ID de la asignatura a actualizar.
-     */
-    public void updateAsignatura(int asignatura_id, String asignatura, String codigo, String descripcion, int sct) {
-        asignaturaRepository.updateAsignatura(asignatura_id, asignatura, codigo, descripcion, sct);
+    public Asignatura update(Asignatura asignatura) {
+        return asignaturaRepository.update(asignatura);
     }
 
-    /**
-     * Elimina una asignatura del repositorio basándose en su ID.
-     * @param asignatura_id el ID de la asignatura a eliminar.
-     */
-    public void deleteAsignatura(int asignatura_id) {
-        asignaturaRepository.deleteAsignatura(asignatura_id);
+    public boolean delete(int id) {
+        return asignaturaRepository.delete(id);
     }
-
 
 }

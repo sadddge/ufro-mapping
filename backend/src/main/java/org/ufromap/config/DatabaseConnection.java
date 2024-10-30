@@ -1,8 +1,6 @@
 package org.ufromap.config;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Clase que gestiona la conexión a la base de datos utilizando las configuraciones
@@ -46,5 +44,21 @@ public class DatabaseConnection {
                 System.out.println("Error al cerrar la conexión: " + e.getMessage());
             }
         }
+    }
+
+    public static int getLastInsertId() {
+        int lastId = -1;
+        try {
+            String query = "SELECT LAST_INSERT_ID()";
+            try (PreparedStatement statement = connection.prepareStatement(query);
+                 ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    lastId = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return lastId;
     }
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.ufromap.models.Edificio;
 import org.ufromap.repositories.EdificioRepository;
+import org.ufromap.repositories.SalaRepository;
 
 /**
  * Servicio que maneja la lógica de negocio para la entidad {@link Edificio}.
@@ -16,6 +17,7 @@ import org.ufromap.repositories.EdificioRepository;
 public class EdificioService {
 
     private EdificioRepository edificioRepository;
+    private SalaRepository salaRepository;
 
     /**
      * Constructor por defecto que inicializa el repositorio de edificios.
@@ -79,8 +81,8 @@ public class EdificioService {
      *
      * @param edificio El objeto {@link Edificio} con los datos del nuevo edificio.
      */
-    public void add(Edificio edificio) {
-         edificioRepository.add(edificio);
+    public Edificio add(Edificio edificio) {
+         return edificioRepository.add(edificio);
     }
 
     /**
@@ -88,8 +90,8 @@ public class EdificioService {
      *
      * @param edificio El objeto {@link Edificio} con los datos actualizados.
      */
-    public void update(Edificio edificio) {
-        edificioRepository.update(edificio);
+    public Edificio update(Edificio edificio) {
+        return edificioRepository.update(edificio);
     }
 
     /**
@@ -97,8 +99,8 @@ public class EdificioService {
      *
      * @param id El ID del edificio a eliminar.
      */
-    public void delete(int id) {
-        edificioRepository.delete(id);
+    public boolean delete(int id) {
+        return edificioRepository.delete(id);
     }
     
 }

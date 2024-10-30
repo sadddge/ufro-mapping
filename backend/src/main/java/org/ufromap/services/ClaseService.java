@@ -1,6 +1,8 @@
 package org.ufromap.services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.ufromap.models.Clase;
@@ -22,50 +24,75 @@ public class ClaseService {
     }
 
     /**
-     * Obtiene todas las clases de la base de datos.
-     * Utiliza el repositorio para recuperar la lista completa de clases.
+     * Método que devuelve todas las clases almacenadas en la base de datos.
+     *
+     * @return Una lista con todas las clases almacenadas en la base de datos.
      */
-    public void getAllClases(){
-        claseRepository.getClases();
+    public List<Clase> findAll() {
+        return claseRepository.findAll();
     }
 
     /**
-     * Obtiene una clase específica por su ID.
-     * 
-     * @param id El ID de la clase que se quiere recuperar.
-     * @return Un objeto {@link Clase} si se encuentra, o {@code null} si no existe.
+     * Método que devuelve una clase almacenada en la base de datos a partir de su id.
+     *
+     * @param id El id de la clase que se desea recuperar.
+     * @return La clase almacenada en la base de datos con el id proporcionado.
      */
-    public Optional<Clase> getClaseById(int id){
-        return claseRepository.getClaseById(id);
+    public Clase findById(int id) {
+        return claseRepository.findById(id);
+    }
+
+    public List<Clase> findByFilter(Integer salaId, Integer edificioId, Integer asignaturaId, Integer diaSemana, Integer periodo, String docente, Integer modulo) {
+        Map<String, Object> filters = new HashMap<>();
+        if (salaId != null) filters.put("salaId", salaId);
+        if (edificioId != null) filters.put("edificioId", edificioId);
+        if (asignaturaId != null) filters.put("asignaturaId", asignaturaId);
+        if (diaSemana != null) filters.put("diaSemana", diaSemana);
+        if (periodo != null) filters.put("periodo", periodo);
+        if (docente != null) filters.put("docente", docente);
+        if (modulo != null) filters.put("modulo", modulo);
+        return claseRepository.findByFilter(filters);
     }
 
     /**
-     * Obtiene todas las clases que ocurren en una sala específica.
-     * 
-     * @param sala_id El ID de la sala.
-     * @return Una lista de objetos {@link Clase} correspondientes a la sala indicada.
+     * Método que devuelve todas las clases almacenadas en la base de datos a partir de un id de asignatura.
+     *
+     * @param asignaturaId El id de la asignatura de la que se desean recuperar las clases.
+     * @return Una lista con todas las clases almacenadas en la base de datos de la asignatura con el id proporcionado.
      */
-    public List<Clase> getClasesBySalaId(int sala_id){
-        return claseRepository.getClasesBySalaId(sala_id);
+    public List<Clase> findByAsignaturaId(int asignaturaId) {
+        return claseRepository.findByAsignaturaId(asignaturaId);
+    }
+
+    public List<Clase> findBySalaId(int salaId) {
+        return claseRepository.findBySalaId(salaId);
     }
 
     /**
-     * Obtiene todas las clases que se dictan en un edificio específico.
-     * 
-     * @param edificio_id El ID del edificio.
-     * @return Una lista de objetos {@link Clase} correspondientes al edificio indicado.
+     * Método que almacena una clase en la base de datos.
+     *
+     * @param clase La clase que se desea almacenar en la base de datos.
      */
-    public List<Clase> getClasesByEdificioId(int edificio_id){
-        return claseRepository.getClasesByEdificioId(edificio_id);
+    public Clase add(Clase clase) {
+        return claseRepository.add(clase);
+    }
+
+
+    /**
+     * Método que actualiza una clase en la base de datos.
+     *
+     * @param clase La clase que se desea actualizar en la base de datos.
+     */
+    public Clase update(Clase clase) {
+        return claseRepository.update(clase);
     }
 
     /**
-     * Obtiene todas las clases de una asignatura específica.
-     * 
-     * @param asignatura_id El ID de la asignatura.
-     * @return Una lista de objetos {@link Clase} correspondientes a la asignatura indicada.
+     * Método que elimina una clase de la base de datos.
+     *
+     * @param id El id de la clase que se desea eliminar de la base de datos.
      */
-    public List<Clase> getClasesByAsignaturaId(int asignatura_id){
-        return claseRepository.getClasesByAsignaturaId(asignatura_id);
+    public boolean delete(int id) {
+        return claseRepository.delete(id);
     }
 }
