@@ -19,15 +19,13 @@ import org.ufromap.models.Sala;
 public class SalaRepository {
 
     private final ClaseRepository claseRepository;
-    private final EdificioRepository edificioRepository;
 
     /**
      * Constructor por defecto que inicializa el repositorio con instancias de los servicios
-     * de {@link ClaseRepository} y {@link EdificioRepository}.
+     * de {@link ClaseRepository}.
      */
     public SalaRepository() {
         this.claseRepository = new ClaseRepository();
-        this.edificioRepository = new EdificioRepository();
     }
 
     /**
@@ -35,11 +33,9 @@ public class SalaRepository {
      * y {@link EdificioRepository}.
      *
      * @param claseRepository    El repositorio para gestionar las clases.
-     * @param edificioRepository El repositorio para gestionar los edificios.
      */
-    public SalaRepository(ClaseRepository claseRepository, EdificioRepository edificioRepository) {
+    public SalaRepository(ClaseRepository claseRepository) {
         this.claseRepository = claseRepository;
-        this.edificioRepository = edificioRepository;
     }
 
     /**
@@ -59,9 +55,9 @@ public class SalaRepository {
             while (resultSet.next()) {
                 int id = resultSet.getInt("sala_id");
                 String nombre = resultSet.getString("sala");
-                Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
+                int edificio_id = resultSet.getInt("edificio_id");
                 List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                Sala sala = new Sala(id, nombre, edificio, clases);
+                Sala sala = new Sala(id, edificio_id, nombre, clases);
                 salas.add(sala);
             }
         } catch (SQLException e) {
@@ -89,9 +85,9 @@ public class SalaRepository {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     String nombre = resultSet.getString("sala");
-                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
+                    int edificio_id = resultSet.getInt("edificio_id");
                     List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                    sala = new Sala(id, nombre, edificio, clases);
+                    sala = new Sala(id, edificio_id, nombre, clases);
                 }
             }
         } catch (SQLException e) {
@@ -119,10 +115,9 @@ public class SalaRepository {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     int salaId = resultSet.getInt("sala_id");
-                    String nombre = resultSet.getString("sala");
-                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
+                    String nombre = resultSet.getString("nombre_sala");
                     List<Clase> clases = claseRepository.getClasesBySalaId(salaId);
-                    Sala sala = new Sala(salaId, nombre, edificio, clases);
+                    Sala sala = new Sala(salaId, id, nombre, clases);
                     salas.add(sala);
                 }
             }
@@ -151,9 +146,9 @@ public class SalaRepository {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     int id = resultSet.getInt("sala_id");
-                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
+                    int edificio_id = resultSet.getInt("edificio_id");
                     List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                    sala = new Sala(id, nombre, edificio, clases);
+                    sala = new Sala(id, edificio_id, nombre, clases);
                 }
             }
         } catch (SQLException e) {
@@ -176,7 +171,7 @@ public class SalaRepository {
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setInt(1, sala.getEdificio().getId());
+            preparedStatement.setInt(1, sala.getEdificioId());
             preparedStatement.setString(2, sala.getNombre());
             preparedStatement.executeUpdate();
             return true;
@@ -200,7 +195,7 @@ public class SalaRepository {
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
             preparedStatement.setString(1, sala.getNombre());
-            preparedStatement.setLong(2, sala.getEdificio().getId());
+            preparedStatement.setLong(2, sala.getEdificioId());
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {

@@ -1,6 +1,7 @@
 package org.ufromap.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.ufromap.models.Clase;
 import org.ufromap.repositories.ClaseRepository;
@@ -34,7 +35,7 @@ public class ClaseService {
      * @param id El ID de la clase que se quiere recuperar.
      * @return Un objeto {@link Clase} si se encuentra, o {@code null} si no existe.
      */
-    public Clase getClaseById(int id){
+    public Optional<Clase> getClaseById(int id){
         return claseRepository.getClaseById(id);
     }
 

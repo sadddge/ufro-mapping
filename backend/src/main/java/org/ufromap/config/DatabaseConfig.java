@@ -1,7 +1,9 @@
 package org.ufromap.config;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -20,8 +22,12 @@ public class DatabaseConfig {
      */
     public DatabaseConfig() {
         properties = new Properties();
-        try (FileInputStream fis = new FileInputStream("config.properties")) {
-            properties.load(fis);
+        try (InputStream fis = getClass().getResourceAsStream("/config.properties")) {
+            if (fis != null) {
+                properties.load(fis);
+            } else {
+                throw new FileNotFoundException("config.properties not found in resources folder");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

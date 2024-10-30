@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.mysql.cj.log.Log;
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Asignatura;
 import org.ufromap.models.Clase;
@@ -162,12 +161,12 @@ public class AsignaturaRepository {
      * @param descripcion una breve descripción de la asignatura.
      * @param sct los créditos SCT de la asignatura.
      */
-    public void addAsignatura(int nombre, String codigo, String descripcion, int sct) {
+    public void addAsignatura(String nombre, String codigo, String descripcion, int sct) {
         String query = "INSERT INTO asignatura (nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura) VALUES (?, ?, ?, ?)";
     
         try (Connection connection = DatabaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, nombre);
+            stmt.setString(1, nombre);
             stmt.setString(2, codigo);
             stmt.setString(3, descripcion);
             stmt.setInt(4, sct);

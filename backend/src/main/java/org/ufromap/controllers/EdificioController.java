@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONObject;
 import org.ufromap.models.Edificio;
 import org.ufromap.services.EdificioService;
 
@@ -54,20 +55,24 @@ public class EdificioController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
+        response.setContentType("application/json");
         if (pathInfo == null || pathInfo.equals("/")) {
             List<Edificio> edificios = edificioService.getEdificios();
-            response.setContentType("application/json");
-            response.getWriter().print(new Gson().toJson(edificios));
-        } else {
-            String id = pathInfo.substring(1);
-            try {
-                int edificioId = Integer.parseInt(id);
-                Edificio edificio = edificioService.getEdificioById(edificioId);
-                response.setContentType("application/json");
-                response.getWriter().print(new Gson().toJson(edificio));
-            } catch (NumberFormatException e) {
-                response.setStatus(400);
+            System.out.println("edificios length: " + edificios.size());
+            if (edificios.isEmpty()) {
+                response.getWriter().print("[]");
+                return;
             }
+            response.getWriter().print(new Gson().toJson(edificios));
+            return;
+        }
+        String id = pathInfo.substring(1);
+        try {
+            int edificioId = Integer.parseInt(id);
+            Edificio edificio = edificioService.getEdificioById(edificioId);
+            response.getWriter().print(new Gson().toJson(edificio));
+        } catch (NumberFormatException e) {
+            response.setStatus(400);
         }
     }
 
@@ -84,9 +89,45 @@ public class EdificioController extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        BufferedReader reader = request.getReader();
-        Edificio edificio = new Gson().fromJson(reader, Edificio.class);
+        response.setContentType("application/json");
+
+        StringBuilder sb = new StringBuilder();
+        String line;
+
+        try (BufferedReader reader = request.getReader()) {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line);
+            }
+        }
+
+        String json = sb.toString();
+        JSONObject jsonObject = new JSONObject(json);
+
+        String nombre = jsonObject.getString("nombre_edificio");
+        String alias = jsonObject.optString("alias_edificio", "");
+        String tipo = jsonObject.optString("tipo_edifico", "");
+        String latitud = jsonObject.getString("latitud");
+        String longitud = jsonObject.getString("longitud");
+
+
+        alias = alias == null ? "" : alias;
+        tipo = tipo == null ? "" : tipo;
+
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Alias: " + alias);
+        System.out.println("Tipo: " + tipo);
+        System.out.println("Latitud: " + latitud);
+        System.out.println("Longitud: " + longitud);
+
+        if (nombre == null || latitud == null || longitud == null) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+
+        Edificio edificio = new Edificio(0, nombre, alias, tipo, Float.parseFloat(latitud), Float.parseFloat(longitud), null);
         edificioService.addEdificio(edificio);
+        response.getWriter().print(new Gson().toJson(edificio));
         response.setStatus(HttpServletResponse.SC_CREATED);
     }
 }

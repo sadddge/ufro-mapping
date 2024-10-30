@@ -2,6 +2,7 @@ package org.ufromap.services;
 
 
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.ufromap.models.Asignatura;
 import org.ufromap.repositories.AsignaturaRepository;
@@ -35,7 +36,7 @@ public class AsignaturaService {
      * @param codigo el código único de la asignatura.
      * @return el objeto Asignatura si se encuentra, null en caso contrario.
      */
-    public Asignatura getAsignaturaByCodigo( String codigo) {
+    public Optional<Asignatura> getAsignaturaByCodigo(String codigo) {
         return asignaturaRepository.getAsignaturaByCodigo(codigo);
     }
 
@@ -44,7 +45,7 @@ public class AsignaturaService {
      * @param nombre el nombre de la asignatura.
      * @return el objeto Asignatura si se encuentra, null en caso contrario.
      */
-    public Asignatura getAsignaturaByNombre( String nombre) {
+    public Optional<Asignatura> getAsignaturaByNombre( String nombre) {
         return asignaturaRepository.getAsignaturaByNombre(nombre);
     }
 
@@ -54,7 +55,7 @@ public class AsignaturaService {
      * @return el objeto Asignatura si se encuentra, null en caso contrario.
      * @throws SQLException si ocurre algún error durante la ejecución de la consulta SQL.
      */
-    public Asignatura getAsignaturaById(int id) throws SQLException {
+    public Optional<Asignatura> getAsignaturaById(int id) throws SQLException {
         return asignaturaRepository.getAsignaturaById(id);
     }
 
@@ -64,8 +65,8 @@ public class AsignaturaService {
      * @param codigo el código de la asignatura.
      * @param descripcion una breve descripción de la asignatura.
      */
-    public void addAsignatura(String asignatura, String codigo, String descripcion) {
-        asignaturaRepository.addAsignatura(asignatura, codigo, descripcion);
+    public void addAsignatura(String asignatura, String codigo, String descripcion, int sct) {
+        asignaturaRepository.addAsignatura(asignatura, codigo, descripcion, sct);
     }
 
     /**
@@ -75,8 +76,8 @@ public class AsignaturaService {
      * @param descripcion la nueva descripción de la asignatura.
      * @param asignatura_id el ID de la asignatura a actualizar.
      */
-    public void updateAsignatura(String asignatura, String codigo, String descripcion, int asignatura_id) {
-        asignaturaRepository.updateAsignatura(asignatura, codigo, descripcion, asignatura_id);
+    public void updateAsignatura(int asignatura_id, String asignatura, String codigo, String descripcion, int sct) {
+        asignaturaRepository.updateAsignatura(asignatura_id, asignatura, codigo, descripcion, sct);
     }
 
     /**

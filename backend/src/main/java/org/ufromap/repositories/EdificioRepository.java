@@ -43,23 +43,32 @@ public class EdificioRepository {
     public List<Edificio> getEdificios() {
         List<Edificio> edificios = new ArrayList<>();
         String query = "SELECT * FROM edificio";
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
 
+            System.out.println("Query: " + query);
+
             while (resultSet.next()) {
+                System.out.println("result:" + resultSet);
                 int id = resultSet.getInt("edificio_id");
-                String nombre = resultSet.getString("edificio");
-                String alias = resultSet.getString("alias");
-                String tipo = resultSet.getString("tipo");
+                String nombre = resultSet.getString("nombre_edificio");
+                String alias = resultSet.getString("alias_edificio");
+                String tipo = resultSet.getString("tipo_edificio");
                 float latitud = resultSet.getFloat("latitud");
                 float longitud = resultSet.getFloat("longitud");
-                List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                edificios.add(new Edificio(id, nombre, alias, latitud, longitud, tipo, salas));
+                System.out.println("id: " + id);
+                System.out.println("nombre: " + nombre);
+                System.out.println("alias: " + alias);
+                System.out.println("tipo: " + tipo);
+                System.out.println("latitud: " + latitud);
+                System.out.println("longitud: " + longitud);
+
+                edificios.add(new Edificio(id, nombre, alias, tipo, latitud, longitud, new ArrayList<>()));
             }
 
         } catch (SQLException e) {
-            // Manejar la excepción adecuadamente
+            System.out.println("Error: " + e.getMessage());
         }
         return edificios;
     }
@@ -84,7 +93,7 @@ public class EdificioRepository {
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
                     List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud, salas);
                 }
             }
         } catch (SQLException e) {
@@ -113,7 +122,7 @@ public class EdificioRepository {
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
                     List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud, salas);
                 }
             }
         } catch (SQLException e) {
@@ -142,7 +151,7 @@ public class EdificioRepository {
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
                     List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud, salas);
                 }
             }
         } catch (SQLException e) {
@@ -171,7 +180,7 @@ public class EdificioRepository {
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
                     List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud, salas);
                 }
             }
         } catch (SQLException e) {

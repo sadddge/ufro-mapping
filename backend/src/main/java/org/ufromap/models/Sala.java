@@ -21,7 +21,7 @@ public class Sala {
      * @param edificio El edificio al que pertenece la sala.
      * @param clases   La lista de clases que se imparten en la sala.
      */
-    public Sala(int id, String nombre, int edificio, List<Clase> clases) {
+    public Sala(int id, int edificio, String nombre,  List<Clase> clases) {
         this.id = id;
         this.nombre = nombre;
         this.edificioId = edificio;
