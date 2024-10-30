@@ -19,11 +19,5 @@ public class AsignaturaController {
         this.asignaturaService = asignaturaService;
     }
 
-    /**
-     * Registra una nueva asignatura utilizando el servicio de Asignatura.
-     * @param asignatura el objeto Asignatura que se desea registrar.
-     */
-    public void registrarAsignatura(Asignatura asignatura) {
-        asignaturaService.registrarAsignatura(asignatura);
-    }
+
 }
