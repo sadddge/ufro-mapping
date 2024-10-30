@@ -10,12 +10,13 @@ import java.util.Map;
 
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Edificio;
+import org.ufromap.models.Sala;
 
 /**
  * Repositorio para manejar las operaciones relacionadas con la entidad {@link Edificio}.
  * Provee métodos para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre la tabla 'edificio'.
  */
-public class EdificioRepository implements IRepository {
+public class EdificioRepository implements IRepository<Edificio> {
 
     private final SalaRepository salaRepository;
 
@@ -49,7 +50,7 @@ public class EdificioRepository implements IRepository {
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                edificios.add((Edificio) mapToObject(resultSet));
+                edificios.add(mapToObject(resultSet));
             }
 
         } catch (SQLException e) {
@@ -73,7 +74,7 @@ public class EdificioRepository implements IRepository {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    edificio = (Edificio) mapToObject(resultSet);
+                    edificio = mapToObject(resultSet);
                 }
             }
         } catch (SQLException e) {
@@ -111,7 +112,7 @@ public class EdificioRepository implements IRepository {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    edificios.add((Edificio) mapToObject(resultSet));
+                    edificios.add(mapToObject(resultSet));
                 }
             }
         } catch (SQLException e) {
@@ -127,19 +128,21 @@ public class EdificioRepository implements IRepository {
      * @param obj El objeto {@link Edificio} con los datos del nuevo edificio.
      */
     @Override
-    public void add(Object obj) {
+    public Edificio add(Edificio obj) {
         String query = "INSERT INTO edificio (nombre_edificio, alias_edificio, tipo_edificio, latitud, longitud) VALUES (?, ?, ?, ?, ?)";
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            Edificio edificio = (Edificio) obj;
-            statement.setString(1, edificio.getNombre());
-            statement.setString(2, edificio.getAlias());
-            statement.setString(3, edificio.getTipo());
-            statement.setFloat(4, edificio.getLatitud());
-            statement.setFloat(5, edificio.getLongitud());
+            statement.setString(1, obj.getNombre());
+            statement.setString(2, obj.getAlias());
+            statement.setString(3, obj.getTipo());
+            statement.setFloat(4, obj.getLatitud());
+            statement.setFloat(5, obj.getLongitud());
             statement.executeUpdate();
+            obj.setId(DatabaseConnection.getLastInsertId());
+            return obj;
         } catch (SQLException e) {
             // Manejar la excepción adecuadamente
+            return null;
         }
     }
 
@@ -149,20 +152,21 @@ public class EdificioRepository implements IRepository {
      * @param obj El objeto {@link Edificio} con los datos actualizados del edificio.
      */
     @Override
-    public void update(Object obj) {
+        public Edificio update(Edificio obj) {
         String query = "UPDATE edificio SET nombre_edificio = ?, alias_edificio = ?, tipo_edificio = ?, latitud = ?, longitud = ? WHERE edificio_id = ?";
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            Edificio edificio = (Edificio) obj;
-            statement.setString(1, edificio.getNombre());
-            statement.setString(2, edificio.getAlias());
-            statement.setString(3, edificio.getTipo());
-            statement.setFloat(4, edificio.getLatitud());
-            statement.setFloat(5, edificio.getLongitud());
-            statement.setInt(6, edificio.getId());
+            statement.setString(1, obj.getNombre());
+            statement.setString(2, obj.getAlias());
+            statement.setString(3, obj.getTipo());
+            statement.setFloat(4, obj.getLatitud());
+            statement.setFloat(5, obj.getLongitud());
+            statement.setInt(6, obj.getId());
             statement.executeUpdate();
+            return obj;
         } catch (SQLException e) {
             // Manejar la excepción adecuadamente
+            return null;
         }
     }
 
@@ -172,14 +176,16 @@ public class EdificioRepository implements IRepository {
      * @param id El ID del edificio a eliminar.
      */
     @Override
-    public void delete(int id) {
+    public boolean delete(int id) {
         String query = "DELETE FROM edificio WHERE edificio_id = ?";
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             statement.executeUpdate();
+            return true;
         } catch (SQLException e) {
             // Manejar la excepción adecuadamente
+            return false;
         }
     }
 
@@ -190,7 +196,7 @@ public class EdificioRepository implements IRepository {
      * @return Un objeto {@link Edificio} con los datos mapeados.
      */
     @Override
-    public Object mapToObject(ResultSet resultSet) {
+    public Edificio mapToObject(ResultSet resultSet) {
         try {
             int id = resultSet.getInt("edificio_id");
             String nombre = resultSet.getString("nombre_edificio");
@@ -198,8 +204,9 @@ public class EdificioRepository implements IRepository {
             String tipo = resultSet.getString("tipo_edificio");
             float latitud = resultSet.getFloat("latitud");
             float longitud = resultSet.getFloat("longitud");
+            List<Sala> salas = salaRepository.findByEdificioId(id);
 
-            return new Edificio(id, nombre, alias, tipo, latitud, longitud, new ArrayList<>());
+            return new Edificio(id, nombre, alias, tipo, latitud, longitud, salas);
         } catch (SQLException e) {
             // Manejar la excepción adecuadamente
             return null;

@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Clase;
@@ -14,236 +14,228 @@ import org.ufromap.models.Clase;
  * Clase que implementa los métodos para gestionar la entidad Clase en la base de datos.
  * Provee funciones para obtener, agregar, actualizar y eliminar clases.
  */
-public class ClaseRepository {
-    
+public class ClaseRepository implements IRepository<Clase> {
+
     /**
-     * Obtiene todas las clases de la base de datos.
-     * 
-     * @return Una lista de objetos {@link Clase}, cada uno representando una fila en la tabla de clases.
+     * Obtiene todas las clases registradas en la base de datos.
+     * @return Una lista de objetos Clase que contiene los detalles de cada clase.
      */
-    public List<Clase> getClases(){
+    @Override
+    public List<Clase> findAll() {
         List<Clase> clases = new ArrayList<>();
-        String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase";
+        String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase";
         Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
 
-        try(PreparedStatement stmt= connection.prepareStatement(query);
-            ResultSet resultSet= stmt.executeQuery()){
-            while(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
-                int salaId = resultSet.getInt("sala_id");
-                int edificioId = resultSet.getInt("edificio_id");
-                int asignaturaId = resultSet.getInt("asignatura_id");
-                int diaSemana = resultSet.getInt("dia_semana");
-                int periodo = resultSet.getInt("periodo_clase");
-                String docente = resultSet.getString("docente_nombre");
-                int modulo = resultSet.getInt("modulo");
-
-                clases.add(new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo));
+            while (resultSet.next()) {
+                Clase clase = mapToObject(resultSet);
+                clases.add(clase);
             }
-        }catch(SQLException e){ }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
         return clases;
     }
 
     /**
-     * Obtiene una clase específica de la base de datos por su ID.
-     * 
-     * @param id El ID de la clase que se quiere obtener.
-     * @return Un objeto {@link Clase} si se encuentra, o {@code null} si no existe.
+     * Obtiene una clase específica por su ID.
+     * @param id El ID de la clase a buscar.
+     * @return El objeto Clase correspondiente al ID proporcionado, o null si no se encuentra.
      */
-    public Optional<Clase> getClaseById(int id){
-        Optional<Clase> clase = Optional.empty();
-        String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE clase_id=?";
+    @Override
+    public Clase findById(int id) {
+        Clase clase = null;
+        String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE clase_id = ?";
         Connection connection = DatabaseConnection.getConnection();
-
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, id);
-            ResultSet resultSet= stmt.executeQuery();
-
-            if(resultSet.next()){
-                int salaId = resultSet.getInt("sala_id");
-                int edificioId = resultSet.getInt("edificio_id");
-                int asignaturaId = resultSet.getInt("asignatura_id");
-                int diaSemana = resultSet.getInt("dia_semana");
-                int periodo = resultSet.getInt("periodo_clase");
-                String docente = resultSet.getString("docente_nombre");
-                int modulo = resultSet.getInt("modulo");
-
-                clase = Optional.of(new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo));
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    clase = mapToObject(resultSet);
+                }
             }
-        }catch(SQLException e){ }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return clase;
     }
 
     /**
-     * Obtiene todas las clases de una sala específica.
-     * 
-     * @param sala_id El ID de la sala.
-     * @return Una lista de objetos {@link Clase} que ocurren en la sala indicada.
+     * Obtiene una lista de clases filtradas por los parámetros proporcionados.
+     * @param filter Un mapa con los campos y valores a filtrar.
+     * @return Una lista de objetos Clase que cumplen con los criterios de filtrado.
      */
-    public List<Clase> getClasesBySalaId(int sala_id){
-        List<Clase> clase = new ArrayList<>();
-        String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE sala_id=?";
-        Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, sala_id);
-            ResultSet resultSet= stmt.executeQuery();
-
-            if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
-                int edificioId = resultSet.getInt("edificio_id");
-                int asignaturaId = resultSet.getInt("asignatura_id");
-                int diaSemana = resultSet.getInt("dia_semana");
-                int periodo = resultSet.getInt("periodo_clase");
-                String docente = resultSet.getString("docente_nombre");
-                int modulo = resultSet.getInt("modulo");
-
-                clase.add(new Clase(id, sala_id, edificioId, asignaturaId, diaSemana, periodo, docente, modulo));
-            }
-        }catch(SQLException e){ }
-        return clase;
-    }
-
-    /**
-     * Obtiene todas las clases que se dictan en un edificio específico.
-     * 
-     * @param edificio_id El ID del edificio.
-     * @return Una lista de objetos {@link Clase} que se dictan en el edificio indicado.
-     */
-    public List<Clase> getClasesByEdificioId(int edificio_id){
-
+    @Override
+    public List<Clase> findByFilter(Map<String, Object> filter) {
         List<Clase> clases = new ArrayList<>();
-        String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE edificio_id=?";
-        Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, edificio_id);
-            ResultSet resultSet= stmt.executeQuery();
-    
-            if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
-                int salaId = resultSet.getInt("sala_id");
-                int asignaturaId = resultSet.getInt("asignatura_id");
-                int diaSemana = resultSet.getInt("dia_semana");
-                int periodo = resultSet.getInt("periodo_clase");
-                String docente = resultSet.getString("docente_nombre");
-                int modulo = resultSet.getInt("modulo");
+        StringBuilder query = getQuery(filter);
 
-                clases.add(new Clase(id, salaId, edificio_id, asignaturaId, diaSemana, periodo, docente, modulo));
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
+            int index = 1;
+            if (filter.containsKey("sala_id")) statement.setInt(index++, (int) filter.get("sala_id"));
+            if (filter.containsKey("edificio_id")) statement.setInt(index++, (int) filter.get("edificio_id"));
+            if (filter.containsKey("asignatura_id")) statement.setInt(index++, (int) filter.get("asignatura_id"));
+            if (filter.containsKey("dia_semana")) statement.setString(index++, (String) filter.get("dia_semana"));
+            if (filter.containsKey("periodo_clase")) statement.setString(index++, (String) filter.get("periodo_clase"));
+            if (filter.containsKey("docente_nombre")) statement.setString(index++, (String) filter.get("docente_nombre"));
+            if (filter.containsKey("modulo")) statement.setString(index, (String) filter.get("modulo"));
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Clase clase = mapToObject(resultSet);
+                    clases.add(clase);
+                }
             }
-        }catch(SQLException e){ }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return clases;
     }
 
-     /**
-     * Obtiene todas las clases de una asignatura específica.
-     * 
-     * @param asignatura_id El ID de la asignatura.
-     * @return Una lista de objetos {@link Clase} correspondientes a la asignatura indicada.
-     */
-    public List<Clase> getClasesByAsignaturaId(int asignatura_id){
+    public List<Clase> findByAsignaturaId(int asignaturaId) {
         List<Clase> clases = new ArrayList<>();
-        String query= "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE asignatura_id=?";
+        String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE asignatura_id = ?";
         Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, asignatura_id);
-            ResultSet resultSet= stmt.executeQuery();
-    
-            if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
-                int salaId = resultSet.getInt("sala_id");
-                int edificioId = resultSet.getInt("edificio_id");
-                int diaSemana = resultSet.getInt("dia_semana");
-                int periodo = resultSet.getInt("periodo_clase");
-                String docente = resultSet.getString("docente_nombre");
-                int modulo = resultSet.getInt("modulo");
-
-                clases.add(new Clase(id, salaId, edificioId, asignatura_id, diaSemana, periodo, docente, modulo));
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, asignaturaId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Clase clase = mapToObject(resultSet);
+                    clases.add(clase);
+                }
             }
-        }catch(SQLException e){ }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return clases;
     }
 
-    /**
-     * Obtiene todas las clases que se dictan en un día específico.
-     * 
-     * @param diaSemana El día de la semana (por ejemplo, "Lunes").
-     * @return Una lista de objetos {@link Clase} que ocurren en el día indicado.
-     */
-    public List<Clase> getClasesByDiaSemana(int diaSemana){
+    public List<Clase> findBySalaId(int id) {
         List<Clase> clases = new ArrayList<>();
-        String query= "SELECT * FROM clase WHERE dia_semana=?";
+        String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE sala_id = ?";
         Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, diaSemana);
-            ResultSet resultSet= stmt.executeQuery();
-    
-            if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
-                int salaId = resultSet.getInt("sala_id");
-                int edificioId = resultSet.getInt("edificio_id");
-                int asignaturaId = resultSet.getInt("asignatura_id");
-                int periodo = resultSet.getInt("periodo_clase");
-                String docente = resultSet.getString("docente_nombre");
-                int modulo = resultSet.getInt("modulo");
-
-                clases.add(new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo));
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Clase clase = mapToObject(resultSet);
+                    clases.add(clase);
+                }
             }
-        }catch(SQLException e){ }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return clases;
+    }
+
+    private static StringBuilder getQuery(Map<String, Object> filter) {
+        StringBuilder query = new StringBuilder("SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE 1=1");
+
+        if (filter.containsKey("sala_id")) query.append(" AND sala_id = ?");
+        if (filter.containsKey("edificio_id")) query.append(" AND edificio_id = ?");
+        if (filter.containsKey("asignatura_id")) query.append(" AND asignatura_id = ?");
+        if (filter.containsKey("dia_semana")) query.append(" AND dia_semana = ?");
+        if (filter.containsKey("periodo_clase")) query.append(" AND periodo_clase = ?");
+        if (filter.containsKey("docente_nombre")) query.append(" AND docente_nombre = ?");
+        if (filter.containsKey("modulo")) query.append(" AND modulo = ?");
+        return query;
     }
 
     /**
      * Agrega una nueva clase a la base de datos.
-     * 
-     * @param clase El objeto {@link Clase} que se quiere agregar.
+     * @param obj El objeto Clase con los datos de la nueva clase.
      */
-    public void addClase(Clase clase){
-        String query= "INSERT INTO clase(sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo) VALUES(?,?,?,?,?,?,?)";
+    @Override
+    public Clase add(Clase obj) {
+        String query = "INSERT INTO clase (sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, clase.getSalaId());
-            stmt.setInt(2, clase.getEdificioId());
-            stmt.setInt(3, clase.getAsignaturaId());
-            stmt.setInt(4, clase.getDiaSemana());
-            stmt.setInt(5, clase.getPeriodo());
-            stmt.setString(6, clase.getDocente());
-            stmt.setInt(7, clase.getModulo());
-            stmt.executeUpdate();
-        }catch(SQLException e){ }
-    }
-
-     /**
-     * Actualiza una clase existente en la base de datos.
-     * 
-     * @param clase El objeto {@link Clase} con la información actualizada.
-     */
-    public void updateClase(Clase clase){
-        String query= "UPDATE clase SET sala_id=?, edificio_id=?, asignatura_id=?, dia_semana=?, periodo_clase=?, docente_nombre=?, modulo=? WHERE clase_id=?";
-        Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, clase.getSalaId());
-            stmt.setInt(2, clase.getEdificioId());
-            stmt.setInt(3, clase.getAsignaturaId());
-            stmt.setInt(4, clase.getDiaSemana());
-            stmt.setInt(5, clase.getPeriodo());
-            stmt.setString(6, clase.getDocente());
-            stmt.setInt(7, clase.getModulo());
-            stmt.setInt(8, clase.getId());
-            stmt.executeUpdate();
-        }catch(SQLException e){ }
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, obj.getSalaId());
+            statement.setInt(2, obj.getEdificioId());
+            statement.setInt(3, obj.getAsignaturaId());
+            statement.setInt(4, obj.getDiaSemana());
+            statement.setInt(5, obj.getPeriodo());
+            statement.setString(6, obj.getDocente());
+            statement.setInt(7, obj.getModulo());
+            statement.executeUpdate();
+            obj.setId(DatabaseConnection.getLastInsertId());
+            return obj;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
-    * Borra una clase existente de la base de datos.
-    * 
-    * @param id El ID de la clase que se quiere borrar.
-    */
-    public void deleteClase(int id){
-        String query= "DELETE FROM clase WHERE clase_id=?";
+     * Actualiza los datos de una clase existente.
+     * @param obj El objeto Clase con los datos actualizados.
+     */
+    @Override
+    public Clase update(Clase obj) {
+        String query = "UPDATE clase SET sala_id = ?, edificio_id = ?, asignatura_id = ?, dia_semana = ?, periodo_clase = ?, docente_nombre = ?, modulo = ? WHERE clase_id = ?";
         Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setInt(1, id);
-            stmt.executeUpdate();
-        }catch(SQLException e){ }
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, obj.getSalaId());
+            statement.setInt(2, obj.getEdificioId());
+            statement.setInt(3, obj.getAsignaturaId());
+            statement.setInt(4, obj.getDiaSemana());
+            statement.setInt(5, obj.getPeriodo());
+            statement.setString(6, obj.getDocente());
+            statement.setInt(7, obj.getModulo());
+            statement.setInt(8, obj.getId());
+            statement.executeUpdate();
+            return obj;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+
+    /**
+     * Elimina una clase de la base de datos por su ID.
+     * @param id El ID de la clase a eliminar.
+     */
+    @Override
+    public boolean delete(int id) {
+        String query = "DELETE FROM clase WHERE clase_id = ?";
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Mapea un ResultSet a un objeto Clase.
+     * @param resultSet El ResultSet que contiene los datos de la clase.
+     * @return Un objeto Clase con los datos obtenidos del ResultSet.
+     */
+    @Override
+    public Clase mapToObject(ResultSet resultSet) {
+        try {
+            int id = resultSet.getInt("clase_id");
+            int salaId = resultSet.getInt("sala_id");
+            int edificioId = resultSet.getInt("edificio_id");
+            int asignaturaId = resultSet.getInt("asignatura_id");
+            int diaSemana = resultSet.getInt("dia_semana");
+            int periodo = resultSet.getInt("periodo_clase");
+            String docente = resultSet.getString("docente_nombre");
+            int modulo = resultSet.getInt("modulo");
+            return new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }

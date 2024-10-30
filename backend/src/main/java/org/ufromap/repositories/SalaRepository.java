@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Clase;
@@ -16,7 +17,7 @@ import org.ufromap.models.Sala;
  * Repositorio que gestiona las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para la entidad {@link Sala}.
  * Se conecta a la base de datos y ejecuta consultas SQL para manipular los datos de la tabla "sala".
  */
-public class SalaRepository {
+public class SalaRepository implements IRepository<Sala> {
 
     private final ClaseRepository claseRepository;
 
@@ -39,189 +40,183 @@ public class SalaRepository {
     }
 
     /**
-     * Obtiene todas las salas almacenadas en la base de datos.
+     * Obtiene todas las salas registradas en la base de datos.
      *
-     * @return Una lista de salas.
-     * @throws SQLException Si ocurre un error durante la consulta a la base de datos.
+     * @return Una lista de objetos {@link Sala} que contiene los detalles de cada sala.
      */
-    public List<Sala> getSalas() throws SQLException {
+    @Override
+    public List<Sala> findAll() {
         List<Sala> salas = new ArrayList<>();
-        String query = "SELECT * FROM sala";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
+        String query = "SELECT sala_id, edificio_id, nombre_sala FROM sala";
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("sala_id");
-                String nombre = resultSet.getString("sala");
-                int edificio_id = resultSet.getInt("edificio_id");
-                List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                Sala sala = new Sala(id, edificio_id, nombre, clases);
+                Sala sala = mapToObject(resultSet);
                 salas.add(sala);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
         return salas;
     }
 
     /**
-     * Obtiene una sala por su ID.
+     * Obtiene una sala específica por su ID.
      *
-     * @param id El identificador de la sala.
-     * @return La sala correspondiente al ID proporcionado, o null si no existe.
-     * @throws SQLException Si ocurre un error durante la consulta a la base de datos.
+     * @param id El ID de la sala a buscar.
+     * @return El objeto {@link Sala} correspondiente al ID proporcionado, o {@code null} si no se encuentra.
      */
-    public Sala getSalaById(int id) throws SQLException {
+    @Override
+    public Sala findById(int id) {
         Sala sala = null;
-        String query = "SELECT * FROM sala WHERE sala_id = ?";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setLong(1, id);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+        String query = "SELECT sala_id, edificio_id, nombre_sala  FROM sala WHERE sala_id = ?";
+        Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    String nombre = resultSet.getString("sala");
-                    int edificio_id = resultSet.getInt("edificio_id");
-                    List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                    sala = new Sala(id, edificio_id, nombre, clases);
+                    sala = mapToObject(resultSet);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
         }
-
         return sala;
     }
 
-    /**
-     * Obtiene todas las salas que pertenecen a un edificio específico por el ID del edificio.
-     *
-     * @param id El identificador del edificio.
-     * @return Una lista de salas asociadas al edificio.
-     * @throws SQLException Si ocurre un error durante la consulta a la base de datos.
-     */
-    public List<Sala> getSalasByEdificioId(int id) throws SQLException {
+    public List<Sala> findByEdificioId(int edificioId) {
         List<Sala> salas = new ArrayList<>();
-        String query = "SELECT * FROM sala WHERE edificio_id = ?";
+        String query = "SELECT sala_id, edificio_id, nombre_sala FROM sala WHERE edificio_id = ?";
         Connection connection = DatabaseConnection.getConnection();
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setLong(1, id);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, edificioId);
+            try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    int salaId = resultSet.getInt("sala_id");
-                    String nombre = resultSet.getString("nombre_sala");
-                    List<Clase> clases = claseRepository.getClasesBySalaId(salaId);
-                    Sala sala = new Sala(salaId, id, nombre, clases);
+                    Sala sala = mapToObject(resultSet);
                     salas.add(sala);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
         }
-
         return salas;
     }
 
     /**
-     * Obtiene una sala por su nombre.
+     * Obtiene una lista de salas filtradas por los parámetros proporcionados.
      *
-     * @param nombre El nombre de la sala.
-     * @return La sala con el nombre especificado, o null si no existe.
-     * @throws SQLException Si ocurre un error durante la consulta a la base de datos.
+     * @param filters Un mapa con los nombres de las columnas y los valores a filtrar.
+     * @return Una lista de objetos {@link Sala} que coinciden con los parámetros de búsqueda.
      */
-    public Sala getSalaByNombre(String nombre) throws SQLException {
-        Sala sala = null;
-        String query = "SELECT * FROM sala WHERE sala = ?";
+    @Override
+    public List<Sala> findByFilter(Map<String, Object> filters) {
+        List<Sala> salas = new ArrayList<>();
+        StringBuilder query = new StringBuilder("SELECT sala_id, edificio_id, nombre_sala FROM sala WHERE 1=1");
+
+        if (filters.containsKey("nombre")) query.append(" AND nombre_sala = ?");
+        if (filters.containsKey("edificioId")) query.append(" AND edificio_id = ?");
+
+
         Connection connection = DatabaseConnection.getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(query.toString())) {
+            int index = 1;
+            if (filters.containsKey("nombre")) statement.setString(index++, (String) filters.get("nombre"));
+            if (filters.containsKey("edificioId")) statement.setInt(index, (int) filters.get("edificioId"));
 
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setString(1, nombre);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    int id = resultSet.getInt("sala_id");
-                    int edificio_id = resultSet.getInt("edificio_id");
-                    List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                    sala = new Sala(id, edificio_id, nombre, clases);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Sala sala = (Sala) mapToObject(resultSet);
+                    salas.add(sala);
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
         }
-
-        return sala;
+        return salas;
     }
 
     /**
      * Agrega una nueva sala a la base de datos.
      *
-     * @param sala La sala que se desea agregar.
-     * @return true si la operación fue exitosa, false en caso contrario.
-     * @throws SQLException Si ocurre un error durante la inserción en la base de datos.
+     * @param obj El objeto {@link Sala} con los datos de la nueva sala.
      */
-    public boolean addSala(Sala sala) throws SQLException {
-        String query = "INSERT INTO sala (edificio_id, sala) VALUES (?, ?)";
+    @Override
+    public Sala add(Sala obj) {
+        String query = "INSERT INTO sala (edificio_id, nombre_sala) VALUES (?, ?)";
         Connection connection = DatabaseConnection.getConnection();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setInt(1, sala.getEdificioId());
-            preparedStatement.setString(2, sala.getNombre());
-            preparedStatement.executeUpdate();
-            return true;
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, obj.getEdificioId());
+            statement.setString(2, obj.getNombre());
+            statement.executeUpdate();
+            obj.setId(DatabaseConnection.getLastInsertId());
+            return obj;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+            return null;
         }
-        return false;
     }
 
     /**
-     * Actualiza una sala existente en la base de datos.
+     * Actualiza los datos de una sala existente.
      *
-     * @param sala La sala que se desea actualizar.
-     * @return true si la operación fue exitosa, false en caso contrario.
-     * @throws SQLException Si ocurre un error durante la actualización en la base de datos.
+     * @param obj El objeto {@link Sala} con los datos actualizados.
      */
-    public boolean updateSala(Sala sala) throws SQLException {
-        String query = "UPDATE sala SET sala = ? WHERE sala_id = ?";
+    @Override
+    public Sala update(Sala obj) {
+        String query = "UPDATE sala SET edificio_id = ?, nombre_sala = ? WHERE sala_id = ?";
         Connection connection = DatabaseConnection.getConnection();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setString(1, sala.getNombre());
-            preparedStatement.setLong(2, sala.getEdificioId());
-            preparedStatement.executeUpdate();
-            return true;
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, obj.getEdificioId());
+            statement.setString(2, obj.getNombre());
+            statement.setInt(3, obj.getId());
+            statement.executeUpdate();
+            return obj;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+            return null;
         }
-        return false;
     }
 
     /**
      * Elimina una sala de la base de datos por su ID.
      *
-     * @param id El identificador de la sala que se desea eliminar.
-     * @return true si la operación fue exitosa, false en caso contrario.
-     * @throws SQLException Si ocurre un error durante la eliminación en la base de datos.
+     * @param id El ID de la sala a eliminar.
      */
-    public boolean deleteSala(long id) throws SQLException {
+    @Override
+    public boolean delete(int id) {
         String query = "DELETE FROM sala WHERE sala_id = ?";
         Connection connection = DatabaseConnection.getConnection();
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-
-            preparedStatement.setLong(1, id);
-            preparedStatement.executeUpdate();
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+            return false;
         }
-        return false;
+    }
+
+    /**
+     * Mapea una fila de la tabla "sala" en la base de datos a un objeto {@link Sala}.
+     *
+     * @param resultSet El conjunto de resultados de una consulta SQL.
+     * @return Un objeto {@link Sala} con los datos de la fila proporcionada.
+     */
+    @Override
+    public Sala mapToObject(ResultSet resultSet) {
+        try {
+            int id = resultSet.getInt("sala_id");
+            int edificioId = resultSet.getInt("edificio_id");
+            String nombre = resultSet.getString("nombre_sala");
+            List<Clase> clases = claseRepository.findBySalaId(id);
+
+            return new Sala(id, edificioId, nombre, clases);
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+            return null;
+        }
     }
 }
