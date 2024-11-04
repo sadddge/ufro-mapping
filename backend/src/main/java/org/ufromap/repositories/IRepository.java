@@ -1,7 +1,5 @@
 package org.ufromap.repositories;
 
-import org.ufromap.models.Edificio;
-
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;

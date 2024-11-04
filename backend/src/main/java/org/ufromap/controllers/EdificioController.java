@@ -149,9 +149,10 @@ public class EdificioController extends BaseController {
         String nombre = jsonObject.optString("nombre_edificio", null);
         String alias = jsonObject.optString("alias_edificio", null);
         String tipo = jsonObject.optString("tipo_edifico", null);
-        float latitud = jsonObject.optFloat("latitud", 0.0f);
-        float longitud = jsonObject.optFloat("longitud", 0.0f);
-
+        Float latitud = jsonObject.optFloat("latitud", 0.0f);
+        Float longitud = jsonObject.optFloat("longitud", 0.0f);
+        if (longitud == 0.0f) latitud = null;
+        if (longitud == 0.0f) longitud = null;
         return new Edificio(id, nombre, alias, tipo, latitud, longitud, null);
     }
 }
