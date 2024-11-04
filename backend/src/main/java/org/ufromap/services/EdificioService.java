@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ufromap.exceptions.BadRequestException;
+import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Edificio;
 import org.ufromap.repositories.EdificioRepository;
-import org.ufromap.repositories.SalaRepository;
 
 /**
  * Servicio que maneja la lógica de negocio para la entidad {@link Edificio}.
@@ -16,14 +17,15 @@ import org.ufromap.repositories.SalaRepository;
  */
 public class EdificioService {
 
-    private EdificioRepository edificioRepository;
-    private SalaRepository salaRepository;
+    private final EdificioRepository edificioRepository;
+    private final SalaService salaService;
 
     /**
      * Constructor por defecto que inicializa el repositorio de edificios.
      */
     public EdificioService() {
         this.edificioRepository = new EdificioRepository();
+        this.salaService = new SalaService();
     }
 
     /**
@@ -31,8 +33,9 @@ public class EdificioService {
      *
      * @param edificioRepository El repositorio de edificios a utilizar.
      */
-    public EdificioService(EdificioRepository edificioRepository) {
+    public EdificioService(EdificioRepository edificioRepository, SalaService salaService) {
         this.edificioRepository = edificioRepository;
+        this.salaService = salaService;
     }
 
     /**
@@ -51,7 +54,11 @@ public class EdificioService {
      * @return El objeto {@link Edificio} correspondiente al ID proporcionado, o {@code null} si no se encuentra.
      */
     public Edificio findById(int id) {
-        return edificioRepository.findById(id);
+        Edificio edificio = edificioRepository.findById(id);
+        if (edificio == null) {
+            throw new EntityNotFoundException("No se encontró un edificio con el ID proporcionado.");
+        }
+        return edificio;
     }
 
 
@@ -72,7 +79,11 @@ public class EdificioService {
         if (tipo != null) filters.put("tipo", tipo);
         if (latitud != null) filters.put("latitud", latitud);
         if (longitud != null) filters.put("longitud", longitud);
-        return edificioRepository.findByFilter(filters);
+        List<Edificio> edificios = edificioRepository.findByFilter(filters);
+        if (edificios.isEmpty()) {
+            throw new EntityNotFoundException("No se encontraron edificios con los filtros proporcionados.");
+        }
+        return edificios;
     }
 
 
@@ -82,6 +93,7 @@ public class EdificioService {
      * @param edificio El objeto {@link Edificio} con los datos del nuevo edificio.
      */
     public Edificio add(Edificio edificio) {
+        validateEdificio(edificio);
          return edificioRepository.add(edificio);
     }
 
@@ -91,6 +103,8 @@ public class EdificioService {
      * @param edificio El objeto {@link Edificio} con los datos actualizados.
      */
     public Edificio update(Edificio edificio) {
+        validateEdificio(edificio);
+        edificio = updateEdificio(edificio);
         return edificioRepository.update(edificio);
     }
 
@@ -100,7 +114,29 @@ public class EdificioService {
      * @param id El ID del edificio a eliminar.
      */
     public boolean delete(int id) {
+        findById(id);
+        salaService.deleteByEdificioId(id);
         return edificioRepository.delete(id);
     }
-    
+
+
+
+    private void validateEdificio(Edificio edificio) {
+        if (edificio.getNombre() == null || edificio.getNombre().isEmpty()) {
+            throw new BadRequestException("El nombre del edificio es obligatorio.");
+        }
+        if (edificio.getLatitud() == null) {
+            throw new BadRequestException("La latitud del edificio es obligatoria.");
+        }
+        if (edificio.getLongitud() == null) {
+            throw new BadRequestException("La longitud del edificio es obligatoria.");
+        }
+    }
+
+    private Edificio updateEdificio(Edificio edificio) {
+        Edificio edificioExistente = findById(edificio.getId());
+        String alias = edificio.getAlias() == null ? edificioExistente.getAlias() : edificio.getAlias();
+        String tipo = edificio.getTipo() == null ? edificioExistente.getTipo() : edificio.getTipo();
+        return new Edificio(edificio.getId(), edificio.getNombre(), alias, tipo, edificio.getLatitud(), edificio.getLongitud(), edificio.getSalas());
+    }
 }

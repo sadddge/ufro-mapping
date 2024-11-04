@@ -11,8 +11,8 @@ public class Edificio {
     private String nombre;
     private String alias;
     private String tipo;
-    private float latitud;
-    private float longitud;
+    private Float latitud;
+    private Float longitud;
     private List<Sala> salas;
 
     /**
@@ -26,7 +26,7 @@ public class Edificio {
      * @param tipo El tipo de edificio (por ejemplo, "académico", "administrativo").
      * @param salas Una lista de objetos {@link Sala} que pertenecen al edificio.
      */
-    public Edificio(int id, String nombre, String alias, String tipo, float latitud, float longitud, List<Sala> salas) {
+    public Edificio(int id, String nombre, String alias, String tipo, Float latitud, Float longitud, List<Sala> salas) {
         this.id = id;
         this.nombre = nombre;
         this.alias = alias;
@@ -95,7 +95,7 @@ public class Edificio {
      * 
      * @return La latitud del edificio.
      */
-    public float getLatitud() {
+    public Float getLatitud() {
         return latitud;
     }
 
@@ -104,7 +104,7 @@ public class Edificio {
      * 
      * @param latitud La nueva latitud del edificio.
      */
-    public void setLatitud(float latitud) {
+    public void setLatitud(Float latitud) {
         this.latitud = latitud;
     }
 
@@ -113,7 +113,7 @@ public class Edificio {
      * 
      * @return La longitud del edificio.
      */
-    public float getLongitud() {
+    public Float getLongitud() {
         return longitud;
     }
 
@@ -122,7 +122,7 @@ public class Edificio {
      * 
      * @param longitud La nueva longitud del edificio.
      */
-    public void setLongitud(float longitud) {
+    public void setLongitud(Float longitud) {
         this.longitud = longitud;
     }
 

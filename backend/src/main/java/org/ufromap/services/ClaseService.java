@@ -23,6 +23,9 @@ public class ClaseService {
         this.claseRepository = claseRepository;
     }
 
+    public ClaseService() {
+        this.claseRepository = new ClaseRepository();
+    }
     /**
      * Método que devuelve todas las clases almacenadas en la base de datos.
      *

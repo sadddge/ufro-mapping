@@ -27,14 +27,11 @@ public class ClaseRepository implements IRepository<Clase> {
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
-
             while (resultSet.next()) {
                 Clase clase = mapToObject(resultSet);
                 clases.add(clase);
             }
-
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
         return clases;
@@ -58,7 +55,8 @@ public class ClaseRepository implements IRepository<Clase> {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+            return null;
         }
         return clase;
     }
@@ -92,35 +90,27 @@ public class ClaseRepository implements IRepository<Clase> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
         return clases;
     }
 
     public List<Clase> findByAsignaturaId(int asignaturaId) {
-        List<Clase> clases = new ArrayList<>();
         String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE asignatura_id = ?";
-        Connection connection = DatabaseConnection.getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, asignaturaId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Clase clase = mapToObject(resultSet);
-                    clases.add(clase);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return clases;
+        return findByParameter(query, asignaturaId);
     }
 
     public List<Clase> findBySalaId(int id) {
-        List<Clase> clases = new ArrayList<>();
         String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE sala_id = ?";
+        return findByParameter(query, id);
+    }
+
+    private List<Clase> findByParameter(String query, int param) {
+        List<Clase> clases = new ArrayList<>();
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
+
+            statement.setInt(1, param);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
                     Clase clase = mapToObject(resultSet);
@@ -128,7 +118,8 @@ public class ClaseRepository implements IRepository<Clase> {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Error: " + e.getMessage());
+            return null;
         }
         return clases;
     }
@@ -155,18 +146,11 @@ public class ClaseRepository implements IRepository<Clase> {
         String query = "INSERT INTO clase (sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, obj.getSalaId());
-            statement.setInt(2, obj.getEdificioId());
-            statement.setInt(3, obj.getAsignaturaId());
-            statement.setInt(4, obj.getDiaSemana());
-            statement.setInt(5, obj.getPeriodo());
-            statement.setString(6, obj.getDocente());
-            statement.setInt(7, obj.getModulo());
+            setClaseParameters(statement, obj);
             statement.executeUpdate();
             obj.setId(DatabaseConnection.getLastInsertId());
             return obj;
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -180,18 +164,11 @@ public class ClaseRepository implements IRepository<Clase> {
         String query = "UPDATE clase SET sala_id = ?, edificio_id = ?, asignatura_id = ?, dia_semana = ?, periodo_clase = ?, docente_nombre = ?, modulo = ? WHERE clase_id = ?";
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, obj.getSalaId());
-            statement.setInt(2, obj.getEdificioId());
-            statement.setInt(3, obj.getAsignaturaId());
-            statement.setInt(4, obj.getDiaSemana());
-            statement.setInt(5, obj.getPeriodo());
-            statement.setString(6, obj.getDocente());
-            statement.setInt(7, obj.getModulo());
+            setClaseParameters(statement, obj);
             statement.setInt(8, obj.getId());
             statement.executeUpdate();
             return obj;
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -209,9 +186,18 @@ public class ClaseRepository implements IRepository<Clase> {
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
             return false;
         }
+    }
+
+    private void setClaseParameters(PreparedStatement statement, Clase obj) throws SQLException {
+        statement.setInt(1, obj.getSalaId());
+        statement.setInt(2, obj.getEdificioId());
+        statement.setInt(3, obj.getAsignaturaId());
+        statement.setInt(4, obj.getDiaSemana());
+        statement.setInt(5, obj.getPeriodo());
+        statement.setString(6, obj.getDocente());
+        statement.setInt(7, obj.getModulo());
     }
 
     /**
@@ -232,7 +218,6 @@ public class ClaseRepository implements IRepository<Clase> {
             int modulo = resultSet.getInt("modulo");
             return new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo);
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }

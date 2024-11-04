@@ -7,9 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Asignatura;
 import org.ufromap.models.Clase;
@@ -56,7 +54,6 @@ public class AsignaturaRepository implements IRepository<Asignatura> {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
         return asignaturas;
@@ -80,7 +77,7 @@ public class AsignaturaRepository implements IRepository<Asignatura> {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
         return asignatura;
     }
@@ -97,7 +94,6 @@ public class AsignaturaRepository implements IRepository<Asignatura> {
                 asignaturas.add(mapToObject(resultSet));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
         return asignaturas;
@@ -127,7 +123,6 @@ public class AsignaturaRepository implements IRepository<Asignatura> {
             obj.setId(DatabaseConnection.getLastInsertId());
             return obj;
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -145,7 +140,6 @@ public class AsignaturaRepository implements IRepository<Asignatura> {
             statement.executeUpdate();
             return obj;
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -159,7 +153,6 @@ public class AsignaturaRepository implements IRepository<Asignatura> {
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            e.printStackTrace();
             return false;
         }
     }
@@ -175,7 +168,6 @@ public class AsignaturaRepository implements IRepository<Asignatura> {
             List<Clase> clases = clasesRepository.findByAsignaturaId(id);
             return new Asignatura(id, nombre, codigo, descripcion, sct, clases);
         } catch (SQLException e) {
-            e.printStackTrace();
             return null;
         }
     }
