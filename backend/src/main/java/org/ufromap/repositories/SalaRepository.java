@@ -10,7 +10,6 @@ import java.util.Map;
 
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Clase;
-import org.ufromap.models.Edificio;
 import org.ufromap.models.Sala;
 
 /**
@@ -128,7 +127,7 @@ public class SalaRepository implements IRepository<Sala> {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    Sala sala = (Sala) mapToObject(resultSet);
+                    Sala sala = mapToObject(resultSet);
                     salas.add(sala);
                 }
             }
@@ -188,9 +187,18 @@ public class SalaRepository implements IRepository<Sala> {
     @Override
     public boolean delete(int id) {
         String query = "DELETE FROM sala WHERE sala_id = ?";
+        return execDelete(query, id);
+    }
+
+    public boolean deleteByEdificioId(int edificioId) {
+        String query = "DELETE FROM sala WHERE edificio_id = ?";
+        return execDelete(query, edificioId);
+    }
+
+    private boolean execDelete(String query, int param) {
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, id);
+            statement.setInt(1, param);
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {

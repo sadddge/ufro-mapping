@@ -43,7 +43,12 @@ public class SalaService {
     }
 
     public boolean delete(int id) {
+        findById(id);
         return salaRepository.delete(id);
+    }
+
+    public boolean deleteByEdificioId(int edificioId) {
+        return salaRepository.deleteByEdificioId(edificioId);
     }
 
 
