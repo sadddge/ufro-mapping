@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.ufromap.exceptions.BadRequestException;
+import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Clase;
 import org.ufromap.repositories.ClaseRepository;
 
@@ -42,7 +44,11 @@ public class ClaseService {
      * @return La clase almacenada en la base de datos con el id proporcionado.
      */
     public Clase findById(int id) {
-        return claseRepository.findById(id);
+        Clase clase = claseRepository.findById(id);
+        if (clase == null) {
+            throw new EntityNotFoundException("No se encontró una clase con el ID proporcionado.");
+        }
+        return clase;
     }
 
     public List<Clase> findByFilter(Integer salaId, Integer edificioId, Integer asignaturaId, Integer diaSemana, Integer periodo, String docente, Integer modulo) {
@@ -54,7 +60,11 @@ public class ClaseService {
         if (periodo != null) filters.put("periodo", periodo);
         if (docente != null) filters.put("docente", docente);
         if (modulo != null) filters.put("modulo", modulo);
-        return claseRepository.findByFilter(filters);
+        List<Clase>clases = claseRepository.findByFilter(filters);
+        if (clases.isEmpty()) {
+            throw new EntityNotFoundException("No se encontraron clases con los filtros proporcionados.");
+        }
+        return clases;
     }
 
     /**
@@ -64,11 +74,19 @@ public class ClaseService {
      * @return Una lista con todas las clases almacenadas en la base de datos de la asignatura con el id proporcionado.
      */
     public List<Clase> findByAsignaturaId(int asignaturaId) {
-        return claseRepository.findByAsignaturaId(asignaturaId);
+        List<Clase> clase = claseRepository.findByAsignaturaId(asignaturaId);
+        if (clase == null) {
+            throw new EntityNotFoundException("No se encontró una clase con el ID de la asignatura proporcionada.");
+        }
+        return clase;
     }
 
     public List<Clase> findBySalaId(int salaId) {
-        return claseRepository.findBySalaId(salaId);
+        List<Clase> clase = claseRepository.findBySalaId(salaId);
+        if (clase == null) {
+            throw new EntityNotFoundException("No se encontró una clase con el ID de la sala proporcionada.");
+        }
+        return clase;
     }
 
     /**
@@ -77,6 +95,7 @@ public class ClaseService {
      * @param clase La clase que se desea almacenar en la base de datos.
      */
     public Clase add(Clase clase) {
+        validateClase(clase);
         return claseRepository.add(clase);
     }
 
@@ -87,6 +106,8 @@ public class ClaseService {
      * @param clase La clase que se desea actualizar en la base de datos.
      */
     public Clase update(Clase clase) {
+        validateClase(clase);
+        clase = updateClase(clase);
         return claseRepository.update(clase);
     }
 
@@ -96,6 +117,36 @@ public class ClaseService {
      * @param id El id de la clase que se desea eliminar de la base de datos.
      */
     public boolean delete(int id) {
+        findById(id);
         return claseRepository.delete(id);
+    }
+
+    public void validateClase (Clase clase){
+        if (clase.getDiaSemana() < 1 || clase.getDiaSemana() > 7) {
+            throw new BadRequestException("El día de la semana debe ser un número entre 1 y 7.");
+        }
+        if (clase.getPeriodo() < 1 || clase.getPeriodo() > 11) {
+            throw new BadRequestException("El periodo debe ser un número entre 1 y 11.");
+        }
+        if (clase.getModulo() < 1) {
+            throw new BadRequestException("El módulo no puede ser menor a 1");
+        }
+        if (clase.getSalaId() == 0 ) {
+            throw new BadRequestException("La clase debe tener una sala válida");
+        }
+        if (clase.getEdificioId() == 0) {
+            throw new BadRequestException("La clase debe tener un edificio válido");
+        }
+        if (clase.getAsignaturaId() == 0) {
+            throw new BadRequestException("La clase debe tener una asignatura válida");
+        }
+    }
+
+    private Clase updateClase(Clase clase) {
+        Clase claseExistente = findById(clase.getId());
+        String docente = clase.getDocente() == null ? claseExistente.getDocente() : clase.getDocente();
+        int modulo = clase.getModulo() == 0 ? claseExistente.getModulo() : clase.getModulo();
+        return new Clase(clase.getId(), clase.getSalaId(), clase.getEdificioId(), clase.getAsignaturaId(), clase.getDiaSemana(), clase.getPeriodo(), docente, modulo);
+
     }
 }
