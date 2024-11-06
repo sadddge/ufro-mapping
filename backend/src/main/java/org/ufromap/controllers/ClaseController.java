@@ -25,12 +25,12 @@ import java.util.Map;
 @WebServlet("/api/clases/*")
 public class ClaseController extends BaseController {
 
+    private final ClaseService claseService;
     /**
      * Constructor que inicializa el controlador con un servicio de clase.
-     * 
+     *
      * @param claseService El servicio {@link ClaseService} que se utilizará para manejar las operaciones.
      */
-    private final ClaseService claseService;
     public ClaseController(ClaseService claseService) {
         this.claseService = claseService;
     }
@@ -109,27 +109,27 @@ public class ClaseController extends BaseController {
     }
 
     private void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int salaId;
-        int edificioId;
-        int asignaturaId;
+        Integer salaId;
+        Integer edificioId;
+        Integer asignaturaId;
         String docenteNombre = request.getParameter("docente");
-        int diaSemana;
-        int periodoClase;
-        int modulo;
+        Integer diaSemana;
+        Integer periodoClase;
+        Integer modulo;
 
         try {
-            salaId = request.getParameter("sala_id") == null ? 0 : Integer.parseInt(request.getParameter("sala_id"));
-            edificioId = request.getParameter("edificio_id") == null ? 0 : Integer.parseInt(request.getParameter("edificio_id"));
-            asignaturaId = request.getParameter("asignatura_id") == null ? 0 : Integer.parseInt(request.getParameter("asignatura_id"));
-            diaSemana = request.getParameter("dia_semana") == null ? 0 : Integer.parseInt(request.getParameter("dia_semana"));
-            periodoClase = request.getParameter("periodo_clase") == null ? 0 : Integer.parseInt(request.getParameter("periodo_clase"));
-            modulo = request.getParameter("modulo") == null ? 0 : Integer.parseInt(request.getParameter("modulo"));
+            salaId = request.getParameter("sala_id") == null ? null : Integer.parseInt(request.getParameter("sala_id"));
+            edificioId = request.getParameter("edificio_id") == null ? null : Integer.parseInt(request.getParameter("edificio_id"));
+            asignaturaId = request.getParameter("asignatura_id") == null ? null : Integer.parseInt(request.getParameter("asignatura_id"));
+            diaSemana = request.getParameter("dia_semana") == null ? null : Integer.parseInt(request.getParameter("dia_semana"));
+            periodoClase = request.getParameter("periodo_clase") == null ? null : Integer.parseInt(request.getParameter("periodo_clase"));
+            modulo = request.getParameter("modulo") == null ? null : Integer.parseInt(request.getParameter("modulo"));
         } catch (NumberFormatException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
             return;
         }
 
-        if (salaId != 0 || edificioId != 0 || asignaturaId != 0 || docenteNombre != null || diaSemana != 0 || periodoClase != 0 || modulo != 0) {
+        if (salaId != null || edificioId != null || asignaturaId != null || docenteNombre != null || diaSemana != null || periodoClase != null || modulo != null) {
             List<Clase> clases = claseService.findByFilter(salaId, edificioId, asignaturaId, diaSemana, periodoClase, docenteNombre, modulo);
             response.getWriter().print(new Gson().toJson(clases));
         } else {
@@ -140,14 +140,14 @@ public class ClaseController extends BaseController {
     }
 
     private Clase getClaseFromJson(JSONObject jsonObject) {
-       int id = jsonObject.optInt("clase_id", 0);
-       int salaId = jsonObject.optInt("sala_id", 0);
-       int edificioId = jsonObject.optInt("edificio_id", 0);
-       int asignaturaId = jsonObject.optInt("asignatura_id", 0);
-       int diaSemana = jsonObject.optInt("dia_semana", 0);
-       int periodo = jsonObject.optInt("periodo_clase", 0);
+       int id = jsonObject.optInt("clase_id", -1);
+       int salaId = jsonObject.optInt("sala_id", -1);
+       int edificioId = jsonObject.optInt("edificio_id", -1);
+       int asignaturaId = jsonObject.optInt("asignatura_id", -1);
+       int diaSemana = jsonObject.optInt("dia_semana", -1);
+       int periodo = jsonObject.optInt("periodo_clase", -1);
        String docente = jsonObject.optString("docente_nombre", null);
-       int modulo = jsonObject.optInt("modulo", 0);
+       int modulo = jsonObject.optInt("modulo", -1);
 
        return new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo);
     }

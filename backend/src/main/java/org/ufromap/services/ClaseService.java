@@ -131,21 +131,13 @@ public class ClaseService {
         if (clase.getModulo() < 1) {
             throw new BadRequestException("El módulo no puede ser menor a 1");
         }
-        if (clase.getSalaId() == 0 ) {
-            throw new BadRequestException("La clase debe tener una sala válida");
-        }
-        if (clase.getEdificioId() == 0) {
-            throw new BadRequestException("La clase debe tener un edificio válido");
-        }
-        if (clase.getAsignaturaId() == 0) {
-            throw new BadRequestException("La clase debe tener una asignatura válida");
-        }
+
     }
 
     private Clase updateClase(Clase clase) {
         Clase claseExistente = findById(clase.getId());
         String docente = clase.getDocente() == null ? claseExistente.getDocente() : clase.getDocente();
-        int modulo = clase.getModulo() == 0 ? claseExistente.getModulo() : clase.getModulo();
+        int modulo = clase.getModulo() == -1 ? claseExistente.getModulo() : clase.getModulo();
         return new Clase(clase.getId(), clase.getSalaId(), clase.getEdificioId(), clase.getAsignaturaId(), clase.getDiaSemana(), clase.getPeriodo(), docente, modulo);
 
     }
