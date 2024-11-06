@@ -1,13 +1,12 @@
 package org.ufromap.services;
 
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.ufromap.exceptions.BadRequestException;
+import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Asignatura;
 import org.ufromap.repositories.AsignaturaRepository;
 
@@ -17,7 +16,7 @@ import org.ufromap.repositories.AsignaturaRepository;
  */
 public class AsignaturaService {
 
-    private AsignaturaRepository asignaturaRepository;
+    private final AsignaturaRepository asignaturaRepository;
 
     /**
      * Constructor que inicializa el servicio con un repositorio de Asignatura.
@@ -40,7 +39,11 @@ public class AsignaturaService {
     }
 
     public Asignatura findById(int id) {
-        return asignaturaRepository.findById(id);
+        Asignatura asignatura = asignaturaRepository.findById(id);
+        if(asignatura == null){
+            throw new EntityNotFoundException("No se encontró la asignatura con el ID proporcionado");
+        }
+        return asignatura;
     }
 
     public List<Asignatura> findByFilter(String nombre_asignatura, String codigo_asignatura, String descripcion_asignatura, Integer sct_asignatura) {
@@ -55,15 +58,30 @@ public class AsignaturaService {
     }
 
     public Asignatura add(Asignatura asignatura) {
+        validateAsignatura(asignatura);
         return asignaturaRepository.add(asignatura);
     }
 
     public Asignatura update(Asignatura asignatura) {
-        return asignaturaRepository.update(asignatura);
+        Asignatura asignaturaExistente = findById(asignatura.getId());
+        String descripcion = asignatura.getDescripcion() == null ? asignaturaExistente.getDescripcion() : asignatura.getDescripcion();
+        String codigo =  asignatura.getCodigo() == null ? asignaturaExistente.getCodigo() : asignatura.getCodigo();
+        int sct =  asignatura.getSct() == 0 ? asignaturaExistente.getSct() : asignatura.getSct();
+        return new Asignatura(asignatura.getId(), asignatura.getNombre(), codigo, descripcion, sct, asignatura.getClases());
     }
 
     public boolean delete(int id) {
+        findById(id);
         return asignaturaRepository.delete(id);
+    }
+
+    public void validateAsignatura(Asignatura asignatura) {
+        if (asignatura.getNombre() == null || asignatura.getNombre().isEmpty()) {
+            throw new BadRequestException("El nombre de la asignatura es obligatorio.");
+        }
+        if (asignatura.getCodigo() == null || asignatura.getCodigo().isEmpty()) {
+            throw new BadRequestException("El codigo de la asignatura es obligatorio.");
+        }
     }
 
 }
