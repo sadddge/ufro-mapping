@@ -104,8 +104,7 @@ public class EdificioService {
      */
     public Edificio update(Edificio edificio) {
         validateEdificio(edificio);
-        edificio = updateEdificio(edificio);
-        return edificioRepository.update(edificio);
+        return edificioRepository.update(updateEdificio(edificio));
     }
 
     /**
@@ -115,8 +114,8 @@ public class EdificioService {
      */
     public boolean delete(int id) {
         findById(id);
-        salaService.deleteByEdificioId(id);
-        return edificioRepository.delete(id);
+        boolean deleteSalas = salaService.deleteByEdificioId(id);
+        return edificioRepository.delete(id) && deleteSalas;
     }
 
 
