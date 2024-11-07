@@ -118,8 +118,8 @@ public class SalaController extends BaseController{
 
     private Sala getSalaFromJson(JSONObject jsonObject) {
         int id = jsonObject.optInt("id", -1);
-        int edificioId = jsonObject.optInt("edificio_id", -1);
-        String nombre = jsonObject.optString("nombre_sala", null);
+        int edificioId = jsonObject.optInt("edificioId", -1);
+        String nombre = jsonObject.optString("nombre", null);
 
         return new Sala(id, edificioId, nombre, null);
     }

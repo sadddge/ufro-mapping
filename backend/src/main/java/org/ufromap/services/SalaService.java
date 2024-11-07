@@ -50,7 +50,6 @@ public class SalaService {
     }
 
     public Sala update(Sala sala) {
-        validateSala(sala);
         return salaRepository.update(updateSala(sala));
     }
 
@@ -77,7 +76,11 @@ public class SalaService {
         if (sala.getNombre() == null) {
             sala.setNombre(existing.getNombre());
         }
-        existing.setEdificioId(sala.getEdificioId());
+        if (sala.getEdificioId() == -1) {
+            sala.setEdificioId(existing.getEdificioId());
+        }
+
+        validateSala(sala);
         return sala;
     }
 
