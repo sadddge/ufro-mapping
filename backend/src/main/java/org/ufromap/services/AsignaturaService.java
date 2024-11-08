@@ -38,7 +38,7 @@ public class AsignaturaService {
         return asignaturaRepository.findAll();
     }
 
-    public Asignatura findById(int id) {
+    public Asignatura findById(int id) throws EntityNotFoundException{
         Asignatura asignatura = asignaturaRepository.findById(id);
         if(asignatura == null){
             throw new EntityNotFoundException("No se encontró la asignatura con el ID proporcionado");
@@ -46,7 +46,7 @@ public class AsignaturaService {
         return asignatura;
     }
 
-    public List<Asignatura> findByFilter(String nombre_asignatura, String codigo_asignatura, String descripcion_asignatura, Integer sct_asignatura) {
+    public List<Asignatura> findByFilter(String nombre_asignatura, String codigo_asignatura, String descripcion_asignatura, Integer sct_asignatura) throws EntityNotFoundException{
         Map<String, Object> filter = new HashMap<>();
 
         if (nombre_asignatura != null) filter.put("nombre_asignatura", nombre_asignatura);
@@ -54,10 +54,15 @@ public class AsignaturaService {
         if (descripcion_asignatura != null) filter.put("descripcion_asignatura", descripcion_asignatura);
         if (sct_asignatura != null) filter.put("sct_asignatura", sct_asignatura);
 
-        return asignaturaRepository.findByFilter(filter);
+        List<Asignatura> asignaturas = asignaturaRepository.findByFilter(filter);
+        if(asignaturas.isEmpty()){
+            throw new EntityNotFoundException("No se encontraron asignaturas con los filtros proporcionados");
+        }
+
+        return asignaturas;
     }
 
-    public Asignatura add(Asignatura asignatura) {
+    public Asignatura add(Asignatura asignatura) throws BadRequestException{
         validateAsignatura(asignatura);
         return asignaturaRepository.add(asignatura);
     }
@@ -70,7 +75,7 @@ public class AsignaturaService {
         return new Asignatura(asignatura.getId(), asignatura.getNombre(), codigo, descripcion, sct, asignatura.getClases());
     }
 
-    public boolean delete(int id) {
+    public boolean delete(int id) throws EntityNotFoundException{
         findById(id);
         return asignaturaRepository.delete(id);
     }
