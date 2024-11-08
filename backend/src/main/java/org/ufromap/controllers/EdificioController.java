@@ -8,7 +8,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
@@ -19,7 +18,7 @@ import com.google.gson.Gson;
 
 
 @WebServlet("/api/edificios/*")
-public class EdificioController extends BaseController {
+public class EdificioController extends BaseController<Edificio> {
     private final EdificioService edificioService;
     public EdificioController() {
         this.edificioService = new EdificioService();
@@ -50,56 +49,6 @@ public class EdificioController extends BaseController {
                 break;
             default:
                 sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
-        }
-    }
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            JSONObject jsonObject = getJson(request);
-            Edificio edificio = getEdificioFromJson(jsonObject);
-            Edificio updated = edificioService.add(edificio);
-            writeJsonResponse(response, new Gson().toJson(updated));
-            response.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (JSONException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON data");
-        } catch (BadRequestException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        }
-    }
-    @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            JSONObject jsonObject = getJson(request);
-            Edificio edificio = getEdificioFromJson(jsonObject);
-            edificioService.update(edificio);
-            writeJsonResponse(response, new Gson().toJson(edificio));
-            response.setStatus(HttpServletResponse.SC_OK);
-        } catch (JSONException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON data");
-        } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        } catch (BadRequestException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        }
-    }
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response){
-        String pathInfo = request.getPathInfo();
-        String[] pathParts = pathInfo == null ? new String[0] : pathInfo.trim().split("/");
-
-        if (pathParts.length != 2) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
-            return;
-        }
-
-        try {
-            int id = Integer.parseInt(pathParts[1]);
-            edificioService.delete(id);
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        } catch (EntityNotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -142,17 +91,42 @@ public class EdificioController extends BaseController {
             sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
         }
     }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        handlePost(request, response);
+    }
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        handlePut(request, response);
+    }
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response){
+        handleDelete(request, response);
+    }
 
-    private Edificio getEdificioFromJson(JSONObject jsonObject) {
+    @Override
+    protected Edificio processPost(Edificio entity) throws BadRequestException {
+        return edificioService.add(entity);
+    }
 
-        int id = jsonObject.optInt("edificio_id", 0);
-        String nombre = jsonObject.optString("nombre_edificio", null);
-        String alias = jsonObject.optString("alias_edificio", null);
-        String tipo = jsonObject.optString("tipo_edifico", null);
-        Float latitud = jsonObject.optFloat("latitud", 0.0f);
-        Float longitud = jsonObject.optFloat("longitud", 0.0f);
-        if (longitud == 0.0f) latitud = null;
-        if (longitud == 0.0f) longitud = null;
+    @Override
+    protected Edificio processPut(Edificio entity) throws EntityNotFoundException {
+        return edificioService.update(entity);
+    }
+
+    @Override
+    protected void processDelete(int id) throws EntityNotFoundException {
+        edificioService.delete(id);
+    }
+
+    @Override
+    protected Edificio mapJsonToEntity(JSONObject jsonObject) {
+        int id = jsonObject.optInt("id", -1);
+        String nombre = jsonObject.optString("nombre", null);
+        String alias = jsonObject.optString("alias", null);
+        String tipo = jsonObject.optString("tipo", null);
+        float latitud = jsonObject.optFloat("latitud", 0);
+        float longitud = jsonObject.optFloat("longitud", 0);
         return new Edificio(id, nombre, alias, tipo, latitud, longitud, null);
     }
 }

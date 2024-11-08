@@ -1,9 +1,7 @@
 package org.ufromap.controllers;
 
 import com.google.gson.Gson;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Asignatura;
 import org.ufromap.services.AsignaturaService;
@@ -16,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @WebServlet("/api/asignaturas/*")
-public class AsignaturaController extends BaseController {
+public class AsignaturaController extends BaseController<Asignatura> {
 
     private final AsignaturaService asignaturaService;
 
@@ -53,59 +51,6 @@ public class AsignaturaController extends BaseController {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            JSONObject jsonObject = getJson(request);
-            Asignatura asignatura = getAsignaturaFromJson(jsonObject);
-            Asignatura created = asignaturaService.add(asignatura);
-            writeJsonResponse(response, new Gson().toJson(created));
-            response.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (JSONException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Datos JSON no válidos");
-        } catch (BadRequestException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            JSONObject jsonObject = getJson(request);
-            Asignatura asignatura = getAsignaturaFromJson(jsonObject);
-            Asignatura updated = asignaturaService.update(asignatura);
-            writeJsonResponse(response, new Gson().toJson(updated));
-            response.setStatus(HttpServletResponse.SC_OK);
-        } catch (JSONException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Datos JSON no válidos");
-        } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        } catch (BadRequestException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @Override
-    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
-        String pathInfo = request.getPathInfo();
-        String[] pathParts = pathInfo == null ? new String[0] : pathInfo.trim().split("/");
-
-        if (pathParts.length != 2) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Ruta no válida");
-            return;
-        }
-
-        try {
-            int id = Integer.parseInt(pathParts[1]);
-            asignaturaService.delete(id);
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-        } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        } catch (EntityNotFoundException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }
-    }
-
     private void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String nombre = request.getParameter("nombre_asignatura");
         String codigo = request.getParameter("codigo_asignatura");
@@ -133,13 +78,43 @@ public class AsignaturaController extends BaseController {
         }
     }
 
-    private Asignatura getAsignaturaFromJson(JSONObject jsonObject) {
-        int id = jsonObject.optInt("asignatura_id", 0);
-        String nombre = jsonObject.optString("nombre_asignatura", null);
-        String codigo = jsonObject.optString("codigo_asignatura", null);
-        String descripcion = jsonObject.optString("descripcion_asignatura", null);
-        int sct = jsonObject.optInt("sct_asignatura", 0);
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        handlePost(request, response);
+    }
 
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        handlePut(request, response);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
+        handleDelete(request, response);
+    }
+
+    @Override
+    protected Asignatura processPost(Asignatura entity) {
+        return asignaturaService.add(entity);
+    }
+
+    @Override
+    protected Asignatura processPut(Asignatura entity) throws EntityNotFoundException {
+        return asignaturaService.update(entity);
+    }
+
+    @Override
+    protected void processDelete(int id) throws EntityNotFoundException {
+        asignaturaService.delete(id);
+    }
+
+    @Override
+    protected Asignatura mapJsonToEntity(JSONObject jsonObject){
+        int id = jsonObject.optInt("id", -1);
+        String nombre = jsonObject.optString("nombre", null);
+        String codigo = jsonObject.optString("codigo", null);
+        String descripcion = jsonObject.optString("descripcion", null);
+        int sct = jsonObject.optInt("sct", -1);
         return new Asignatura(id, nombre, codigo, descripcion, sct, null);
     }
 }

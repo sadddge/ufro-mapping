@@ -23,7 +23,7 @@ import java.util.Map;
  * operaciones relacionadas con las clases.
  */
 @WebServlet("/api/clases/*")
-public class ClaseController extends BaseController {
+public class ClaseController extends BaseController<Clase> {
 
     private final ClaseService claseService;
     /**
@@ -59,55 +59,6 @@ public class ClaseController extends BaseController {
         }
     }
 
-    @Override
-    protected void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            JSONObject jsonObject = getJson(request);
-            Clase clase = getClaseFromJson(jsonObject);
-            Clase added = claseService.add(clase);
-            writeJsonResponse(response, new Gson().toJson(added));
-            response.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (JSONException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON data");
-        } catch (BadRequestException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
-        }
-    }
-
-    @Override
-    protected void doPut (HttpServletRequest request, HttpServletResponse response) throws IOException {
-        try {
-            JSONObject jsonObject = getJson(request);
-            Clase clase = getClaseFromJson(jsonObject);
-            Clase updated = claseService.update(clase);
-            writeJsonResponse(response, new Gson().toJson(updated));
-            response.setStatus(HttpServletResponse.SC_OK);
-        } catch (JSONException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON data");
-        } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        }
-    }
-
-    @Override
-    protected void doDelete (HttpServletRequest request, HttpServletResponse response) {
-        String pathInfo = request.getPathInfo();
-        String[] pathParts = pathInfo == null ? new String[0] : pathInfo.trim().split("/");
-        if (pathParts.length == 2) {
-            try {
-                int id = Integer.parseInt(pathParts[1]);
-                claseService.delete(id);
-                response.setStatus(HttpServletResponse.SC_OK);
-            } catch (NumberFormatException e) {
-                sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
-            } catch (EntityNotFoundException e) {
-                sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-            }
-        } else {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
-        }
-    }
-
     private void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Integer salaId;
         Integer edificioId;
@@ -139,18 +90,50 @@ public class ClaseController extends BaseController {
 
     }
 
-    private Clase getClaseFromJson(JSONObject jsonObject) {
-       int id = jsonObject.optInt("clase_id", -1);
-       int salaId = jsonObject.optInt("sala_id", -1);
-       int edificioId = jsonObject.optInt("edificio_id", -1);
-       int asignaturaId = jsonObject.optInt("asignatura_id", -1);
-       int diaSemana = jsonObject.optInt("dia_semana", -1);
-       int periodo = jsonObject.optInt("periodo_clase", -1);
-       String docente = jsonObject.optString("docente_nombre", null);
-       int modulo = jsonObject.optInt("modulo", -1);
+    @Override
+    protected void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException {
+        handlePost(request, response);
+    }
 
-       return new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo);
+    @Override
+    protected void doPut (HttpServletRequest request, HttpServletResponse response) throws IOException {
+        handlePut(request, response);
+    }
+
+    @Override
+    protected void doDelete (HttpServletRequest request, HttpServletResponse response) {
+        handleDelete(request, response);
     }
 
 
+
+
+    @Override
+    protected Clase processPost(Clase entity) throws BadRequestException {
+        return claseService.add(entity);
+    }
+
+    @Override
+    protected Clase processPut(Clase entity) throws EntityNotFoundException {
+        return claseService.update(entity);
+    }
+
+    @Override
+    protected void processDelete(int id) throws EntityNotFoundException {
+        claseService.delete(id);
+    }
+
+    @Override
+    protected Clase mapJsonToEntity(JSONObject jsonObject) {
+        return new Clase(
+            jsonObject.optInt("id", -1),
+            jsonObject.optInt("sala_id", -1),
+            jsonObject.optInt("edificio_id", -1),
+            jsonObject.optInt("asignatura_id", -1),
+            jsonObject.optInt("dia_semana", -1),
+                jsonObject.optInt("periodo_clase", -1),
+                jsonObject.optString("docente", null),
+                jsonObject.optInt("modulo", -1)
+        );
+    }
 }
