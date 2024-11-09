@@ -2,16 +2,13 @@ package org.ufromap.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 
-/**
- * Representa un usuario con atributos de nombre, contraseña, correo y asignaturas.
- * Proporciona métodos para gestionar la sesión y actualizar información del usuario.
- */
+@Getter
+@Setter
 public class Usuario {
     @Expose
     @SerializedName("usuario_id")
@@ -27,14 +24,9 @@ public class Usuario {
     @SerializedName("correo_usuario")
     private String correo;
 
+    @Expose
     private Set<Asignatura> asignaturas;
 
-    /**
-     * Constructor por defecto de Usuario no registrado.
-     */
-    public Usuario() {
-
-    }
 
     /**
      * Constructor que inicializa un usuario con un nombre, contraseña, correo y un conjunto de asignaturas.
@@ -49,46 +41,6 @@ public class Usuario {
         this.nombre = nombre;
         this.contrasenia = contrasenia;
         this.correo = correo;
-        this.asignaturas = asignaturas;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getContrasenia() {
-        return contrasenia;
-    }
-
-    public void setContrasenia(String contrasenia) {
-        this.contrasenia = contrasenia;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public Set<Asignatura> getAsignaturas() {
-        return asignaturas;
-    }
-
-    public void setAsignaturas(Set<Asignatura> asignaturas) {
         this.asignaturas = asignaturas;
     }
 }
