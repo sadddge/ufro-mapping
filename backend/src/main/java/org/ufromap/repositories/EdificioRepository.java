@@ -48,14 +48,14 @@ public class EdificioRepository {
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("edificio_id");
-                String nombre = resultSet.getString("edificio");
+                int id = resultSet.getInt("id");
+                String nombre = resultSet.getString("nombre_edificio");
                 String alias = resultSet.getString("alias");
                 String tipo = resultSet.getString("tipo");
                 float latitud = resultSet.getFloat("latitud");
                 float longitud = resultSet.getFloat("longitud");
-                List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                edificios.add(new Edificio(id, nombre, alias, latitud, longitud, tipo, salas));
+
+                edificios.add(new Edificio(id, nombre, alias, tipo, latitud, longitud));
             }
 
         } catch (SQLException e) {
@@ -72,19 +72,18 @@ public class EdificioRepository {
      */
     public Edificio getEdificioById(int id) {
         Edificio edificio = null;
-        String query = "SELECT * FROM edificio WHERE edificio_id = ?";
+        String query = "SELECT * FROM edificio WHERE id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    String nombre = resultSet.getString("edificio");
+                    String nombre = resultSet.getString("nombre_edificio");
                     String alias = resultSet.getString("alias");
                     String tipo = resultSet.getString("tipo");
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
-                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud);
                 }
             }
         } catch (SQLException e) {
@@ -101,7 +100,7 @@ public class EdificioRepository {
      */
     public Edificio getEdificioByNombre(String nombre) {
         Edificio edificio = null;
-        String query = "SELECT * FROM edificio WHERE edificio = ?";
+        String query = "SELECT * FROM edificio WHERE nombre_edificio = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, nombre);
@@ -112,8 +111,7 @@ public class EdificioRepository {
                     String tipo = resultSet.getString("tipo");
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
-                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud);
                 }
             }
         } catch (SQLException e) {
@@ -137,12 +135,11 @@ public class EdificioRepository {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int id = resultSet.getInt("edificio_id");
-                    String nombre = resultSet.getString("edificio");
+                    String nombre = resultSet.getString("nombre_edificio");
                     String tipo = resultSet.getString("tipo");
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
-                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud);
                 }
             }
         } catch (SQLException e) {
@@ -166,12 +163,11 @@ public class EdificioRepository {
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     int id = resultSet.getInt("edificio_id");
-                    String nombre = resultSet.getString("edificio");
+                    String nombre = resultSet.getString("nombre_edificio");
                     String alias = resultSet.getString("alias");
                     float latitud = resultSet.getFloat("latitud");
                     float longitud = resultSet.getFloat("longitud");
-                    List<Sala> salas = salaRepository.getSalasByEdificioId(id);
-                    edificio = new Edificio(id, nombre, alias, latitud, longitud, tipo, salas);
+                    edificio = new Edificio(id, nombre, alias, tipo, latitud, longitud);
                 }
             }
         } catch (SQLException e) {
@@ -187,14 +183,14 @@ public class EdificioRepository {
      * @return {@code true} si la operación fue exitosa, {@code false} si ocurrió algún error.
      */
     public boolean addEdificio(Edificio edificio) {
-        String query = "INSERT INTO edificio (edificio, alias, latitud, longitud, tipo) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO edificio (nombre_edificio, alias, tipo, latitud, longitud) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, edificio.getNombre());
             statement.setString(2, edificio.getAlias());
-            statement.setFloat(3, edificio.getLatitud());
-            statement.setFloat(4, edificio.getLongitud());
-            statement.setString(5, edificio.getTipo());
+            statement.setString(3, edificio.getTipo());
+            statement.setFloat(4, edificio.getLatitud());
+            statement.setFloat(5, edificio.getLongitud());
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -210,14 +206,14 @@ public class EdificioRepository {
      * @return {@code true} si la operación fue exitosa, {@code false} si ocurrió algún error.
      */
     public boolean updateEdificio(Edificio edificio) {
-        String query = "UPDATE edificio SET edificio = ?, alias = ?, latitud = ?, longitud = ?, tipo = ? WHERE edificio_id = ?";
+        String query = "UPDATE edificio SET nombre_edificio = ?, alias = ?,tipo = ?, latitud = ?, longitud = ? WHERE id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, edificio.getNombre());
             statement.setString(2, edificio.getAlias());
-            statement.setFloat(3, edificio.getLatitud());
-            statement.setFloat(4, edificio.getLongitud());
-            statement.setString(5, edificio.getTipo());
+               statement.setString(3, edificio.getTipo());
+            statement.setFloat(4, edificio.getLatitud());
+            statement.setFloat(5, edificio.getLongitud());
             statement.setInt(6, edificio.getId());
             statement.executeUpdate();
             return true;
@@ -234,7 +230,7 @@ public class EdificioRepository {
      * @return {@code true} si la operación fue exitosa, {@code false} si ocurrió algún error.
      */
     public boolean deleteEdificio(int id) {
-        String query = "DELETE FROM edificio WHERE edificio_id = ?";
+        String query = "DELETE FROM edificio WHERE id = ?";
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);

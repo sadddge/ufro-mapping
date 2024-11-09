@@ -58,25 +58,14 @@ public class AsignaturaService {
         return asignaturaRepository.getAsignaturaById(id);
     }
 
-    /**
-     * Agrega una nueva asignatura utilizando el repositorio.
-     * @param asignatura el nombre de la asignatura.
-     * @param codigo el código de la asignatura.
-     * @param descripcion una breve descripción de la asignatura.
-     */
-    public void addAsignatura(String asignatura, String codigo, String descripcion) {
-        asignaturaRepository.addAsignatura(asignatura, codigo, descripcion);
+
+    public void addAsignatura(Asignatura asignatura) {
+        asignaturaRepository.addAsignatura(asignatura);
     }
 
-    /**
-     * Actualiza una asignatura existente en el repositorio.
-     * @param asignatura el nuevo nombre de la asignatura.
-     * @param codigo el nuevo código de la asignatura.
-     * @param descripcion la nueva descripción de la asignatura.
-     * @param asignatura_id el ID de la asignatura a actualizar.
-     */
-    public void updateAsignatura(String asignatura, String codigo, String descripcion, int asignatura_id) {
-        asignaturaRepository.updateAsignatura(asignatura, codigo, descripcion, asignatura_id);
+
+    public void updateAsignatura(Asignatura asignatura) {
+        asignaturaRepository.updateAsignatura(asignatura);
     }
 
     /**

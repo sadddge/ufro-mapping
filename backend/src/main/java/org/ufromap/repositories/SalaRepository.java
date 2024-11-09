@@ -57,11 +57,11 @@ public class SalaRepository {
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                int id = resultSet.getInt("sala_id");
-                String nombre = resultSet.getString("sala");
-                Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
-                List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                Sala sala = new Sala(id, nombre, edificio, clases);
+                int id = resultSet.getInt("id");
+                int edificioId = resultSet.getInt("edificio_id");
+                String nombre = resultSet.getString("nombre_sala");
+
+                Sala sala = new Sala(id, edificioId, nombre);
                 salas.add(sala);
             }
         } catch (SQLException e) {
@@ -80,7 +80,7 @@ public class SalaRepository {
      */
     public Sala getSalaById(int id) throws SQLException {
         Sala sala = null;
-        String query = "SELECT * FROM sala WHERE sala_id = ?";
+        String query = "SELECT * FROM sala WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -88,10 +88,9 @@ public class SalaRepository {
             preparedStatement.setLong(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    String nombre = resultSet.getString("sala");
-                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
-                    List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                    sala = new Sala(id, nombre, edificio, clases);
+                    int edificioId = resultSet.getInt("edificio_id");
+                    String nombre = resultSet.getString("nombre_sala");
+                    sala = new Sala(id, edificioId, nombre);
                 }
             }
         } catch (SQLException e) {
@@ -108,21 +107,20 @@ public class SalaRepository {
      * @return Una lista de salas asociadas al edificio.
      * @throws SQLException Si ocurre un error durante la consulta a la base de datos.
      */
-    public List<Sala> getSalasByEdificioId(int id) throws SQLException {
+    public List<Sala> getSalasByEdificioId(int edificioId) throws SQLException {
         List<Sala> salas = new ArrayList<>();
         String query = "SELECT * FROM sala WHERE edificio_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(1, edificioId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    int salaId = resultSet.getInt("sala_id");
-                    String nombre = resultSet.getString("sala");
-                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
-                    List<Clase> clases = claseRepository.getClasesBySalaId(salaId);
-                    Sala sala = new Sala(salaId, nombre, edificio, clases);
+                    int id = resultSet.getInt("id");
+
+                    String nombre = resultSet.getString("nombre_sala");
+                    Sala sala = new Sala(id, edificioId, nombre);
                     salas.add(sala);
                 }
             }
@@ -142,7 +140,7 @@ public class SalaRepository {
      */
     public Sala getSalaByNombre(String nombre) throws SQLException {
         Sala sala = null;
-        String query = "SELECT * FROM sala WHERE sala = ?";
+        String query = "SELECT * FROM sala WHERE nombre_sala = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -150,10 +148,9 @@ public class SalaRepository {
             preparedStatement.setString(1, nombre);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    int id = resultSet.getInt("sala_id");
-                    Edificio edificio = edificioRepository.getEdificioById(resultSet.getInt("edificio_id"));
-                    List<Clase> clases = claseRepository.getClasesBySalaId(id);
-                    sala = new Sala(id, nombre, edificio, clases);
+                    int id = resultSet.getInt("id");
+                    int edificioId = resultSet.getInt("edificio_id");
+                    sala = new Sala(id, edificioId, nombre);
                 }
             }
         } catch (SQLException e) {
@@ -171,13 +168,14 @@ public class SalaRepository {
      * @throws SQLException Si ocurre un error durante la inserción en la base de datos.
      */
     public boolean addSala(Sala sala) throws SQLException {
-        String query = "INSERT INTO sala (edificio_id, sala) VALUES (?, ?)";
+        String query = "INSERT INTO sala (edificio_id, nombre_sala) VALUES (?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setInt(1, sala.getEdificio().getId());
-            preparedStatement.setString(2, sala.getNombre());
+            preparedStatement.setInt(1, sala.getId());
+            preparedStatement.setInt(2, sala.getEdificioId());
+            preparedStatement.setString(3, sala.getNombre());
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -194,13 +192,14 @@ public class SalaRepository {
      * @throws SQLException Si ocurre un error durante la actualización en la base de datos.
      */
     public boolean updateSala(Sala sala) throws SQLException {
-        String query = "UPDATE sala SET sala = ? WHERE sala_id = ?";
+        String query = "UPDATE sala SET sala = ? WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setString(1, sala.getNombre());
-            preparedStatement.setLong(2, sala.getEdificio().getId());
+            preparedStatement.setInt(1, sala.getId());
+            preparedStatement.setInt(2, sala.getEdificioId());
+            preparedStatement.setString(3, sala.getNombre());
             preparedStatement.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -217,7 +216,7 @@ public class SalaRepository {
      * @throws SQLException Si ocurre un error durante la eliminación en la base de datos.
      */
     public boolean deleteSala(long id) throws SQLException {
-        String query = "DELETE FROM sala WHERE sala_id = ?";
+        String query = "DELETE FROM sala WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {

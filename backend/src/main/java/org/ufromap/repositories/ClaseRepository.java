@@ -29,13 +29,16 @@ public class ClaseRepository {
             ResultSet resultSet= stmt.executeQuery()){
 
             while(resultSet.next()){
-                String docente = resultSet.getString("docente_nombre");
-                String diaSemana = resultSet.getString("dia_semana");
-                String horaInicio = resultSet.getString("hora_inicio");
-                String horaFin = resultSet.getString("hora_fin");
+                int id = resultSet.getInt("id");
+                int salaId = resultSet.getInt("sala_id");
+                int edificioId = resultSet.getInt("edificio_id");
+                int asignaturaId = resultSet.getInt("asignatura_id");
+                int diaSemana = resultSet.getInt("dia_semana");
+                int periodo = resultSet.getInt("periodo");
+                String docenteNombre = resultSet.getString("docente_nombre");
                 int modulo = resultSet.getInt("modulo");
 
-                clases.add(new Clase(docente, diaSemana, horaInicio, horaFin, modulo, null));
+                clases.add(new Clase(id,salaId,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
 
@@ -52,7 +55,7 @@ public class ClaseRepository {
     public Clase getClaseById(int id){
 
         Clase clase = null;
-        String query= "SELECT * FROM clase WHERE clase_id=?";
+        String query= "SELECT * FROM clase WHERE id=?";
 
         try(Connection connection= DatabaseConnection.getConnection();
             PreparedStatement stmt= connection.prepareStatement(query)){
@@ -60,13 +63,15 @@ public class ClaseRepository {
             ResultSet resultSet= stmt.executeQuery();
 
             if(resultSet.next()){
-                String docente = resultSet.getString("docente_nombre");
-                String diaSemana = resultSet.getString("dia_semana");
-                String horaInicio = resultSet.getString("hora_inicio");
-                String horaFin = resultSet.getString("hora_fin");
+                int salaId = resultSet.getInt("sala_id");
+                int edificioId = resultSet.getInt("edificio_id");
+                int asignaturaId = resultSet.getInt("asignatura_id");
+                int diaSemana = resultSet.getInt("dia_semana");
+                int periodo = resultSet.getInt("periodo");
+                String docenteNombre = resultSet.getString("docente_nombre");
                 int modulo = resultSet.getInt("modulo");
 
-                clase = new Clase(docente, diaSemana, horaInicio, horaFin, modulo, null);
+                clase = new Clase(id,salaId,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo);
             }
         }catch(SQLException e){
 
@@ -92,13 +97,15 @@ public class ClaseRepository {
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                String docente = resultSet.getString("docente_nombre");
-                String diaSemana = resultSet.getString("dia_semana");
-                String horaInicio = resultSet.getString("hora_inicio");
-                String horaFin = resultSet.getString("hora_fin");
+                int id = resultSet.getInt("clase_id");
+                int edificioId = resultSet.getInt("edificio_id");
+                int asignaturaId = resultSet.getInt("asignatura_id");
+                int diaSemana = resultSet.getInt("dia_semana");
+                int periodo = resultSet.getInt("periodo");
+                String docenteNombre = resultSet.getString("docente_nombre");
                 int modulo = resultSet.getInt("modulo");
     
-                clase.add(new Clase(docente, diaSemana, horaInicio, horaFin, modulo, null));
+                clase.add(new Clase(id,sala_id,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
 
@@ -124,13 +131,15 @@ public class ClaseRepository {
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                String docente = resultSet.getString("docente_nombre");
-                String diaSemana = resultSet.getString("dia_semana");
-                String horaInicio = resultSet.getString("hora_inicio");
-                String horaFin = resultSet.getString("hora_fin");
+                int id = resultSet.getInt("clase_id");
+                int salaId = resultSet.getInt("sala_id");
+                int asignaturaId = resultSet.getInt("asignatura_id");
+                int diaSemana = resultSet.getInt("dia_semana");
+                int periodo = resultSet.getInt("periodo");
+                String docenteNombre = resultSet.getString("docente_nombre");
                 int modulo = resultSet.getInt("modulo");
                 
-                clases.add(new Clase(docente, diaSemana, horaInicio, horaFin, modulo, null));
+                clases.add(new Clase(id,salaId,edificio_id,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
 
@@ -155,13 +164,15 @@ public class ClaseRepository {
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                String docente = resultSet.getString("docente_nombre");
-                String diaSemana = resultSet.getString("dia_semana");
-                String horaInicio = resultSet.getString("hora_inicio");
-                String horaFin = resultSet.getString("hora_fin");
+                int id = resultSet.getInt("clase_id");
+                int salaId = resultSet.getInt("sala_id");
+                int edificioId = resultSet.getInt("edificio_id");
+                int diaSemana = resultSet.getInt("dia_semana");
+                int periodo = resultSet.getInt("periodo");
+                String docenteNombre = resultSet.getString("docente_nombre");
                 int modulo = resultSet.getInt("modulo");
     
-                clases.add(new Clase(docente, diaSemana, horaInicio, horaFin, modulo, null));
+                clases.add(new Clase(id,salaId,edificioId,asignatura_id,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
 
@@ -176,22 +187,25 @@ public class ClaseRepository {
      * @param diaSemana El día de la semana (por ejemplo, "Lunes").
      * @return Una lista de objetos {@link Clase} que ocurren en el día indicado.
      */
-    public List<Clase> getClasesByDiaSemana(String diaSemana){
+    public List<Clase> getClasesByDiaSemana(int diaSemana){
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT * FROM clase WHERE dia_semana=?";
     
         try(Connection connection= DatabaseConnection.getConnection();
             PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setString(1, diaSemana);
+            stmt.setInt(1, diaSemana);
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                String docente = resultSet.getString("docente_nombre");
-                String horaInicio = resultSet.getString("hora_inicio");
-                String horaFin = resultSet.getString("hora_fin");
+                int id = resultSet.getInt("clase_id");
+                int salaId = resultSet.getInt("sala_id");
+                int edificioId = resultSet.getInt("edificio_id");
+                int asignaturaId = resultSet.getInt("asignatura_id");
+                int periodo = resultSet.getInt("periodo");
+                String docenteNombre = resultSet.getString("docente_nombre");
                 int modulo = resultSet.getInt("modulo");
     
-                clases.add(new Clase(docente, diaSemana, horaInicio, horaFin, modulo, null));
+                clases.add(new Clase(id,salaId,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
 
@@ -208,16 +222,17 @@ public class ClaseRepository {
      */
     public boolean addClase(Clase clase){
         boolean result = false;
-        String query= "INSERT INTO clase(sala_id, edificio_id, asignatura_id, hora_fin, hora_inicio, docente_nombre, modulo) VALUES(?,?,?,?,?,?,?)";
+        String query= "INSERT INTO clase(sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo) VALUES(?,?,?,?,?,?,?)";
 
         try(Connection connection= DatabaseConnection.getConnection();
             PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setString(1, clase.getDocente());
-            stmt.setString(2, clase.getDiaSemana());
-            stmt.setString(3, clase.getHoraInicio());
-            stmt.setString(4, clase.getHoraFin());
-            stmt.setInt(5, clase.getModulo());
-            stmt.setInt(6, clase.getSala().getId());
+            stmt.setInt(1, clase.getSalaId());
+            stmt.setInt(2, clase.getEdificioId());
+            stmt.setInt(3, clase.getAsignaturaId());
+            stmt.setInt(4, clase.getDiaSemana());
+            stmt.setInt(5, clase.getPeriodo());
+            stmt.setString(6, clase.getDocenteNombre());
+            stmt.setInt(7, clase.getModulo());
 
             result = stmt.executeUpdate() > 0;
         }catch(SQLException e){
@@ -234,16 +249,18 @@ public class ClaseRepository {
      */
     public boolean updateClase(Clase clase){
         boolean result = false;
-        String query= "UPDATE clase SET sala_id=?, edificio_id=?, asignatura_id=?, hora_fin=?, hora_inicio=?, docente_nombre=?, modulo=? WHERE clase_id=?";
+        String query= "UPDATE clase SET sala_id=?, edificio_id=?, asignatura_id=?, dia_semana = ?, periodo = ?, docente_nombre=?, modulo=? WHERE id=?";
 
         try(Connection connection= DatabaseConnection.getConnection();
             PreparedStatement stmt= connection.prepareStatement(query)){
-            stmt.setString(1, clase.getDocente());
-            stmt.setString(2, clase.getDiaSemana());
-            stmt.setString(3, clase.getHoraInicio());
-            stmt.setString(4, clase.getHoraFin());
-            stmt.setInt(5, clase.getModulo());
-            stmt.setInt(6, clase.getSala().getId());
+            stmt.setInt(1, clase.getSalaId());
+            stmt.setInt(2, clase.getEdificioId());
+            stmt.setInt(3, clase.getAsignaturaId());
+            stmt.setInt(4, clase.getDiaSemana());
+            stmt.setInt(5, clase.getPeriodo());
+            stmt.setString(6, clase.getDocenteNombre());
+            stmt.setInt(7, clase.getModulo());
+
 
             result = stmt.executeUpdate() > 0;
         }catch(SQLException e){
@@ -260,7 +277,7 @@ public class ClaseRepository {
     */
     public boolean deleteClase(int id){
         boolean result = false;
-        String query= "DELETE FROM clase WHERE clase_id=?";
+        String query= "DELETE FROM clase WHERE id=?";
 
         try(Connection connection= DatabaseConnection.getConnection();
             PreparedStatement stmt= connection.prepareStatement(query)){

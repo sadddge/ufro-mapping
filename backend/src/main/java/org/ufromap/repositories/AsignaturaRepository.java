@@ -49,14 +49,14 @@ public class AsignaturaRepository {
             PreparedStatement stmt = connection.prepareStatement(query);
             ResultSet resultSet = stmt.executeQuery()) {
             while (resultSet.next()) {
-                int id = resultSet.getInt("asignatura_id");
-                String nombre = resultSet.getString("nombre");
+                int id = resultSet.getInt("id");
+                String nombre = resultSet.getString("nombre_asignatura");
                 String codigo = resultSet.getString("codigo");
                 String descripcion = resultSet.getString("descripcion");
                 int sct = resultSet.getInt("sct");
-                List<Clase> clases = clasesRepository.getClasesByAsignaturaId(id);
 
-                Asignatura asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases);
+
+                Asignatura asignatura = new Asignatura(id, nombre, codigo, descripcion, sct);
                 asignaturas.add(asignatura);
             }
         } catch (SQLException e) {
@@ -84,13 +84,13 @@ public class AsignaturaRepository {
             try (ResultSet resultSetAsignatura = stmtAsignatura.executeQuery()) {
 
                 if (resultSetAsignatura.next()) {
-                    String nombre = resultSetAsignatura.getString("nombre");
+                    String nombre = resultSetAsignatura.getString("nombre_asignatura");
                     String codigo = resultSetAsignatura.getString("codigo");
                     String descripcion = resultSetAsignatura.getString("descripcion");
                     int sct = resultSetAsignatura.getInt("sct");
-                    List<Clase> clases = clasesRepository.getClasesByAsignaturaId(id);
 
-                    asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases);
+
+                    asignatura = new Asignatura(id, nombre, codigo, descripcion, sct);
 
                     
                     
@@ -121,12 +121,12 @@ public class AsignaturaRepository {
 
                 if (resultSetAsignatura.next()) {
                     int id = resultSetAsignatura.getInt("id");
-                    String nombre = resultSetAsignatura.getString("nombre");
+                    String nombre = resultSetAsignatura.getString("nombre_asignatura");
                     String descripcion = resultSetAsignatura.getString("descripcion");
                     int sct = resultSetAsignatura.getInt("sct");
-                    List<Clase> clases = clasesRepository.getClasesByAsignaturaId(id);
 
-                    asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases);
+
+                    asignatura = new Asignatura(id, nombre, codigo, descripcion, sct);
 
                     
                     
@@ -165,8 +165,7 @@ public class AsignaturaRepository {
                     String codigo = resultSetAsignatura.getString("codigo");
                     String descripcion = resultSetAsignatura.getString("descripcion");
                     int sct = resultSetAsignatura.getInt("sct");
-                    List<Clase> clases = clasesRepository.getClasesByAsignaturaId(id);
-                    asignatura = new Asignatura(nombre, codigo, descripcion, sct, clases); 
+                    asignatura = new Asignatura(id, nombre, codigo, descripcion, sct);
                 }   
             } catch (SQLException e) {
 
@@ -178,20 +177,16 @@ public class AsignaturaRepository {
         return asignatura;
     }
 
-    /**
-     * Agrega una nueva asignatura a la base de datos.
-     * @param asignatura el nombre de la asignatura.
-     * @param codigo el código de la asignatura.
-     * @param descripcion una breve descripción de la asignatura.
-     */
-    public void addAsignatura(String asignatura, String codigo, String descripcion) {
-        String query = "INSERT INTO asignatura (asignatura, codigo, descripcion) VALUES (?, ?, ?)";
+
+    public void addAsignatura(Asignatura asignatura) {
+        String query = "INSERT INTO asignatura (nombre_asignatura, codigo, descripcion,sct) VALUES (?, ?, ?, ?)";
     
         try (Connection connection = DatabaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, asignatura);
-            stmt.setString(2, codigo);
-            stmt.setString(3, descripcion);
+            stmt.setString(1, asignatura.getNombre());
+            stmt.setString(2, asignatura.getCodigo());
+            stmt.setString(3, asignatura.getDescripcion());
+            stmt.setInt(4, asignatura.getSct());
             stmt.executeUpdate();
 
 
@@ -200,22 +195,17 @@ public class AsignaturaRepository {
         }
     }
 
-    /**
-     * Actualiza una asignatura existente en la base de datos.
-     * @param asignatura el nuevo nombre de la asignatura.
-     * @param codigo el nuevo código de la asignatura.
-     * @param descripcion la nueva descripción de la asignatura.
-     * @param asignatura_id el ID de la asignatura a actualizar.
-     */
-    public void updateAsignatura(String asignatura, String codigo, String descripcion, int asignatura_id) {
-        String query = "UPDATE asignatura SET asignatura = ?, codigo = ?, descripcion = ? WHERE asignatura_id = ?";
+
+    public void updateAsignatura(Asignatura asignatura) {
+        String query = "UPDATE asignatura SET nombre_asignatura = ?, codigo = ?, descripcion = ?, sct = ? WHERE asignatura_id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
             PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, asignatura);
-            stmt.setString(2, codigo);
-            stmt.setString(3, descripcion);
-            stmt.setInt(4, asignatura_id);
+            stmt.setString(1, asignatura.getNombre());
+            stmt.setString(2, asignatura.getCodigo());
+            stmt.setString(3, asignatura.getDescripcion());
+            stmt.setInt(4, asignatura.getSct());
+            stmt.setInt(5, asignatura.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
