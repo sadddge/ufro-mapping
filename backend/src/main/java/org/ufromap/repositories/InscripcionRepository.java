@@ -72,11 +72,14 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
 
     @Override
     protected void setParametersForInsert(PreparedStatement statement, Inscripcion obj) throws SQLException {
-
+        statement.setInt(1, obj.getUsuarioId());
+        statement.setInt(2, obj.getAsignaturaId());
     }
 
     @Override
     protected void setParametersForUpdate(PreparedStatement statement, Inscripcion obj) throws SQLException {
-
+        statement.setInt(1, obj.getAsignaturaId());
+        statement.setInt(2, obj.getUsuarioId());
+        statement.setInt(3, obj.getId());
     }
 }
