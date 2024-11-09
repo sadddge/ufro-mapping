@@ -33,27 +33,27 @@ public class AsignaturaRepository extends BaseRepository<Asignatura> {
 
     @Override
     protected String getColumns() {
-        return "id, nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura";
+        return "id, nombre_asignatura, codigo, descripcion, sct";
     }
 
     @Override
     protected String getInsertQuery() {
-        return "INSERT INTO asignatura (nombre_asignatura, codigo_asignatura, descripcion_asignatura, sct_asignatura) VALUES (?, ?, ?, ?)";
+        return "INSERT INTO asignatura (nombre_asignatura, codigo, descripcion, sct) VALUES (?, ?, ?, ?)";
     }
 
     @Override
     protected String getUpdateQuery() {
-        return "UPDATE asignatura SET nombre_asignatura = ?, codigo_asignatura = ?, descripcion_asignatura = ?, sct_asignatura = ? WHERE id = ?";
+        return "UPDATE asignatura SET nombre_asignatura = ?, codigo = ?, descripcion = ?, sct = ? WHERE id = ?";
     }
 
     @Override
     public Asignatura mapToObject(ResultSet resultSet) {
         try {
-            int id = resultSet.getInt("asignatura_id");
+            int id = resultSet.getInt("id");
             String nombre = resultSet.getString("nombre_asignatura");
-            String codigo = resultSet.getString("codigo_asignatura");
-            String descripcion = resultSet.getString("descripcion_asignatura");
-            int sct = resultSet.getInt("sct_asignatura");
+            String codigo = resultSet.getString("codigo");
+            String descripcion = resultSet.getString("descripcion");
+            int sct = resultSet.getInt("sct");
             List<Clase> clases = clasesRepository.findByAsignaturaId(id);
             return new Asignatura(id, nombre, codigo, descripcion, sct, clases);
         } catch (SQLException e) {

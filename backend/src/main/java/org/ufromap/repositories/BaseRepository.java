@@ -12,15 +12,23 @@ import java.util.logging.Logger;
 
 import org.ufromap.config.DatabaseConnection;
 
-public abstract class BaseRepository<T> implements IRepository<T>{
+public abstract class BaseRepository<T> implements IRepository<T> {
     private static final Logger logger = Logger.getLogger(BaseRepository.class.getName());
+
     protected abstract String getTableName();
+
     protected abstract String getColumns();
+
     protected abstract String getInsertQuery();
+
     protected abstract String getUpdateQuery();
+
     protected abstract T mapToObject(ResultSet resultSet);
+
     protected abstract void setParametersForInsert(PreparedStatement statement, T obj) throws SQLException;
+
     protected abstract void setParametersForUpdate(PreparedStatement statement, T obj) throws SQLException;
+
     @Override
     public List<T> findAll() {
         List<T> results = new ArrayList<>();
@@ -99,7 +107,7 @@ public abstract class BaseRepository<T> implements IRepository<T>{
     private String getQueryByFilters(Map<String, Object> filters) {
         StringBuilder query = new StringBuilder("SELECT " + getColumns() + " FROM " + getTableName() + " WHERE 1 = 1");
         for (Map.Entry<String, Object> entry : filters.entrySet()) {
-            query.append(" AND ").append(entry.getKey()).append(" = ").append(entry.getValue());
+            query.append(" AND ").append(entry.getKey()).append(" = '").append(entry.getValue()).append("'");
         }
         return query.toString();
     }

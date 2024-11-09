@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Clase;
@@ -15,14 +16,15 @@ import org.ufromap.models.Clase;
  * Provee funciones para obtener, agregar, actualizar y eliminar clases.
  */
 public class ClaseRepository extends BaseRepository<Clase> {
+    private static final Logger logger = Logger.getLogger(ClaseRepository.class.getName());
 
     public List<Clase> findByAsignaturaId(int asignaturaId) {
-        String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE asignatura_id = ?";
+        String query = "SELECT id, sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo FROM clase WHERE asignatura_id = ?";
         return findByParameter(query, asignaturaId);
     }
 
     public List<Clase> findBySalaId(int id) {
-        String query = "SELECT clase_id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo FROM clase WHERE sala_id = ?";
+        String query = "SELECT id, sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo FROM clase WHERE sala_id = ?";
         return findByParameter(query, id);
     }
 
@@ -30,7 +32,6 @@ public class ClaseRepository extends BaseRepository<Clase> {
         List<Clase> clases = new ArrayList<>();
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-
             statement.setInt(1, param);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -39,7 +40,7 @@ public class ClaseRepository extends BaseRepository<Clase> {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            logger.severe("Error executing query: " + query);
             return null;
         }
         return clases;
@@ -52,28 +53,28 @@ public class ClaseRepository extends BaseRepository<Clase> {
 
     @Override
     protected String getColumns() {
-        return "id, sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo";
+        return "id, sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo";
     }
 
     @Override
     protected String getInsertQuery() {
-        return "INSERT INTO clase (sala_id, edificio_id, asignatura_id, dia_semana, periodo_clase, docente_nombre, modulo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        return "INSERT INTO clase (sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo) VALUES (?, ?, ?, ?, ?, ?, ?)";
     }
 
     @Override
     protected String getUpdateQuery() {
-        return "UPDATE clase SET sala_id = ?, edificio_id = ?, asignatura_id = ?, dia_semana = ?, periodo_clase = ?, docente_nombre = ?, modulo = ? WHERE id = ?";
+        return "UPDATE clase SET sala_id = ?, edificio_id = ?, asignatura_id = ?, dia_semana = ?, periodo = ?, docente_nombre = ?, modulo = ? WHERE id = ?";
     }
 
     @Override
     public Clase mapToObject(ResultSet resultSet) {
         try {
-            int id = resultSet.getInt("clase_id");
+            int id = resultSet.getInt("id");
             int salaId = resultSet.getInt("sala_id");
             int edificioId = resultSet.getInt("edificio_id");
             int asignaturaId = resultSet.getInt("asignatura_id");
             int diaSemana = resultSet.getInt("dia_semana");
-            int periodo = resultSet.getInt("periodo_clase");
+            int periodo = resultSet.getInt("periodo");
             String docente = resultSet.getString("docente_nombre");
             int modulo = resultSet.getInt("modulo");
             return new Clase(id, salaId, edificioId, asignaturaId, diaSemana, periodo, docente, modulo);

@@ -31,26 +31,26 @@ public class EdificioRepository extends BaseRepository<Edificio> {
 
     @Override
     protected String getColumns() {
-        return "id, nombre_edificio, alias_edificio, tipo_edificio, latitud, longitud";
+        return "id, nombre_edificio, alias, tipo, latitud, longitud";
     }
 
     @Override
     protected String getInsertQuery() {
-        return "INSERT INTO edificio (nombre_edificio, alias_edificio, tipo_edificio, latitud, longitud) VALUES (?, ?, ?, ?, ?)";
+        return "INSERT INTO edificio (nombre_edificio, alias, tipo, latitud, longitud) VALUES (?, ?, ?, ?, ?)";
     }
 
     @Override
     protected String getUpdateQuery() {
-        return "UPDATE edificio SET nombre_edificio = ?, alias_edificio = ?, tipo_edificio = ?, latitud = ?, longitud = ? WHERE id = ?";
+        return "UPDATE edificio SET nombre_edificio = ?, alias = ?, tipo = ?, latitud = ?, longitud = ? WHERE id = ?";
     }
 
     @Override
     public Edificio mapToObject(ResultSet resultSet) {
         try {
-            int id = resultSet.getInt("edificio_id");
+            int id = resultSet.getInt("id");
             String nombre = resultSet.getString("nombre_edificio");
-            String alias = resultSet.getString("alias_edificio");
-            String tipo = resultSet.getString("tipo_edificio");
+            String alias = resultSet.getString("alias");
+            String tipo = resultSet.getString("tipo");
             float latitud = resultSet.getFloat("latitud");
             float longitud = resultSet.getFloat("longitud");
             List<Sala> salas = salaRepository.findByEdificioId(id);

@@ -30,7 +30,7 @@ public class SalaRepository extends BaseRepository<Sala> {
 
     public List<Sala> findByEdificioId(int edificioId) {
         List<Sala> salas = new ArrayList<>();
-        String query = "SELECT sala_id, edificio_id, nombre_sala FROM sala WHERE edificio_id = ?";
+        String query = "SELECT id, edificio_id, nombre_sala FROM sala WHERE edificio_id = ?";
         Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, edificioId);
@@ -69,7 +69,7 @@ public class SalaRepository extends BaseRepository<Sala> {
     @Override
     public Sala mapToObject(ResultSet resultSet) {
         try {
-            int id = resultSet.getInt("sala_id");
+            int id = resultSet.getInt("id");
             int edificioId = resultSet.getInt("edificio_id");
             String nombre = resultSet.getString("nombre_sala");
             List<Clase> clases = claseRepository.findBySalaId(id);
