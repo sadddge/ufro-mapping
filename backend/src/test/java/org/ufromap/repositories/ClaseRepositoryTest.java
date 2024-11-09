@@ -1,52 +1,68 @@
 package org.ufromap.repositories;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.ufromap.models.Clase;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
 
 public class ClaseRepositoryTest {
 
     private ClaseRepository claseRepository;
-    private Connection mockConnection;
-    private PreparedStatement mockPreparedStatement;
-    private ResultSet mockResultSet;
+    private Connection connection;
 
+    @BeforeAll
+    public static void setUpClass() {
+        // Configura el driver de H2 para que pueda ser utilizado en las pruebas
+        System.setProperty("jdbc.drivers", "org.h2.Driver");
+    }
     @BeforeEach
     public void setUp() throws SQLException {
-        claseRepository = new ClaseRepository();
-        mockConnection = Mockito.mock(Connection.class);
-        mockPreparedStatement = Mockito.mock(PreparedStatement.class);
-        mockResultSet = Mockito.mock(ResultSet.class);
+        // Configura la conexión a la base de datos H2 en memoria
+        connection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
 
-        // Simula la conexión a la base de datos
-        when(mockConnection.prepareStatement(anyString())).thenReturn(mockPreparedStatement);
-        when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+        // Crear la tabla en la base de datos H2
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute("DROP TABLE IF EXISTS clase");
+            String createTable = """
+                CREATE TABLE clase (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    sala_id INT,
+                    edificio_id INT,
+                    asignatura_id INT,
+                    dia_semana INT,
+                    periodo INT,
+                    docente_nombre VARCHAR(255),
+                    modulo INT
+                );
+                """;
+            stmt.execute(createTable);
+
+            // Insertar datos de ejemplo para los tests
+            String insertData = """
+                INSERT INTO clase (sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo)
+                VALUES (101, 201, 301, 1, 2023, 'Profesor Test', 1);
+                """;
+            stmt.execute(insertData);
+        }
+
+        // Inicia ClaseRepository con la conexión H2 en memoria
+        claseRepository = new ClaseRepository(connection);
+    }
+
+    @AfterEach
+    public void tearDown() throws SQLException {
+        // Cierra la conexión después de cada test
+        connection.close();
     }
 
     @Test
-    public void testGetClases() throws SQLException {
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getInt("sala_id")).thenReturn(101);
-        when(mockResultSet.getInt("edificio_id")).thenReturn(201);
-        when(mockResultSet.getInt("asignatura_id")).thenReturn(301);
-        when(mockResultSet.getInt("dia_semana")).thenReturn(1);
-        when(mockResultSet.getInt("periodo")).thenReturn(2023);
-        when(mockResultSet.getString("docente_nombre")).thenReturn("Profesor Test");
-        when(mockResultSet.getInt("modulo")).thenReturn(1);
+    public void testGetClases() {
 
         List<Clase> clases = claseRepository.getClases();
         assertNotNull(clases);
@@ -55,15 +71,7 @@ public class ClaseRepositoryTest {
     }
 
     @Test
-    public void testGetClaseById() throws SQLException {
-        when(mockResultSet.next()).thenReturn(true);
-        when(mockResultSet.getInt("sala_id")).thenReturn(101);
-        when(mockResultSet.getInt("edificio_id")).thenReturn(201);
-        when(mockResultSet.getInt("asignatura_id")).thenReturn(301);
-        when(mockResultSet.getInt("dia_semana")).thenReturn(2);
-        when(mockResultSet.getInt("periodo")).thenReturn(2023);
-        when(mockResultSet.getString("docente_nombre")).thenReturn("Profesor Test");
-        when(mockResultSet.getInt("modulo")).thenReturn(1);
+    public void testGetClaseById() {
 
         Clase clase = claseRepository.getClaseById(1);
         assertNotNull(clase);
@@ -72,15 +80,7 @@ public class ClaseRepositoryTest {
     }
 
     @Test
-    public void testGetClasesBySalaId() throws SQLException {
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getInt("edificio_id")).thenReturn(201);
-        when(mockResultSet.getInt("asignatura_id")).thenReturn(301);
-        when(mockResultSet.getInt("dia_semana")).thenReturn(3);
-        when(mockResultSet.getInt("periodo")).thenReturn(2023);
-        when(mockResultSet.getString("docente_nombre")).thenReturn("Profesor Test");
-        when(mockResultSet.getInt("modulo")).thenReturn(2);
+    public void testGetClasesBySalaId() {
 
         List<Clase> clases = claseRepository.getClasesBySalaId(101);
         assertNotNull(clases);
@@ -89,15 +89,7 @@ public class ClaseRepositoryTest {
     }
 
     @Test
-    public void testGetClasesByEdificioId() throws SQLException {
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getInt("sala_id")).thenReturn(101);
-        when(mockResultSet.getInt("asignatura_id")).thenReturn(301);
-        when(mockResultSet.getInt("dia_semana")).thenReturn(4);
-        when(mockResultSet.getInt("periodo")).thenReturn(2023);
-        when(mockResultSet.getString("docente_nombre")).thenReturn("Profesor Test");
-        when(mockResultSet.getInt("modulo")).thenReturn(3);
+    public void testGetClasesByEdificioId() {
 
         List<Clase> clases = claseRepository.getClasesByEdificioId(201);
         assertNotNull(clases);
@@ -106,15 +98,7 @@ public class ClaseRepositoryTest {
     }
 
     @Test
-    public void testGetClasesByAsignaturaId() throws SQLException {
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getInt("sala_id")).thenReturn(101);
-        when(mockResultSet.getInt("edificio_id")).thenReturn(201);
-        when(mockResultSet.getInt("dia_semana")).thenReturn(5);
-        when(mockResultSet.getInt("periodo")).thenReturn(2023);
-        when(mockResultSet.getString("docente_nombre")).thenReturn("Profesor Test");
-        when(mockResultSet.getInt("modulo")).thenReturn(4);
+    public void testGetClasesByAsignaturaId() {
 
         List<Clase> clases = claseRepository.getClasesByAsignaturaId(301);
         assertNotNull(clases);
@@ -123,15 +107,7 @@ public class ClaseRepositoryTest {
     }
 
     @Test
-    public void testGetClasesByDiaSemana() throws SQLException {
-        when(mockResultSet.next()).thenReturn(true).thenReturn(false);
-        when(mockResultSet.getInt("id")).thenReturn(1);
-        when(mockResultSet.getInt("sala_id")).thenReturn(101);
-        when(mockResultSet.getInt("edificio_id")).thenReturn(201);
-        when(mockResultSet.getInt("asignatura_id")).thenReturn(301);
-        when(mockResultSet.getInt("periodo")).thenReturn(2023);
-        when(mockResultSet.getString("docente_nombre")).thenReturn("Profesor Test");
-        when(mockResultSet.getInt("modulo")).thenReturn(1);
+    public void testGetClasesByDiaSemana() {
 
         List<Clase> clases = claseRepository.getClasesByDiaSemana(1);
         assertNotNull(clases);
@@ -140,29 +116,22 @@ public class ClaseRepositoryTest {
     }
 
     @Test
-    public void testAddClase() throws SQLException {
-        Clase clase = new Clase(1, 101, 201, 301, 1, 2023, "Profesor Test", 1);
-
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
+    public void testAddClase() {
+        Clase clase = new Clase(2, 101, 201, 301, 1, 2023, "Profesor Test", 1);
 
         boolean result = claseRepository.addClase(clase);
         assertTrue(result);
     }
 
     @Test
-    public void testUpdateClase() throws SQLException {
+    public void testUpdateClase() {
         Clase clase = new Clase(1, 101, 201, 301, 2, 2023, "Profesor Actualizado", 1);
-
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
         boolean result = claseRepository.updateClase(clase);
         assertTrue(result);
     }
 
     @Test
-    public void testDeleteClase() throws SQLException {
-        when(mockPreparedStatement.executeUpdate()).thenReturn(1);
-
+    public void testDeleteClase(){
         boolean result = claseRepository.deleteClase(1);
         assertTrue(result);
     }

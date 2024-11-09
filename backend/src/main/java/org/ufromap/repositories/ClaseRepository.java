@@ -14,7 +14,17 @@ import org.ufromap.models.Clase;
  * Provee funciones para obtener, agregar, actualizar y eliminar clases.
  */
 public class ClaseRepository {
-    
+
+    private final Connection connection;
+
+    public ClaseRepository(){
+        this.connection = DatabaseConnection.getConnection();
+    }
+
+    public ClaseRepository(Connection connection){
+        this.connection = connection;
+    }
+
     /**
      * Obtiene todas las clases de la base de datos.
      * 
@@ -24,8 +34,7 @@ public class ClaseRepository {
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT * FROM clase";
 
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query);
+        try(PreparedStatement stmt= connection.prepareStatement(query);
             ResultSet resultSet= stmt.executeQuery()){
 
             while(resultSet.next()){
@@ -41,7 +50,7 @@ public class ClaseRepository {
                 clases.add(new Clase(id,salaId,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
         return clases;
     }
@@ -57,8 +66,7 @@ public class ClaseRepository {
         Clase clase = null;
         String query= "SELECT * FROM clase WHERE id=?";
 
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, id);
             ResultSet resultSet= stmt.executeQuery();
 
@@ -74,7 +82,7 @@ public class ClaseRepository {
                 clase = new Clase(id,salaId,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo);
             }
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
 
         return clase;
@@ -91,13 +99,12 @@ public class ClaseRepository {
         List<Clase> clase = new ArrayList<>();
         String query= "SELECT * FROM clase WHERE sala_id=?";
     
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, sala_id);
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
+                int id = resultSet.getInt("id");
                 int edificioId = resultSet.getInt("edificio_id");
                 int asignaturaId = resultSet.getInt("asignatura_id");
                 int diaSemana = resultSet.getInt("dia_semana");
@@ -108,7 +115,7 @@ public class ClaseRepository {
                 clase.add(new Clase(id,sala_id,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
     
         return clase;
@@ -125,13 +132,12 @@ public class ClaseRepository {
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT * FROM clase WHERE edificio_id=?";
     
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, edificio_id);
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
+                int id = resultSet.getInt("id");
                 int salaId = resultSet.getInt("sala_id");
                 int asignaturaId = resultSet.getInt("asignatura_id");
                 int diaSemana = resultSet.getInt("dia_semana");
@@ -142,7 +148,7 @@ public class ClaseRepository {
                 clases.add(new Clase(id,salaId,edificio_id,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
     
         return clases;
@@ -158,13 +164,12 @@ public class ClaseRepository {
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT * FROM clase WHERE asignatura_id=?";
     
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, asignatura_id);
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
+                int id = resultSet.getInt("id");
                 int salaId = resultSet.getInt("sala_id");
                 int edificioId = resultSet.getInt("edificio_id");
                 int diaSemana = resultSet.getInt("dia_semana");
@@ -175,7 +180,7 @@ public class ClaseRepository {
                 clases.add(new Clase(id,salaId,edificioId,asignatura_id,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
     
         return clases;
@@ -191,13 +196,12 @@ public class ClaseRepository {
         List<Clase> clases = new ArrayList<>();
         String query= "SELECT * FROM clase WHERE dia_semana=?";
     
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, diaSemana);
             ResultSet resultSet= stmt.executeQuery();
     
             if(resultSet.next()){
-                int id = resultSet.getInt("clase_id");
+                int id = resultSet.getInt("id");
                 int salaId = resultSet.getInt("sala_id");
                 int edificioId = resultSet.getInt("edificio_id");
                 int asignaturaId = resultSet.getInt("asignatura_id");
@@ -208,7 +212,7 @@ public class ClaseRepository {
                 clases.add(new Clase(id,salaId,edificioId,asignaturaId,diaSemana,periodo,docenteNombre,modulo));
             }
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
     
         return clases;
@@ -224,8 +228,7 @@ public class ClaseRepository {
         boolean result = false;
         String query= "INSERT INTO clase(sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo) VALUES(?,?,?,?,?,?,?)";
 
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, clase.getSalaId());
             stmt.setInt(2, clase.getEdificioId());
             stmt.setInt(3, clase.getAsignaturaId());
@@ -236,7 +239,7 @@ public class ClaseRepository {
 
             result = stmt.executeUpdate() > 0;
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
         return result;
     }
@@ -251,8 +254,7 @@ public class ClaseRepository {
         boolean result = false;
         String query= "UPDATE clase SET sala_id=?, edificio_id=?, asignatura_id=?, dia_semana = ?, periodo = ?, docente_nombre=?, modulo=? WHERE id=?";
 
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, clase.getSalaId());
             stmt.setInt(2, clase.getEdificioId());
             stmt.setInt(3, clase.getAsignaturaId());
@@ -260,11 +262,12 @@ public class ClaseRepository {
             stmt.setInt(5, clase.getPeriodo());
             stmt.setString(6, clase.getDocenteNombre());
             stmt.setInt(7, clase.getModulo());
+            stmt.setInt(8, clase.getId());
 
 
             result = stmt.executeUpdate() > 0;
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
         return result;
     }
@@ -279,13 +282,12 @@ public class ClaseRepository {
         boolean result = false;
         String query= "DELETE FROM clase WHERE id=?";
 
-        try(Connection connection= DatabaseConnection.getConnection();
-            PreparedStatement stmt= connection.prepareStatement(query)){
+        try(PreparedStatement stmt= connection.prepareStatement(query)){
             stmt.setInt(1, id);
 
             result = stmt.executeUpdate() > 0;
         }catch(SQLException e){
-
+            System.out.println(e.getMessage());
         }
         return result;
     }
