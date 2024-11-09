@@ -1,10 +1,10 @@
 package org.ufromap.config;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * Clase que gestiona la configuración de la base de datos mediante la carga de un archivo
@@ -12,11 +12,11 @@ import java.util.Properties;
  * nombre de usuario, contraseña y driver de la base de datos.
  */
 public class DatabaseConfig {
-    private Properties properties;
+    private final Properties properties;
+    private static final Logger logger = Logger.getLogger(DatabaseConfig.class.getName());
 
     /**
      * Constructor de la clase DatabaseConfig.
-     *
      * Carga el archivo de configuración `config.properties` desde el sistema de archivos.
      * Si el archivo no se encuentra o no puede ser leído, se imprime una traza de la excepción.
      */
@@ -29,7 +29,7 @@ public class DatabaseConfig {
                 throw new FileNotFoundException("config.properties not found in resources folder");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.severe("Error loading database configuration: " + e.getMessage());
         }
     }
 
