@@ -79,6 +79,8 @@ public abstract class BaseController<T> extends HttpServlet {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON");
         } catch (EntityNotFoundException e) {
             sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+        } catch (BadRequestException e) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         }
     }
 
