@@ -7,13 +7,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,18 +25,7 @@ import java.util.Map;
 @WebServlet("/api/clases/*")
 public class ClaseController extends BaseController<Clase> {
 
-    private final ClaseService claseService;
-    /**
-     * Constructor que inicializa el controlador con un servicio de clase.
-     *
-     * @param claseService El servicio {@link ClaseService} que se utilizará para manejar las operaciones.
-     */
-    public ClaseController(ClaseService claseService) {
-        this.claseService = claseService;
-    }
-    public ClaseController() {
-        this.claseService = new ClaseService();
-    }
+    private final ClaseService claseService = new ClaseService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -60,34 +49,22 @@ public class ClaseController extends BaseController<Clase> {
     }
 
     private void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Integer salaId;
-        Integer edificioId;
-        Integer asignaturaId;
-        String docenteNombre = request.getParameter("docente");
-        Integer diaSemana;
-        Integer periodoClase;
-        Integer modulo;
+        Map<String, Object> filters = new HashMap<>();
+        String[] validFilters = {"sala_id", "edificio_id", "asignatura_id", "dia_semana", "periodo", "docente", "modulo"};
 
-        try {
-            salaId = request.getParameter("sala_id") == null ? null : Integer.parseInt(request.getParameter("sala_id"));
-            edificioId = request.getParameter("edificio_id") == null ? null : Integer.parseInt(request.getParameter("edificio_id"));
-            asignaturaId = request.getParameter("asignatura_id") == null ? null : Integer.parseInt(request.getParameter("asignatura_id"));
-            diaSemana = request.getParameter("dia_semana") == null ? null : Integer.parseInt(request.getParameter("dia_semana"));
-            periodoClase = request.getParameter("periodo_clase") == null ? null : Integer.parseInt(request.getParameter("periodo_clase"));
-            modulo = request.getParameter("modulo") == null ? null : Integer.parseInt(request.getParameter("modulo"));
-        } catch (NumberFormatException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
+        for (String filter : validFilters) {
+            if (request.getParameter(filter) != null) {
+                filters.put(filter, request.getParameter(filter));
+            }
+        }
+
+        if (filters.isEmpty()) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Missing filters");
             return;
         }
 
-        if (salaId != null || edificioId != null || asignaturaId != null || docenteNombre != null || diaSemana != null || periodoClase != null || modulo != null) {
-            List<Clase> clases = claseService.findByFilter(salaId, edificioId, asignaturaId, diaSemana, periodoClase, docenteNombre, modulo);
-            response.getWriter().print(new Gson().toJson(clases));
-        } else {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
-        }
-
-
+        List<Clase> clases = claseService.findByFilter(filters);
+        writeJsonResponse(response, new Gson().toJson(clases));
     }
 
     @Override
@@ -104,9 +81,6 @@ public class ClaseController extends BaseController<Clase> {
     protected void doDelete (HttpServletRequest request, HttpServletResponse response) {
         handleDelete(request, response);
     }
-
-
-
 
     @Override
     protected Clase processPost(Clase entity) throws BadRequestException {
@@ -127,11 +101,11 @@ public class ClaseController extends BaseController<Clase> {
     protected Clase mapJsonToEntity(JSONObject jsonObject) {
         return new Clase(
             jsonObject.optInt("id", -1),
-            jsonObject.optInt("sala_id", -1),
-            jsonObject.optInt("edificio_id", -1),
-            jsonObject.optInt("asignatura_id", -1),
-            jsonObject.optInt("dia_semana", -1),
-                jsonObject.optInt("periodo_clase", -1),
+            jsonObject.optInt("salaId", -1),
+            jsonObject.optInt("edificioId", -1),
+            jsonObject.optInt("asignaturaId", -1),
+            jsonObject.optInt("diaSemana", -1),
+                jsonObject.optInt("periodo", -1),
                 jsonObject.optString("docente", null),
                 jsonObject.optInt("modulo", -1)
         );

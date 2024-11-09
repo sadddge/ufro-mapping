@@ -10,21 +10,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @WebServlet("/api/asignaturas/*")
 public class AsignaturaController extends BaseController<Asignatura> {
 
-    private final AsignaturaService asignaturaService;
-
-    public AsignaturaController() {
-        this.asignaturaService = new AsignaturaService();
-    }
-
-    public AsignaturaController(AsignaturaService asignaturaService) {
-        this.asignaturaService = asignaturaService;
-    }
+    private final AsignaturaService asignaturaService = new AsignaturaService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -52,12 +45,21 @@ public class AsignaturaController extends BaseController<Asignatura> {
     }
 
     private void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String nombre = request.getParameter("nombre_asignatura");
-        String codigo = request.getParameter("codigo_asignatura");
-        String descripcion = request.getParameter("descripcion_asignatura");
-        Integer sct = Integer.parseInt(request.getParameter("sct_asignatura"));
+        Map<String, Object> filters = new HashMap<>();
+        String[] validFilters = {"nombre_asignatura", "codigo_asignatura", "sct_asignatura"};
 
-        List<Asignatura> asignaturas = asignaturaService.findByFilter(nombre, codigo, descripcion, sct);
+        for (String filter : validFilters) {
+            if (request.getParameter(filter) != null) {
+                filters.put(filter, request.getParameter(filter));
+            }
+        }
+
+        if (filters.isEmpty()) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Filtros inválidos");
+            return;
+        }
+
+        List<Asignatura> asignaturas = asignaturaService.findByFilter(filters);
         response.getWriter().print(new Gson().toJson(asignaturas));
     }
 
@@ -110,11 +112,13 @@ public class AsignaturaController extends BaseController<Asignatura> {
 
     @Override
     protected Asignatura mapJsonToEntity(JSONObject jsonObject){
-        int id = jsonObject.optInt("id", -1);
-        String nombre = jsonObject.optString("nombre", null);
-        String codigo = jsonObject.optString("codigo", null);
-        String descripcion = jsonObject.optString("descripcion", null);
-        int sct = jsonObject.optInt("sct", -1);
-        return new Asignatura(id, nombre, codigo, descripcion, sct, null);
+        return new Asignatura(
+            jsonObject.optInt("id", -1),
+            jsonObject.optString("nombre", null),
+            jsonObject.optString("codigo", null),
+            jsonObject.optString("descripcion", null),
+            jsonObject.optInt("sct", -1),
+                null
+        );
     }
 }

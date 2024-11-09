@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @WebServlet("/api/salas/*")
@@ -55,26 +56,22 @@ public class SalaController extends BaseController<Sala>{
     }
 
     private void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String nombre = request.getParameter("nombre");
-        Integer edificioId;
+        Map<String, Object> filters = new HashMap<>();
+        String[] validFilters = {"edificio_id", "nombre_sala"};
 
-        try {
-            edificioId = request.getParameter("edificio_id") == null ? null : Integer.parseInt(request.getParameter("edificio_id"));
-        } catch (NumberFormatException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid edificio_id");
+        for (String filter : validFilters) {
+            if (request.getParameter(filter) != null) {
+                filters.put(filter, request.getParameter(filter));
+            }
+        }
+
+        if (filters.isEmpty()) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Missing filters");
             return;
         }
 
-        if (edificioId != null || nombre != null) {
-            try {
-                List<Sala> list = salaService.findByFilter(edificioId, nombre);
-                writeJsonResponse(response, new Gson().toJson(list));
-            } catch (EntityNotFoundException e) {
-                sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-            }
-        } else {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
-        }
+        List<Sala> salas = salaService.findByFilter(filters);
+        writeJsonResponse(response, new Gson().toJson(salas));
     }
 
     @Override
@@ -94,9 +91,11 @@ public class SalaController extends BaseController<Sala>{
 
     @Override
     protected Sala mapJsonToEntity(JSONObject jsonObject) {
-        int id = jsonObject.optInt("id", -1);
-        int edificioId = jsonObject.optInt("edificio_id", -1);
-        String nombre = jsonObject.optString("nombre", null);
-        return new Sala(id, edificioId, nombre, null);
+        return new Sala(
+                jsonObject.optInt("id", -1),
+                jsonObject.optInt("edificioId", -1),
+                jsonObject.optString("nombre", null),
+                null
+        );
     }
 }

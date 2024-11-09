@@ -1,6 +1,7 @@
 package org.ufromap.controllers;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,13 +20,7 @@ import com.google.gson.Gson;
 
 @WebServlet("/api/edificios/*")
 public class EdificioController extends BaseController<Edificio> {
-    private final EdificioService edificioService;
-    public EdificioController() {
-        this.edificioService = new EdificioService();
-    }
-    public EdificioController(EdificioService edificioService) {
-        this.edificioService = edificioService;
-    }
+    private final EdificioService edificioService = new EdificioService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -53,25 +48,22 @@ public class EdificioController extends BaseController<Edificio> {
     }
 
     private void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String nombre = request.getParameter("nombre");
-        String alias = request.getParameter("alias");
-        String tipo = request.getParameter("tipo");
-        Float latitud;
-        Float longitud;
-        try {
-            latitud = request.getParameter("latitud") == null ? null : Float.parseFloat(request.getParameter("latitud"));
-            longitud = request.getParameter("longitud") == null ? null : Float.parseFloat(request.getParameter("longitud"));
-        } catch (NumberFormatException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
+        Map<String, Object> filters = new HashMap<>();
+        String[] validFilters = {"nombre_edificio", "alias_edificio", "tipo_edificio", "latitud", "longitud"};
+
+        for (String filter : validFilters) {
+            if (request.getParameter(filter) != null) {
+                filters.put(filter, request.getParameter(filter));
+            }
+        }
+
+        if (filters.isEmpty()) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Missing filters");
             return;
         }
 
-        if (nombre != null || alias != null || tipo != null || latitud != null || longitud != null) {
-            List<Edificio> edificios = edificioService.findByFilter(nombre, alias, tipo, latitud, longitud);
-            response.getWriter().print(new Gson().toJson(edificios));
-        } else {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid parameters");
-        }
+        List<Edificio> edificios = edificioService.findByFilter(filters);
+        writeJsonResponse(response, new Gson().toJson(edificios));
     }
 
 
@@ -121,12 +113,14 @@ public class EdificioController extends BaseController<Edificio> {
 
     @Override
     protected Edificio mapJsonToEntity(JSONObject jsonObject) {
-        int id = jsonObject.optInt("id", -1);
-        String nombre = jsonObject.optString("nombre", null);
-        String alias = jsonObject.optString("alias", null);
-        String tipo = jsonObject.optString("tipo", null);
-        float latitud = jsonObject.optFloat("latitud", 0);
-        float longitud = jsonObject.optFloat("longitud", 0);
-        return new Edificio(id, nombre, alias, tipo, latitud, longitud, null);
+        return new Edificio(
+            jsonObject.optInt("id", -1),
+            jsonObject.optString("nombre", null),
+            jsonObject.optString("alias", null),
+            jsonObject.optString("tipo", null),
+            jsonObject.optFloat("latitud", -1),
+            jsonObject.optFloat("longitud", -1),
+                null
+        );
     }
 }
