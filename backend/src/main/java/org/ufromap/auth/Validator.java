@@ -1,5 +1,7 @@
 package org.ufromap.auth;
 
+import org.ufromap.exceptions.BadRequestException;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,17 +11,19 @@ public class Validator {
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
     private static final int MIN_PASSWORD_LENGTH = 8;
 
-    public static boolean isValidEmail(String email) {
+    public static void validateEmail(String email) {
         if (email == null || email.isEmpty()) {
-            return false;
+            throw new BadRequestException("Email is empty");
         }
         Matcher matcher = EMAIL_PATTERN.matcher(email);
-        return matcher.matches();
+        if (!matcher.matches()){
+            throw new BadRequestException("Email contains invalid format");
+        }
     }
 
-    public static boolean isValidPassword(String password) {
+    public static void validatePassword(String password) {
         if (password == null || password.length() < MIN_PASSWORD_LENGTH) {
-            return false;
+            throw new BadRequestException("Password is too short");
         }
         boolean hasUpperCase = false;
         boolean hasLowerCase = false;
@@ -33,7 +37,9 @@ public class Validator {
             if (!Character.isLetterOrDigit(c)) hasSpecialChar = true;
         }
 
-        return hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar;
+        if (!hasUpperCase && !hasLowerCase && !hasDigit && !hasSpecialChar) {
+            throw new BadRequestException("Password contains invalid characters");
+        }
     }
 }
 
