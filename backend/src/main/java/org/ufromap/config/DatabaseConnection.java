@@ -1,6 +1,7 @@
 package org.ufromap.config;
 
 import java.sql.*;
+import java.util.logging.Logger;
 
 /**
  * Clase que gestiona la conexión a la base de datos utilizando las configuraciones
@@ -9,6 +10,7 @@ import java.sql.*;
  */
 public class DatabaseConnection {
     private static Connection connection = null;
+    private static final Logger logger = Logger.getLogger(DatabaseConnection.class.getName());
 
     /**
      * Obtiene la conexión a la base de datos. Si no existe una conexión activa,
@@ -28,22 +30,10 @@ public class DatabaseConnection {
                 connection = DriverManager.getConnection(url, username, password);
 
             } catch (ClassNotFoundException | SQLException e) {
-                e.printStackTrace();
+                logger.severe("Error: " + e.getMessage());
             }
         }
         return connection;
-    }
-
-    public static void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-                connection = null; // Asigna null para que se pueda volver a abrir si es necesario
-                System.out.println("Conexión cerrada correctamente.");
-            } catch (SQLException e) {
-                System.out.println("Error al cerrar la conexión: " + e.getMessage());
-            }
-        }
     }
 
     public static int getLastInsertId() {
@@ -57,7 +47,7 @@ public class DatabaseConnection {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("Error: " + e.getMessage());
         }
         return lastId;
     }

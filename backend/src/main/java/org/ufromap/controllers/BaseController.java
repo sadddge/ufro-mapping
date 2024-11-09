@@ -5,26 +5,60 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
+import org.ufromap.services.IService;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.Map;
 
 public abstract class BaseController<T> extends HttpServlet {
-    protected abstract T processPost(T entity) throws BadRequestException;
-    protected abstract T processPut(T entity) throws EntityNotFoundException;
-    protected abstract void processDelete(int id) throws EntityNotFoundException;
+    protected final IService<T> service;
+
+    public BaseController(IService<T> service) {
+        this.service = service;
+    }
+
     protected abstract T mapJsonToEntity(JSONObject jsonObject);
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+    protected abstract String[] getValidFilters();
+
+    protected void handleExtraGetRequests(String[] pathParts, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, String[]> params = request.getParameterMap();
+        String pathInfo = request.getPathInfo();
+        String[] pathParts = pathInfo == null ? new String[0] : pathInfo.trim().split("/");
+
+        switch (pathParts.length) {
+            case 2:
+                handleIdRequest(pathParts[1], response);
+                break;
+            case 0:
+                if (!params.isEmpty()) {
+                    handleQueryRequest(request, response);
+                } else {
+                    handleAllRequest(response);
+                }
+                break;
+            default:
+                handleExtraGetRequests(pathParts, request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             JSONObject jsonObject = getJson(request);
             T entity = mapJsonToEntity(jsonObject);
-            entity = processPost(entity);
+            entity = service.add(entity);
             writeJsonResponse(response, new Gson().toJson(entity));
             response.setStatus(HttpServletResponse.SC_CREATED);
         } catch (JSONException e) {
@@ -34,11 +68,12 @@ public abstract class BaseController<T> extends HttpServlet {
         }
     }
 
-    protected void handlePut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             JSONObject jsonObject = getJson(request);
             T entity = mapJsonToEntity(jsonObject);
-            entity = processPut(entity);
+            entity = service.update(entity);
             writeJsonResponse(response, new Gson().toJson(entity));
         } catch (JSONException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid JSON");
@@ -47,7 +82,8 @@ public abstract class BaseController<T> extends HttpServlet {
         }
     }
 
-    protected void handleDelete(HttpServletRequest request, HttpServletResponse response){
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) {
         String pathInfo = request.getPathInfo();
         String[] pathParts = pathInfo == null ? new String[0] : pathInfo.trim().split("/");
 
@@ -58,7 +94,7 @@ public abstract class BaseController<T> extends HttpServlet {
 
         try {
             int id = Integer.parseInt(pathParts[1]);
-            processDelete(id);
+            service.delete(id);
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } catch (NumberFormatException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid id");
@@ -88,10 +124,10 @@ public abstract class BaseController<T> extends HttpServlet {
         }
     }
 
-    protected void handleIdRequest(String pathPart, HttpServletResponse response, Function<Integer, T> findById)  throws IOException {
+    protected void handleIdRequest(String pathPart, HttpServletResponse response) throws IOException {
         try {
             int id = Integer.parseInt(pathPart);
-            T entity = findById.apply(id);
+            T entity = service.findById(id);
             writeJsonResponse(response, new Gson().toJson(entity));
         } catch (NumberFormatException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -100,8 +136,29 @@ public abstract class BaseController<T> extends HttpServlet {
         }
     }
 
-    protected void handleAllRequest(HttpServletResponse response, Supplier<List<T>> findAll) throws IOException {
-        List<T> list = findAll.get();
+    protected void handleQueryRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Map<String, Object> filters = new HashMap<>();
+        for (String filter : getValidFilters()) {
+            if (request.getParameter(filter) != null) {
+                filters.put(filter, request.getParameter(filter));
+            }
+        }
+
+        if (filters.isEmpty()) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid filters");
+            return;
+        }
+
+        try {
+            List<T> list = service.findByFilter(filters);
+            writeJsonResponse(response, new Gson().toJson(list));
+        } catch (EntityNotFoundException e) {
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+        }
+    }
+
+    protected void handleAllRequest(HttpServletResponse response) throws IOException {
+        List<T> list = service.findAll();
         writeJsonResponse(response, new Gson().toJson(list));
     }
 
@@ -114,5 +171,4 @@ public abstract class BaseController<T> extends HttpServlet {
         }
         return new JSONObject(sb.toString());
     }
-
 }

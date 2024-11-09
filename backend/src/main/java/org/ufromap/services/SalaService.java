@@ -6,11 +6,10 @@ import org.ufromap.models.Sala;
 import org.ufromap.repositories.EdificioRepository;
 import org.ufromap.repositories.SalaRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SalaService {
+public class SalaService implements IService<Sala> {
 
     private final SalaRepository salaRepository;
     private final EdificioRepository edificioRepository;
@@ -26,21 +25,14 @@ public class SalaService {
 
     public Sala findById(int id) {
         Sala sala = salaRepository.findById(id);
-        if (sala == null) {
-            throw new EntityNotFoundException("No se encontró una sala con el ID proporcionado.");
-        }
+        if (sala == null) throw new EntityNotFoundException("No se encontró una sala con el ID proporcionado.");
         return sala;
     }
 
-    public List<Sala> findByFilter(Integer edificioId, String nombre) {
-        Map<String, Object> filter = new HashMap<>();
-        if (edificioId != null) filter.put("edificioId", edificioId);
-        if (nombre != null) filter.put("nombre", nombre);
-        List<Sala> salas = salaRepository.findByFilter(filter);
-        if (salas.isEmpty()) {
+    public List<Sala> findByFilter(Map<String, Object> filters) {
+        List<Sala> salas = salaRepository.findByFilter(filters);
+        if (salas.isEmpty())
             throw new EntityNotFoundException("No se encontraron salas con los filtros proporcionados.");
-        }
-
         return salas;
     }
 
@@ -50,16 +42,13 @@ public class SalaService {
     }
 
     public Sala update(Sala sala) {
-        return salaRepository.update(updateSala(sala));
+        validateSala(sala);
+        return salaRepository.update(sala);
     }
 
-    public boolean delete(int id) {
+    public void delete(int id) {
         findById(id);
-        return salaRepository.delete(id);
-    }
-
-    public boolean deleteByEdificioId(int edificioId) {
-        return salaRepository.deleteByEdificioId(edificioId);
+        salaRepository.delete(id);
     }
 
     private void validateSala(Sala sala) {
@@ -70,19 +59,4 @@ public class SalaService {
             throw new BadRequestException("El edificio de la sala no existe.");
         }
     }
-
-    private Sala updateSala(Sala sala) {
-        Sala existing = findById(sala.getId());
-        if (sala.getNombre() == null) {
-            sala.setNombre(existing.getNombre());
-        }
-        if (sala.getEdificioId() == -1) {
-            sala.setEdificioId(existing.getEdificioId());
-        }
-
-        validateSala(sala);
-        return sala;
-    }
-
-
 }
