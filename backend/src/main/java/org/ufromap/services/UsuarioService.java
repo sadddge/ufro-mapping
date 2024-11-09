@@ -2,9 +2,12 @@ package org.ufromap.services;
 
 import org.ufromap.auth.Validator;
 import org.ufromap.exceptions.EntityNotFoundException;
+import org.ufromap.models.Asignatura;
+import org.ufromap.models.Clase;
 import org.ufromap.models.Usuario;
 import org.ufromap.repositories.UsuarioRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,5 +61,13 @@ public class UsuarioService implements IService<Usuario> {
         usuarioRepository.delete(id);
     }
 
-    //Find by filter (Social Update)
+    public List<Clase> getClasesByUsuarioId(int id) {
+        List<Clase> clases = new ArrayList<>();
+        Usuario usuario = findById(id);
+
+        for (Asignatura asignatura : usuario.getAsignaturas()) {
+            clases.addAll(asignatura.getClases());
+        }
+        return clases;
+    }
 }

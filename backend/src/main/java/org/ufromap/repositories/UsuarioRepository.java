@@ -61,11 +61,16 @@ public class UsuarioRepository extends BaseRepository<Usuario> {
 
     @Override
     protected void setParametersForInsert(PreparedStatement statement, Usuario obj) throws SQLException {
-
+        statement.setString(1, obj.getNombre());
+        statement.setString(2, obj.getCorreo());
+        statement.setString(3, obj.getContrasenia());
     }
 
     @Override
     protected void setParametersForUpdate(PreparedStatement statement, Usuario obj) throws SQLException {
-
+        statement.setString(1, obj.getNombre());
+        statement.setString(2, obj.getCorreo());
+        statement.setString(3, obj.getContrasenia());
+        statement.setInt(4, obj.getId());
     }
 }
