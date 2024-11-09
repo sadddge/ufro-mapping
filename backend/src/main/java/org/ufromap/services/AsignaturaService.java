@@ -1,12 +1,15 @@
 package org.ufromap.services;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Asignatura;
+import org.ufromap.models.Inscripcion;
 import org.ufromap.repositories.AsignaturaRepository;
 
 /**
@@ -65,6 +68,14 @@ public class AsignaturaService implements IService<Asignatura> {
         if (asignatura.getCodigo() == null || asignatura.getCodigo().isEmpty()) {
             throw new BadRequestException("El codigo de la asignatura es obligatorio.");
         }
+    }
+
+    public Set<Asignatura> getAsignaturasByInscripciones(List<Inscripcion> inscripciones) {
+        Set<Asignatura> asignaturas = new HashSet<Asignatura>();
+        for (Inscripcion inscripcion : inscripciones) {
+            asignaturas.add(findById(inscripcion.getAsignaturaId()));
+        }
+        return asignaturas;
     }
 
 }
