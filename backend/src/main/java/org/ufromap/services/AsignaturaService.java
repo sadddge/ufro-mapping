@@ -27,11 +27,12 @@ public class AsignaturaService implements IService<Asignatura> {
         this.asignaturaRepository = new AsignaturaRepository();
     }
 
-
+    @Override
     public List<Asignatura> findAll() {
         return asignaturaRepository.findAll();
     }
 
+    @Override
     public Asignatura findById(int id) throws EntityNotFoundException {
         Asignatura asignatura = asignaturaRepository.findById(id);
         if (asignatura == null)
@@ -39,6 +40,7 @@ public class AsignaturaService implements IService<Asignatura> {
         return asignatura;
     }
 
+    @Override
     public List<Asignatura> findByFilter(Map<String, Object> filter) throws EntityNotFoundException {
         List<Asignatura> asignaturas = asignaturaRepository.findByFilter(filter);
         if (asignaturas.isEmpty())
@@ -46,16 +48,19 @@ public class AsignaturaService implements IService<Asignatura> {
         return asignaturas;
     }
 
+    @Override
     public Asignatura add(Asignatura asignatura) throws BadRequestException {
         validateAsignatura(asignatura);
         return asignaturaRepository.add(asignatura);
     }
 
+    @Override
     public Asignatura update(Asignatura asignatura) {
         validateAsignatura(asignatura);
         return asignaturaRepository.update(asignatura);
     }
 
+    @Override
     public void delete(int id) throws EntityNotFoundException {
         findById(id);
         asignaturaRepository.delete(id);

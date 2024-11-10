@@ -16,7 +16,6 @@ import org.ufromap.repositories.ClaseRepository;
 public class ClaseService implements IService<Clase> {
     private final ClaseRepository claseRepository;
 
-
     public ClaseService() {
         this.claseRepository = new ClaseRepository();
     }
@@ -26,16 +25,19 @@ public class ClaseService implements IService<Clase> {
      *
      * @return Una lista con todas las clases almacenadas en la base de datos.
      */
+    @Override
     public List<Clase> findAll() {
         return claseRepository.findAll();
     }
 
+    @Override
     public Clase findById(int id) {
         Clase clase = claseRepository.findById(id);
         if (clase == null) throw new EntityNotFoundException("No se encontró una clase con el ID proporcionado.");
         return clase;
     }
 
+    @Override
     public List<Clase> findByFilter(Map<String, Object> filters) {
         List<Clase> clases = claseRepository.findByFilter(filters);
         if (clases.isEmpty())
@@ -48,6 +50,7 @@ public class ClaseService implements IService<Clase> {
      *
      * @param clase La clase que se desea almacenar en la base de datos.
      */
+    @Override
     public Clase add(Clase clase) {
         validateClase(clase);
         return claseRepository.add(clase);
@@ -59,11 +62,13 @@ public class ClaseService implements IService<Clase> {
      *
      * @param clase La clase que se desea actualizar en la base de datos.
      */
+    @Override
     public Clase update(Clase clase) {
         validateClase(clase);
         return claseRepository.update(clase);
     }
 
+    @Override
     public void delete(int id) {
         findById(id);
         claseRepository.delete(id);
