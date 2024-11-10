@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Clase;
 
@@ -17,6 +19,14 @@ import org.ufromap.models.Clase;
  */
 public class ClaseRepository extends BaseRepository<Clase> {
     private static final Logger logger = Logger.getLogger(ClaseRepository.class.getName());
+
+    public ClaseRepository() {
+        super();
+    }
+
+    public ClaseRepository(Connection connection) {
+        super(connection);
+    }
 
     public List<Clase> findByAsignaturaId(int asignaturaId) {
         String query = "SELECT id, sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo FROM clase WHERE asignatura_id = ?";
@@ -30,7 +40,6 @@ public class ClaseRepository extends BaseRepository<Clase> {
 
     private List<Clase> findByParameter(String query, int param) {
         List<Clase> clases = new ArrayList<>();
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, param);
             try (ResultSet resultSet = statement.executeQuery()) {
