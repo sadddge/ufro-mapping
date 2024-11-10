@@ -1,9 +1,8 @@
 package org.ufromap.repositories;
 
+import lombok.extern.java.Log;
 import org.ufromap.config.DatabaseConnection;
-import org.ufromap.models.Clase;
 import org.ufromap.models.Inscripcion;
-import org.ufromap.models.Sala;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,11 +11,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-
+@Log
 public class InscripcionRepository extends BaseRepository<Inscripcion> {
 
-    private static final Logger log = Logger.getLogger(InscripcionRepository.class.getName());
+    public InscripcionRepository() {
+        super();
+    }
+
+    public InscripcionRepository(Connection connection) {
+        super(connection);
+    }
 
     public List<Inscripcion> getInscripcionByUsuarioId(int usuarioId){
         List<Inscripcion> inscripciones = new ArrayList<>();

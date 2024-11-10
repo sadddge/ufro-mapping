@@ -6,19 +6,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.ufromap.config.DatabaseConnection;
+import lombok.extern.java.Log;
 import org.ufromap.models.Clase;
 
 /**
  * Clase que implementa los métodos para gestionar la entidad Clase en la base de datos.
  * Provee funciones para obtener, agregar, actualizar y eliminar clases.
  */
+@Log
 public class ClaseRepository extends BaseRepository<Clase> {
-    private static final Logger logger = Logger.getLogger(ClaseRepository.class.getName());
 
     public ClaseRepository() {
         super();
@@ -49,7 +47,7 @@ public class ClaseRepository extends BaseRepository<Clase> {
                 }
             }
         } catch (SQLException e) {
-            logger.severe("Error executing query: " + query);
+            log.log(Level.SEVERE,"Error executing query: " + query, e);
             return null;
         }
         return clases;

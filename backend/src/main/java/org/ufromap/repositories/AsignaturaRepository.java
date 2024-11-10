@@ -1,5 +1,6 @@
 package org.ufromap.repositories;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +23,13 @@ public class AsignaturaRepository extends BaseRepository<Asignatura> {
      * Constructor por defecto que inicializa el repositorio con una nueva instancia de ClaseRepository.
      */
     public AsignaturaRepository() {
+        super();
         this.clasesRepository = new ClaseRepository();
+    }
+
+    public AsignaturaRepository(Connection connection, ClaseRepository clasesRepository) {
+        super(connection);
+        this.clasesRepository = clasesRepository;
     }
 
 

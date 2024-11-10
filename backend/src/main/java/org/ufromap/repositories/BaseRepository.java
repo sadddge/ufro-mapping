@@ -8,13 +8,13 @@ import java.util.Map;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import org.ufromap.config.DatabaseConnection;
+@Log
 @AllArgsConstructor
 public abstract class BaseRepository<T> implements IRepository<T> {
-    private static final Logger logger = Logger.getLogger(BaseRepository.class.getName());
     protected final Connection connection;
 
     public BaseRepository() {
@@ -54,7 +54,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             }
             resultSet.close();
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
         }
         return result;
     }
@@ -75,7 +75,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             obj = findById(getLastInsertId());
             return obj;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
             return null;
         }
     }
@@ -88,7 +88,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             statement.executeUpdate();
             return obj;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
             return null;
         }
     }
@@ -101,7 +101,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
             return false;
         }
     }
@@ -121,7 +121,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
                 results.add(mapToObject(resultSet));
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
         }
         return results;
     }
@@ -144,7 +144,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
                 }
             }
         } catch (SQLException e) {
-            logger.severe("Error: " + e.getMessage());
+            log.severe("Error: " + e.getMessage());
         }
         return lastId;
     }
