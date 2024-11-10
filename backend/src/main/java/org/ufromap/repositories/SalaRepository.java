@@ -18,30 +18,6 @@ import org.ufromap.models.Sala;
  */
 public class SalaRepository {
 
-    private final ClaseRepository claseRepository;
-    private final EdificioRepository edificioRepository;
-
-    /**
-     * Constructor por defecto que inicializa el repositorio con instancias de los servicios
-     * de {@link ClaseRepository} y {@link EdificioRepository}.
-     */
-    public SalaRepository() {
-        this.claseRepository = new ClaseRepository();
-        this.edificioRepository = new EdificioRepository();
-    }
-
-    /**
-     * Constructor que permite inyectar instancias personalizadas de {@link ClaseRepository}
-     * y {@link EdificioRepository}.
-     *
-     * @param claseRepository    El repositorio para gestionar las clases.
-     * @param edificioRepository El repositorio para gestionar los edificios.
-     */
-    public SalaRepository(ClaseRepository claseRepository, EdificioRepository edificioRepository) {
-        this.claseRepository = claseRepository;
-        this.edificioRepository = edificioRepository;
-    }
-
     /**
      * Obtiene todas las salas almacenadas en la base de datos.
      *
@@ -103,7 +79,7 @@ public class SalaRepository {
     /**
      * Obtiene todas las salas que pertenecen a un edificio específico por el ID del edificio.
      *
-     * @param id El identificador del edificio.
+     * @param edificioId El identificador del edificio.
      * @return Una lista de salas asociadas al edificio.
      * @throws SQLException Si ocurre un error durante la consulta a la base de datos.
      */

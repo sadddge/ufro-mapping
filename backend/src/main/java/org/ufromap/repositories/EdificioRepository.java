@@ -17,24 +17,6 @@ import org.ufromap.models.Sala;
  */
 public class EdificioRepository {
 
-    private final SalaRepository salaRepository;
-
-    /**
-     * Constructor por defecto que inicializa una instancia de {@link SalaRepository}.
-     */
-    public EdificioRepository() {
-        this.salaRepository = new SalaRepository();
-    }
-
-    /**
-     * Constructor que permite inyectar una instancia de {@link SalaRepository}.
-     *
-     * @param salaRepository Instancia del repositorio de salas.
-     */
-    public EdificioRepository(SalaRepository salaRepository) {
-        this.salaRepository = salaRepository;
-    }
-
     /**
      * Obtiene todos los edificios registrados en la base de datos.
      *
