@@ -30,6 +30,7 @@ public class EdificioService implements IService<Edificio> {
      *
      * @return Una lista de objetos {@link Edificio} que contiene todos los edificios.
      */
+    @Override
     public List<Edificio> findAll() {
         return edificioRepository.findAll();
     }
@@ -40,12 +41,14 @@ public class EdificioService implements IService<Edificio> {
      * @param id El ID del edificio a buscar.
      * @return El objeto {@link Edificio} correspondiente al ID proporcionado, o {@code null} si no se encuentra.
      */
+    @Override
     public Edificio findById(int id) {
         Edificio edificio = edificioRepository.findById(id);
         if (edificio == null) throw new EntityNotFoundException("No se encontró un edificio con el ID proporcionado.");
         return edificio;
     }
 
+    @Override
     public List<Edificio> findByFilter(Map<String, Object> filters) {
         List<Edificio> edificios = edificioRepository.findByFilter(filters);
         if (edificios.isEmpty())
@@ -59,6 +62,7 @@ public class EdificioService implements IService<Edificio> {
      *
      * @param edificio El objeto {@link Edificio} con los datos del nuevo edificio.
      */
+    @Override
     public Edificio add(Edificio edificio) {
         validateEdificio(edificio);
         return edificioRepository.add(edificio);
@@ -69,6 +73,7 @@ public class EdificioService implements IService<Edificio> {
      *
      * @param edificio El objeto {@link Edificio} con los datos actualizados.
      */
+    @Override
     public Edificio update(Edificio edificio) {
         validateEdificio(edificio);
         return edificioRepository.update(edificio);
@@ -79,6 +84,7 @@ public class EdificioService implements IService<Edificio> {
      *
      * @param id El ID del edificio a eliminar.
      */
+    @Override
     public void delete(int id) {
         findById(id);
         edificioRepository.delete(id);

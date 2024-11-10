@@ -19,16 +19,19 @@ public class SalaService implements IService<Sala> {
         this.edificioRepository = new EdificioRepository();
     }
 
+    @Override
     public List<Sala> findAll() {
         return salaRepository.findAll();
     }
 
+    @Override
     public Sala findById(int id) {
         Sala sala = salaRepository.findById(id);
         if (sala == null) throw new EntityNotFoundException("No se encontró una sala con el ID proporcionado.");
         return sala;
     }
 
+    @Override
     public List<Sala> findByFilter(Map<String, Object> filters) {
         List<Sala> salas = salaRepository.findByFilter(filters);
         if (salas.isEmpty())
@@ -36,16 +39,19 @@ public class SalaService implements IService<Sala> {
         return salas;
     }
 
+    @Override
     public Sala add(Sala sala) {
         validateSala(sala);
         return salaRepository.add(sala);
     }
 
+    @Override
     public Sala update(Sala sala) {
         validateSala(sala);
         return salaRepository.update(sala);
     }
 
+    @Override
     public void delete(int id) {
         findById(id);
         salaRepository.delete(id);

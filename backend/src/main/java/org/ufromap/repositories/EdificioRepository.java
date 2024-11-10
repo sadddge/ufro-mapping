@@ -1,5 +1,6 @@
 package org.ufromap.repositories;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,7 +21,13 @@ public class EdificioRepository extends BaseRepository<Edificio> {
      * Constructor por defecto que inicializa una instancia de {@link SalaRepository}.
      */
     public EdificioRepository() {
+        super();
         this.salaRepository = new SalaRepository();
+    }
+
+    public EdificioRepository(Connection connection, SalaRepository salaRepository) {
+        super(connection);
+        this.salaRepository = salaRepository;
     }
 
 

@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Clase;
 import org.ufromap.models.Sala;
 
@@ -26,12 +25,15 @@ public class SalaRepository extends BaseRepository<Sala> {
     public SalaRepository() {
         this.claseRepository = new ClaseRepository();
     }
+    public SalaRepository(Connection connection, ClaseRepository claseRepository) {
+        super(connection);
+        this.claseRepository = claseRepository;
+    }
 
 
     public List<Sala> findByEdificioId(int edificioId) {
         List<Sala> salas = new ArrayList<>();
         String query = "SELECT id, edificio_id, nombre_sala FROM sala WHERE edificio_id = ?";
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, edificioId);
             try (ResultSet resultSet = statement.executeQuery()) {

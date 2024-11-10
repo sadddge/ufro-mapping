@@ -35,20 +35,4 @@ public class DatabaseConnection {
         }
         return connection;
     }
-
-    public static int getLastInsertId() {
-        int lastId = -1;
-        try {
-            String query = "SELECT LAST_INSERT_ID()";
-            try (PreparedStatement statement = connection.prepareStatement(query);
-                 ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    lastId = resultSet.getInt(1);
-                }
-            }
-        } catch (SQLException e) {
-            logger.severe("Error: " + e.getMessage());
-        }
-        return lastId;
-    }
 }

@@ -8,12 +8,18 @@ import java.util.Map;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import org.ufromap.config.DatabaseConnection;
-
+@Log
+@AllArgsConstructor
 public abstract class BaseRepository<T> implements IRepository<T> {
-    private static final Logger logger = Logger.getLogger(BaseRepository.class.getName());
+    protected final Connection connection;
+
+    public BaseRepository() {
+        this.connection = DatabaseConnection.getConnection();
+    }
 
     protected abstract String getTableName();
 
@@ -40,7 +46,6 @@ public abstract class BaseRepository<T> implements IRepository<T> {
     public T findById(int id) {
         T result = null;
         String query = "SELECT " + getColumns() + " FROM " + getTableName() + " WHERE id = ?";
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -49,7 +54,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             }
             resultSet.close();
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
         }
         return result;
     }
@@ -64,14 +69,13 @@ public abstract class BaseRepository<T> implements IRepository<T> {
     @Override
     public T add(T obj) {
         String query = getInsertQuery();
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             setParametersForInsert(statement, obj);
             statement.executeUpdate();
-            obj = findById(DatabaseConnection.getLastInsertId());
+            obj = findById(getLastInsertId());
             return obj;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
             return null;
         }
     }
@@ -79,13 +83,12 @@ public abstract class BaseRepository<T> implements IRepository<T> {
     @Override
     public T update(T obj) {
         String query = getUpdateQuery();
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             setParametersForUpdate(statement, obj);
             statement.executeUpdate();
             return obj;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
             return null;
         }
     }
@@ -93,13 +96,12 @@ public abstract class BaseRepository<T> implements IRepository<T> {
     @Override
     public boolean delete(int id) {
         String query = "DELETE FROM " + getTableName() + " WHERE id = ?";
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
             return false;
         }
     }
@@ -113,16 +115,38 @@ public abstract class BaseRepository<T> implements IRepository<T> {
     }
 
     private List<T> execListQuery(List<T> results, String query) {
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
                 results.add(mapToObject(resultSet));
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error executing query: " + query, e);
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
         }
         return results;
+    }
+
+    private int getLastInsertId() {
+        int lastId = -1;
+        try {
+            String query = "";
+
+            if (connection.getMetaData().getURL().contains("mysql")) {
+                query = "SELECT LAST_INSERT_ID()"; // MySQL
+            } else if (connection.getMetaData().getURL().contains("h2")) {
+                query = "SELECT MAX(id) FROM clase"; // H2
+            }
+
+            try (PreparedStatement statement = connection.prepareStatement(query);
+                 ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    lastId = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            log.severe("Error: " + e.getMessage());
+        }
+        return lastId;
     }
 
 }

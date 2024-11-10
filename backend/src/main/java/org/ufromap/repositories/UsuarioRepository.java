@@ -1,9 +1,6 @@
 package org.ufromap.repositories;
 
-import org.ufromap.config.DatabaseConnection;
 import org.ufromap.models.Asignatura;
-import org.ufromap.models.Clase;
-import org.ufromap.models.Sala;
 import org.ufromap.models.Usuario;
 import org.ufromap.services.AsignaturaService;
 
@@ -11,9 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class UsuarioRepository extends BaseRepository<Usuario> {
@@ -21,8 +15,15 @@ public class UsuarioRepository extends BaseRepository<Usuario> {
     private final AsignaturaService asignaturaService;
 
     public UsuarioRepository() {
+        super();
         this.inscripcionRepository = new InscripcionRepository();
         this.asignaturaService = new AsignaturaService();
+    }
+
+    public UsuarioRepository(Connection connection, InscripcionRepository inscripcionRepository, AsignaturaService asignaturaService) {
+        super(connection);
+        this.inscripcionRepository = inscripcionRepository;
+        this.asignaturaService = asignaturaService;
     }
 
     @Override

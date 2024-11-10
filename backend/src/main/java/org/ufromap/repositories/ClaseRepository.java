@@ -6,17 +6,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
-import org.ufromap.config.DatabaseConnection;
+import lombok.extern.java.Log;
 import org.ufromap.models.Clase;
 
 /**
  * Clase que implementa los métodos para gestionar la entidad Clase en la base de datos.
  * Provee funciones para obtener, agregar, actualizar y eliminar clases.
  */
+@Log
 public class ClaseRepository extends BaseRepository<Clase> {
-    private static final Logger logger = Logger.getLogger(ClaseRepository.class.getName());
+
+    public ClaseRepository() {
+        super();
+    }
+
+    public ClaseRepository(Connection connection) {
+        super(connection);
+    }
 
     public List<Clase> findByAsignaturaId(int asignaturaId) {
         String query = "SELECT id, sala_id, edificio_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo FROM clase WHERE asignatura_id = ?";
@@ -30,7 +38,6 @@ public class ClaseRepository extends BaseRepository<Clase> {
 
     private List<Clase> findByParameter(String query, int param) {
         List<Clase> clases = new ArrayList<>();
-        Connection connection = DatabaseConnection.getConnection();
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, param);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -40,7 +47,7 @@ public class ClaseRepository extends BaseRepository<Clase> {
                 }
             }
         } catch (SQLException e) {
-            logger.severe("Error executing query: " + query);
+            log.log(Level.SEVERE,"Error executing query: " + query, e);
             return null;
         }
         return clases;
