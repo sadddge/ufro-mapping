@@ -2,15 +2,14 @@ package org.ufromap.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Usuario {
     @Expose
     @SerializedName("usuario_id")
@@ -18,10 +17,10 @@ public class Usuario {
     @Expose
     @SerializedName("nombre_usuario")
     private String nombre;
-    private String contrasenia;
     @Expose
     @SerializedName("correo_usuario")
     private String correo;
+    private String contrasenia;
     @Expose
     private Set<Asignatura> asignaturas;
 }

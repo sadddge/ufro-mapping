@@ -24,7 +24,7 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
 
     public List<Inscripcion> getInscripcionByUsuarioId(int usuarioId){
         List<Inscripcion> inscripciones = new ArrayList<>();
-        String query = "SELECT id, asignatura_id FROM inscribe WHERE usuario_id = ?";
+        String query = "SELECT id, usuario_id, asignatura_id FROM inscribe WHERE usuario_id = ?";
         Connection connection = DatabaseConnection.getConnection();
         try(PreparedStatement statement = connection.prepareStatement(query)){
             statement.setInt(1, usuarioId);
@@ -40,6 +40,18 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
         return inscripciones;
     }
 
+    public void deleteInscripcionByUsuarioIdAndAsignaturaId(int usuarioId, int asignaturaId){
+        String query = "DELETE FROM inscribe WHERE usuario_id = ? AND asignatura_id = ?";
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setInt(1, usuarioId);
+            statement.setInt(2, asignaturaId);
+            statement.executeUpdate();
+        }catch (SQLException e){
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
+        }
+    }
+
 
     @Override
     protected String getTableName() {
@@ -48,12 +60,12 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
 
     @Override
     protected String getColumns() {
-        return "usuario_id, asignatura_id";
+        return "id, usuario_id, asignatura_id";
     }
 
     @Override
     protected String getInsertQuery() {
-        return "INSERT INTO inscribe (usuario_id, asingatura_id) VALUES (?, ?)";
+        return "INSERT INTO inscribe (usuario_id, asignatura_id) VALUES (?, ?)";
     }
 
     @Override

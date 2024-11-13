@@ -1,9 +1,7 @@
 package org.ufromap.models;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -11,9 +9,10 @@ import java.util.List;
  * Clase que representa una sala dentro de un edificio en el sistema.
  * Una sala está asociada a un edificio y puede tener una lista de clases que se imparten en ella.
  */
-@Getter
-@Setter
+@Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Sala {
     private int id;
     @SerializedName("edificio_id")

@@ -1,9 +1,8 @@
 package org.ufromap.models;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,13 +11,17 @@ import java.util.List;
  * Una Asignatura tiene un nombre, código, descripción, valor en SCT (Sistema de Créditos Transferibles),
  * y una lista de clases asociadas.
  */
-@Getter
-@Setter
+@Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Asignatura {
+    @Expose
     private int id;
+    @Expose
     @SerializedName("nombre_asignatura")
     private String nombre;
+    @Expose
     private String codigo;
     private String descripcion;
     private int sct;
