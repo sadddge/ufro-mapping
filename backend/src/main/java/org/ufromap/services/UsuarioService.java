@@ -4,7 +4,9 @@ import org.ufromap.auth.Validator;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Asignatura;
 import org.ufromap.models.Clase;
+import org.ufromap.models.Inscripcion;
 import org.ufromap.models.Usuario;
+import org.ufromap.repositories.InscripcionRepository;
 import org.ufromap.repositories.UsuarioRepository;
 
 import java.util.ArrayList;
@@ -13,13 +15,16 @@ import java.util.Map;
 
 public class UsuarioService implements IService<Usuario> {
     private final UsuarioRepository usuarioRepository;
+    private final InscripcionRepository inscripcionRepository;
 
     public UsuarioService() {
         this.usuarioRepository = new UsuarioRepository();
+        this.inscripcionRepository = new InscripcionRepository();
     }
 
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, InscripcionRepository inscripcionRepository) {
         this.usuarioRepository = usuarioRepository;
+        this.inscripcionRepository = inscripcionRepository;
     }
 
     @Override
@@ -69,5 +74,13 @@ public class UsuarioService implements IService<Usuario> {
             clases.addAll(asignatura.getClases());
         }
         return clases;
+    }
+
+    public Inscripcion inscribirAsignatura(Inscripcion inscripcion) {
+        return inscripcionRepository.add(inscripcion);
+    }
+
+    public void deleteInscripcion(int id, int idAsignatura) {
+        inscripcionRepository.deleteInscripcionByUsuarioIdAndAsignaturaId(id, idAsignatura);
     }
 }

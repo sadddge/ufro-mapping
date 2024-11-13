@@ -11,8 +11,6 @@ import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Edificio;
 import org.ufromap.services.EdificioService;
 
-import com.google.gson.Gson;
-
 
 @WebServlet("/api/edificios/*")
 public class EdificioController extends BaseController<Edificio> {
@@ -38,7 +36,7 @@ public class EdificioController extends BaseController<Edificio> {
                 return;
             }
             Edificio edificio = service.findById(id);
-            writeJsonResponse(response, new Gson().toJson(edificio.getSalas()));
+            writeJsonResponse(response, gson.toJson(edificio.getSalas()));
         } catch (NumberFormatException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
         } catch (EntityNotFoundException e) {

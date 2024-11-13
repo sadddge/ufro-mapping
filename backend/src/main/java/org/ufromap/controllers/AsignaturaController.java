@@ -1,6 +1,5 @@
 package org.ufromap.controllers;
 
-import com.google.gson.Gson;
 import org.json.JSONObject;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Asignatura;
@@ -36,7 +35,7 @@ public class AsignaturaController extends BaseController<Asignatura> {
                 return;
             }
             Asignatura asignatura = service.findById(id);
-            writeJsonResponse(response, new Gson().toJson(asignatura.getClases()));
+            writeJsonResponse(response, gson.toJson(asignatura.getClases()));
         } catch (NumberFormatException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
         } catch (EntityNotFoundException e) {

@@ -1,16 +1,15 @@
 package org.ufromap.models;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 /**
  * Representa una clase académica, incluyendo información sobre el docente, horario, y la sala asignada.
  */
-@Getter
-@Setter
+@Data
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class Clase {
 
     private int id;
