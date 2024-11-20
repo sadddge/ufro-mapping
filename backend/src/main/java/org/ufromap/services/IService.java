@@ -1,5 +1,6 @@
 package org.ufromap.services;
 
+import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 
@@ -16,6 +17,8 @@ public interface IService<T> {
     T add(T entity) throws BadRequestException;
 
     T update(T entity) throws EntityNotFoundException;
+
+    T patch(T entity, JSONObject jsonObject) throws EntityNotFoundException;
 
     void delete(int id) throws EntityNotFoundException;
 

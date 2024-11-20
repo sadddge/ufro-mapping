@@ -98,4 +98,20 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
         statement.setInt(2, obj.getUsuarioId());
         statement.setInt(3, obj.getId());
     }
+
+    public List<Inscripcion> findByUsuarioId(int id) {
+        List<Inscripcion> inscripciones = new ArrayList<>();
+        String query = "SELECT id, usuario_id, asignatura_id FROM inscribe WHERE usuario_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    inscripciones.add(mapToObject(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
+        }
+        return inscripciones;
+    }
 }

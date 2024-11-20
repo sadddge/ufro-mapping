@@ -1,5 +1,6 @@
 package org.ufromap.services;
 
+import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Sala;
@@ -49,6 +50,15 @@ public class SalaService implements IService<Sala> {
     public Sala update(Sala sala) {
         validateSala(sala);
         return salaRepository.update(sala);
+    }
+
+    @Override
+    public Sala patch(Sala entity, JSONObject jsonObject) throws EntityNotFoundException {
+        Sala sala = new Sala();
+        sala.setId(entity.getId());
+        sala.setEdificioId(jsonObject.optInt("edificioId", entity.getEdificioId()));
+        sala.setNombre(jsonObject.optString("nombre", entity.getNombre()));
+        return update(sala);
     }
 
     @Override

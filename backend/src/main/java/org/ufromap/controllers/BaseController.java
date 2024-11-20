@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,15 @@ public abstract class BaseController<T> extends HttpServlet {
 
     protected void handleExtraDeleteRequests(String[] pathParts, HttpServletRequest request, HttpServletResponse response) throws IOException {
         sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
+    }
+
+    @Override
+    public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        if (request.getMethod().equalsIgnoreCase("PATCH")){
+            doPatch(request, response);
+        } else {
+            super.service(request, response);
+        }
     }
 
     @Override
@@ -107,6 +117,24 @@ public abstract class BaseController<T> extends HttpServlet {
             } else {
                 handleExtraDeleteRequests(pathParts, request, response);
             }
+        } catch (IOException e) {
+            sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing request");
+        }
+    }
+
+    protected void doPatch(HttpServletRequest request, HttpServletResponse response) {
+        String pathInfo = request.getPathInfo();
+        String[] pathParts = pathInfo == null ? new String[0] : pathInfo.trim().split("/");
+        try {
+            int id = Integer.parseInt(pathParts[1]);
+            JSONObject jsonObject = getJson(request);
+            T existingEntity = service.findById(id);
+            T updatedEntity = service.patch(existingEntity, jsonObject);
+            writeJsonResponse(response, gson.toJson(updatedEntity));
+        } catch (EntityNotFoundException e) {
+            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
+        } catch (BadRequestException e) {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (IOException e) {
             sendError(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing request");
         }
@@ -189,7 +217,7 @@ public abstract class BaseController<T> extends HttpServlet {
         try {
             int id = Integer.parseInt(pathPart);
             service.delete(id);
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            writeJsonResponse(response, new JSONObject().toString());
         } catch (NumberFormatException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
         } catch (EntityNotFoundException e) {

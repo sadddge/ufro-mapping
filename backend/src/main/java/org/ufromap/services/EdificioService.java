@@ -3,6 +3,7 @@ package org.ufromap.services;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Edificio;
@@ -78,6 +79,24 @@ public class EdificioService implements IService<Edificio> {
         validateEdificio(edificio);
         return edificioRepository.update(edificio);
     }
+
+    @Override
+    public Edificio patch(Edificio entity, JSONObject jsonObject) throws EntityNotFoundException {
+        Edificio edificio = new Edificio();
+        String nombre = jsonObject.optString("nombre", entity.getNombre());
+        String alias = jsonObject.optString("alias", entity.getAlias());
+        String tipo = jsonObject.optString("tipo", entity.getTipo());
+        float latitud = jsonObject.optFloat("latitud", entity.getLatitud());
+        float longitud = jsonObject.optFloat("longitud", entity.getLongitud());
+        edificio.setId(entity.getId());
+        edificio.setNombre(nombre);
+        edificio.setAlias(alias);
+        edificio.setTipo(tipo);
+        edificio.setLatitud(latitud);
+        edificio.setLongitud(longitud);
+        return update(edificio);
+    }
+
 
     /**
      * Elimina un edificio de la base de datos por su ID.

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
+import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Clase;
@@ -66,6 +67,27 @@ public class ClaseService implements IService<Clase> {
     public Clase update(Clase clase) {
         validateClase(clase);
         return claseRepository.update(clase);
+    }
+
+    @Override
+    public Clase patch(Clase entity, JSONObject jsonObject) throws EntityNotFoundException {
+        Clase clase = new Clase();
+        int salaId = jsonObject.optInt("salaId", entity.getSalaId());
+        int edificioId = jsonObject.optInt("edificioId", entity.getEdificioId());
+        int asignaturaId = jsonObject.optInt("asignaturaid", entity.getAsignaturaId());
+        int diaSemana = jsonObject.optInt("diasemana", entity.getDiaSemana());
+        int periodo = jsonObject.optInt("periodo", entity.getPeriodo());
+        String docente = jsonObject.optString("docente", entity.getDocente());
+        int modulo = jsonObject.optInt("modulo", entity.getModulo());
+        clase.setId(entity.getId());
+        clase.setSalaId(salaId);
+        clase.setEdificioId(edificioId);
+        clase.setAsignaturaId(asignaturaId);
+        clase.setDiaSemana(diaSemana);
+        clase.setPeriodo(periodo);
+        clase.setDocente(docente);
+        clase.setModulo(modulo);
+        return update(clase);
     }
 
     @Override

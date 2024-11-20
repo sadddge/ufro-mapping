@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONObject;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Asignatura;
@@ -59,6 +60,22 @@ public class AsignaturaService implements IService<Asignatura> {
         validateAsignatura(asignatura);
         return asignaturaRepository.update(asignatura);
     }
+
+    @Override
+    public Asignatura patch(Asignatura entity, JSONObject jsonObject) throws EntityNotFoundException {
+        Asignatura asignatura = new Asignatura();
+        String nombre = jsonObject.optString("nombre", entity.getNombre());
+        String codigo = jsonObject.optString("codigo", entity.getCodigo());
+        String descripcion = jsonObject.optString("descripcion", entity.getDescripcion());
+        int sct = jsonObject.optInt("sct", entity.getSct());
+        asignatura.setId(entity.getId());
+        asignatura.setNombre(nombre);
+        asignatura.setCodigo(codigo);
+        asignatura.setDescripcion(descripcion);
+        asignatura.setSct(sct);
+        return update(asignatura);
+    }
+
 
     @Override
     public void delete(int id) throws EntityNotFoundException {

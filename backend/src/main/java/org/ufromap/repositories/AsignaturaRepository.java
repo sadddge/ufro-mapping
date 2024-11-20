@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.ufromap.models.Asignatura;
 import org.ufromap.models.Clase;
+import org.ufromap.models.Inscripcion;
 
 
 /**
@@ -83,6 +84,12 @@ public class AsignaturaRepository extends BaseRepository<Asignatura> {
         statement.setString(3, obj.getDescripcion());
         statement.setInt(4, obj.getSct());
         statement.setInt(5, obj.getId());
+    }
+
+    public List<Asignatura> findByInscripciones(List<Inscripcion> inscripciones) {
+        List<Asignatura> asignaturas = findAll();
+        asignaturas.removeIf(asignatura -> inscripciones.stream().noneMatch(inscripcion -> inscripcion.getAsignaturaId() == asignatura.getId()));
+        return asignaturas;
     }
 
 

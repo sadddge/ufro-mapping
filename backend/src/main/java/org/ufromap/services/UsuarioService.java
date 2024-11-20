@@ -1,11 +1,13 @@
 package org.ufromap.services;
 
+import org.json.JSONObject;
 import org.ufromap.auth.Validator;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Asignatura;
 import org.ufromap.models.Clase;
 import org.ufromap.models.Inscripcion;
 import org.ufromap.models.Usuario;
+import org.ufromap.repositories.AsignaturaRepository;
 import org.ufromap.repositories.InscripcionRepository;
 import org.ufromap.repositories.UsuarioRepository;
 
@@ -15,16 +17,19 @@ import java.util.Map;
 
 public class UsuarioService implements IService<Usuario> {
     private final UsuarioRepository usuarioRepository;
+    private final AsignaturaRepository asignaturaRepository;
     private final InscripcionRepository inscripcionRepository;
 
     public UsuarioService() {
         this.usuarioRepository = new UsuarioRepository();
         this.inscripcionRepository = new InscripcionRepository();
+        this.asignaturaRepository = new AsignaturaRepository();
     }
 
-    public UsuarioService(UsuarioRepository usuarioRepository, InscripcionRepository inscripcionRepository) {
+    public UsuarioService(UsuarioRepository usuarioRepository, InscripcionRepository inscripcionRepository, AsignaturaRepository asignaturaRepository) {
         this.usuarioRepository = usuarioRepository;
         this.inscripcionRepository = inscripcionRepository;
+        this.asignaturaRepository = asignaturaRepository;
     }
 
     @Override
@@ -61,6 +66,19 @@ public class UsuarioService implements IService<Usuario> {
     }
 
     @Override
+    public Usuario patch(Usuario entity, JSONObject jsonObject) throws EntityNotFoundException {
+        Usuario usuario = new Usuario();
+        String nombre = jsonObject.optString("nombre", entity.getNombre());
+        String correo = jsonObject.optString("correo", entity.getCorreo());
+        String contrasenia = jsonObject.optString("contrasenia", entity.getContrasenia());
+        usuario.setId(entity.getId());
+        usuario.setNombre(nombre);
+        usuario.setCorreo(correo);
+        usuario.setContrasenia(contrasenia);
+        return update(usuario);
+    }
+
+    @Override
     public void delete(int id) {
         findById(id);
         usuarioRepository.delete(id);
@@ -74,6 +92,15 @@ public class UsuarioService implements IService<Usuario> {
             clases.addAll(asignatura.getClases());
         }
         return clases;
+    }
+
+    public List<Asignatura> getAsignaturasByUsuarioId(int id) {
+        List<Inscripcion> inscripciones = getInscripcionesByUsuarioId(id);
+        return asignaturaRepository.findByInscripciones(inscripciones);
+    }
+
+    public List<Inscripcion> getInscripcionesByUsuarioId(int id) {
+        return inscripcionRepository.findByUsuarioId(id);
     }
 
     public Inscripcion inscribirAsignatura(Inscripcion inscripcion) {
