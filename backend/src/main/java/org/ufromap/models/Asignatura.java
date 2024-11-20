@@ -19,7 +19,6 @@ public class Asignatura {
     @Expose
     private int id;
     @Expose
-    @SerializedName("nombre_asignatura")
     private String nombre;
     @Expose
     private String codigo;

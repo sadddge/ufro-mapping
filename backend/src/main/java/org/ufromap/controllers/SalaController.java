@@ -16,14 +16,14 @@ public class SalaController extends BaseController<Sala> {
     protected Sala mapJsonToEntity(JSONObject jsonObject) {
         return new Sala(
                 jsonObject.optInt("id", -1),
-                jsonObject.optInt("edificio_id", -1),
-                jsonObject.optString("nombre_sala", null),
+                jsonObject.optInt("edificioId", -1),
+                jsonObject.optString("nombre", null),
                 null
         );
     }
 
     @Override
     protected String[] getValidFilters() {
-        return new String[]{"edificio_id", "nombre_sala"};
+        return new String[]{"edificioId", "nombre"};
     }
 }

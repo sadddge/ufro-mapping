@@ -47,7 +47,7 @@ public class AsignaturaController extends BaseController<Asignatura> {
     protected Asignatura mapJsonToEntity(JSONObject jsonObject) {
         return new Asignatura(
                 jsonObject.optInt("id", -1),
-                jsonObject.optString("nombre_asignatura", null),
+                jsonObject.optString("nombre", null),
                 jsonObject.optString("codigo", null),
                 jsonObject.optString("descripcion", null),
                 jsonObject.optInt("sct", -1),
@@ -57,6 +57,6 @@ public class AsignaturaController extends BaseController<Asignatura> {
 
     @Override
     protected String[] getValidFilters() {
-        return new String[]{"nombre_asignatura", "codigo", "sct"};
+        return new String[]{"nombre", "codigo", "sct"};
     }
 }

@@ -48,7 +48,7 @@ public class EdificioController extends BaseController<Edificio> {
     protected Edificio mapJsonToEntity(JSONObject jsonObject) {
         return new Edificio(
                 jsonObject.optInt("id", -1),
-                jsonObject.optString("nombre_edificio", null),
+                jsonObject.optString("nombre", null),
                 jsonObject.optString("alias", null),
                 jsonObject.optString("tipo", null),
                 jsonObject.optFloat("latitud", -1),
@@ -59,6 +59,6 @@ public class EdificioController extends BaseController<Edificio> {
 
     @Override
     protected String[] getValidFilters() {
-        return new String[]{"nombre_edificio", "alias", "tipo"};
+        return new String[]{"nombre", "alias", "tipo"};
     }
 }

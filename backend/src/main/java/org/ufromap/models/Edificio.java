@@ -15,7 +15,6 @@ import java.util.List;
 public class Edificio {
 
     private int id;
-    @SerializedName("nombre_edificio")
     private String nombre;
     private String alias;
     private String tipo;

@@ -23,18 +23,18 @@ public class ClaseController extends BaseController<Clase> {
     protected Clase mapJsonToEntity(JSONObject jsonObject) {
         return new Clase(
                 jsonObject.optInt("id", -1),
-                jsonObject.optInt("sala_id", -1),
-                jsonObject.optInt("edificio_id", -1),
-                jsonObject.optInt("asignatura_id", -1),
-                jsonObject.optInt("dia_semana", -1),
+                jsonObject.optInt("salaId", -1),
+                jsonObject.optInt("edificioId", -1),
+                jsonObject.optInt("asignaturaId", -1),
+                jsonObject.optInt("diaSemana", -1),
                 jsonObject.optInt("periodo", -1),
-                jsonObject.optString("docente_nombre", null),
+                jsonObject.optString("docente", null),
                 jsonObject.optInt("modulo", -1)
         );
     }
 
     @Override
     protected String[] getValidFilters() {
-        return new String[]{"sala_id", "edificio_id", "asignatura_id", "dia_semana", "periodo", "docente_nombre", "modulo"};
+        return new String[]{"salaId", "edificioId", "asignaturaId", "diaSemana", "periodo", "docente", "modulo"};
     }
 }

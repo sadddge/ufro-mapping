@@ -12,13 +12,10 @@ import java.util.Set;
 @NoArgsConstructor
 public class Usuario {
     @Expose
-    @SerializedName("usuario_id")
     private int id;
     @Expose
-    @SerializedName("nombre_usuario")
     private String nombre;
     @Expose
-    @SerializedName("correo_usuario")
     private String correo;
     private String contrasenia;
     @Expose

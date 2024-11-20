@@ -15,9 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Sala {
     private int id;
-    @SerializedName("edificio_id")
     private int edificioId;
-    @SerializedName("nombre_sala")
     private String nombre;
     private List<Clase> clases;
 }
