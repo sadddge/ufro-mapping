@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class UsuarioRepository extends BaseRepository<Usuario> {
@@ -73,5 +75,21 @@ public class UsuarioRepository extends BaseRepository<Usuario> {
         statement.setString(2, obj.getCorreo());
         statement.setString(3, obj.getContrasenia());
         statement.setInt(4, obj.getId());
+    }
+
+    public Usuario findByCorreoYContrasenia(String correo, String contrasenia) {
+        String query = "SELECT id, nombre_usuario, correo, contrasenia FROM usuario WHERE correo = ?AND contrasenia = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, correo);
+            statement.setString(2, contrasenia);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapToObject(resultSet);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return null;
     }
 }
