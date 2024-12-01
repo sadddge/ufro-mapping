@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.Optional;
 import java.util.logging.Level;
 
 import lombok.AllArgsConstructor;
@@ -43,18 +44,19 @@ public abstract class BaseRepository<T> implements IRepository<T> {
     }
 
     @Override
-    public T findById(int id) {
-        T result = null;
+    public Optional<T> findById(int id) {
+        Optional<T> result = Optional.empty();
         String query = "SELECT " + getColumns() + " FROM " + getTableName() + " WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                result = mapToObject(resultSet);
+                result = Optional.of(mapToObject(resultSet));
             }
             resultSet.close();
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
+            throw new RuntimeException("Failed to execute get operation", e);
         }
         return result;
     }
@@ -72,11 +74,11 @@ public abstract class BaseRepository<T> implements IRepository<T> {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             setParametersForInsert(statement, obj);
             statement.executeUpdate();
-            obj = findById(getLastInsertId());
-            return obj;
+
+            return findById(getLastInsertId()).orElse(null);
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            return null;
+            throw new RuntimeException("Failed to execute insert operation", e);
         }
     }
 
@@ -89,7 +91,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             return obj;
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            return null;
+            throw new RuntimeException("Failed to execute set operation", e);
         }
     }
 
@@ -102,7 +104,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             return true;
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            return false;
+            throw new RuntimeException("Failed to execute delete operation", e);
         }
     }
 
@@ -122,6 +124,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             }
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
+            throw new RuntimeException("Failed to execute selec operation", e);
         }
         return results;
     }
@@ -145,6 +148,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             }
         } catch (SQLException e) {
             log.severe("Error: " + e.getMessage());
+            throw new RuntimeException("Failed to execute select last_insert_id operation", e);
         }
         return lastId;
     }

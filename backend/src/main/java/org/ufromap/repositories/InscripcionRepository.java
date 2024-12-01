@@ -2,6 +2,7 @@ package org.ufromap.repositories;
 
 import lombok.extern.java.Log;
 import org.ufromap.config.DatabaseConnection;
+import org.ufromap.models.Asignatura;
 import org.ufromap.models.Inscripcion;
 
 import java.sql.Connection;
@@ -40,7 +41,7 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
         return inscripciones;
     }
 
-    public void deleteInscripcionByUsuarioIdAndAsignaturaId(int usuarioId, int asignaturaId){
+    public void deleteByUsuarioIdAndAsignaturaId(int usuarioId, int asignaturaId){
         String query = "DELETE FROM inscribe WHERE usuario_id = ? AND asignatura_id = ?";
         Connection connection = DatabaseConnection.getConnection();
         try(PreparedStatement statement = connection.prepareStatement(query)){
@@ -75,15 +76,15 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
 
     @Override
     protected Inscripcion mapToObject(ResultSet resultSet) {
+        Inscripcion inscripcion = new Inscripcion();
         try {
-            int id = resultSet.getInt("id");
-            int usuarioId = resultSet.getInt("usuario_id");
-            int asignaturaId = resultSet.getInt("asignatura_id");
-            return new Inscripcion(id, usuarioId, asignaturaId);
+            inscripcion.setId(resultSet.getInt("id"));
+            inscripcion.setUsuarioId(resultSet.getInt("usuario_id"));
+            inscripcion.setAsignaturaId(resultSet.getInt("asignatura_id"));
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            log.log(Level.SEVERE, "Error mapping object", e);
         }
+        return inscripcion;
     }
 
     @Override
@@ -97,5 +98,44 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
         statement.setInt(1, obj.getAsignaturaId());
         statement.setInt(2, obj.getUsuarioId());
         statement.setInt(3, obj.getId());
+    }
+
+    public List<Asignatura> findAsignaturasByUsuarioId(int usuarioId){
+        List<Asignatura> asignaturas = new ArrayList<>();
+        String query = "SELECT a.id, a.nombre_asignatura, a.codigo, a.sct FROM asignatura a JOIN inscribe i ON a.id = i.asignatura_id WHERE i.usuario_id = ?";
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setInt(1, usuarioId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Asignatura asignatura = new Asignatura();
+                    asignatura.setId(resultSet.getInt("id"));
+                    asignatura.setNombre(resultSet.getString("nombre_asignatura"));
+                    asignatura.setCodigo(resultSet.getString("codigo"));
+                    asignatura.setSct(resultSet.getInt("sct"));
+                    asignaturas.add(asignatura);
+                }
+            }
+        }catch (SQLException e){
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
+        }
+        return asignaturas;
+    }
+
+    public boolean existsByUsuarioIdAndAsignaturaId(int usuarioId, int asignaturaId){
+        String query = "SELECT COUNT(*) FROM inscribe WHERE usuario_id = ? AND asignatura_id = ?";
+        Connection connection = DatabaseConnection.getConnection();
+        try(PreparedStatement statement = connection.prepareStatement(query)){
+            statement.setInt(1, usuarioId);
+            statement.setInt(2, asignaturaId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        }catch (SQLException e){
+            log.log(Level.SEVERE, "Error executing query: " + query, e);
+        }
+        return false;
     }
 }
