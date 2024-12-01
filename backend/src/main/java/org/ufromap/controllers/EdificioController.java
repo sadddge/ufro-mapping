@@ -1,58 +1,42 @@
 package org.ufromap.controllers;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
-import org.ufromap.dto.request.EdificioRequestDTO;
-import org.ufromap.dto.response.EdificioDTO;
-import org.ufromap.dto.response.LocationDTO;
-import org.ufromap.dto.response.SalaDTO;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Edificio;
-import org.ufromap.services.ISalaService;
-import org.ufromap.services.impl.EdificioServiceImpl;
-import org.ufromap.services.impl.SalaServiceImpl;
+import org.ufromap.services.EdificioService;
 
 
 @WebServlet("/api/edificios/*")
-public class EdificioController extends CrudController<EdificioDTO, EdificioRequestDTO, Edificio> {
-    private final ISalaService salaService;
+public class EdificioController extends BaseController<Edificio> {
     public EdificioController() {
-        super(new EdificioServiceImpl());
-        salaService = new SalaServiceImpl();
+        super(new EdificioService());
     }
 
     @Override
     protected void handleExtraGetRequests(String[] pathParts, HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (pathParts.length == 3) {
-            if ("map".equals(pathParts[1]) && "locations".equals(pathParts[2])) {
-                handleLocationsRequest(response);
-            } else if ("salas".equals(pathParts[2])) {
-                handleSalasByEdificioIdRequest(pathParts, response);
-            } else {
-                sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
-            }
+            handleSalasByEdificioIdRequest(pathParts, response);
         } else {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
         }
-    }
-
-    private void handleLocationsRequest(HttpServletResponse response) throws IOException {
-        List<LocationDTO> locations = ((EdificioServiceImpl) service).findAllLocations();
-        writeJsonResponse(response, gson.toJson(locations));
     }
 
     private void handleSalasByEdificioIdRequest(String[] pathPart, HttpServletResponse response) throws IOException {
         try {
             int id = Integer.parseInt(pathPart[1]);
             String salas = pathPart[2];
-            List<SalaDTO> salasDTO = salaService.getSalasByEdificioId(id);
-            writeJsonResponse(response, gson.toJson(salasDTO));
+            if (!salas.equals("salas")) {
+                sendError(response, HttpServletResponse.SC_NOT_FOUND, "Invalid path");
+                return;
+            }
+            Edificio edificio = service.findById(id);
+            writeJsonResponse(response, gson.toJson(edificio.getSalas()));
         } catch (NumberFormatException e) {
             sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid ID");
         } catch (EntityNotFoundException e) {
@@ -61,13 +45,15 @@ public class EdificioController extends CrudController<EdificioDTO, EdificioRequ
     }
 
     @Override
-    protected EdificioRequestDTO mapJsonToEntity(JSONObject jsonObject) {
-        return new EdificioRequestDTO(
+    protected Edificio mapJsonToEntity(JSONObject jsonObject) {
+        return new Edificio(
+                jsonObject.optInt("id", -1),
                 jsonObject.optString("nombre", null),
                 jsonObject.optString("alias", null),
                 jsonObject.optString("tipo", null),
                 jsonObject.optFloat("latitud", -1),
-                jsonObject.optFloat("longitud", -1)
+                jsonObject.optFloat("longitud", -1),
+                null
         );
     }
 
