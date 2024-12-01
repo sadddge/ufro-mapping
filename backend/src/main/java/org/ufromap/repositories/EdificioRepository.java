@@ -4,30 +4,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.logging.Level;
 
+import lombok.extern.java.Log;
 import org.ufromap.models.Edificio;
-import org.ufromap.models.Sala;
-
-/**
- * Repositorio para manejar las operaciones relacionadas con la entidad {@link Edificio}.
- * Provee métodos para realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre la tabla 'edificio'.
- */
+@Log
 public class EdificioRepository extends BaseRepository<Edificio> {
 
-    private final SalaRepository salaRepository;
-
-    /**
-     * Constructor por defecto que inicializa una instancia de {@link SalaRepository}.
-     */
     public EdificioRepository() {
         super();
-        this.salaRepository = new SalaRepository();
     }
 
-    public EdificioRepository(Connection connection, SalaRepository salaRepository) {
+    public EdificioRepository(Connection connection) {
         super(connection);
-        this.salaRepository = salaRepository;
     }
 
 
@@ -53,19 +42,18 @@ public class EdificioRepository extends BaseRepository<Edificio> {
 
     @Override
     public Edificio mapToObject(ResultSet resultSet) {
+        Edificio edificio = new Edificio();
         try {
-            int id = resultSet.getInt("id");
-            String nombre = resultSet.getString("nombre_edificio");
-            String alias = resultSet.getString("alias");
-            String tipo = resultSet.getString("tipo");
-            float latitud = resultSet.getFloat("latitud");
-            float longitud = resultSet.getFloat("longitud");
-            List<Sala> salas = salaRepository.findByEdificioId(id);
-
-            return new Edificio(id, nombre, alias, tipo, latitud, longitud, salas);
+            edificio.setId(resultSet.getInt("id"));
+            edificio.setNombre(resultSet.getString("nombre_edificio"));
+            edificio.setAlias(resultSet.getString("alias"));
+            edificio.setTipo(resultSet.getString("tipo"));
+            edificio.setLatitud(resultSet.getFloat("latitud"));
+            edificio.setLongitud(resultSet.getFloat("longitud"));
         } catch (SQLException e) {
-            return null;
+            log.log(Level.SEVERE,"Error mapping object", e);
         }
+        return edificio;
     }
 
     @Override
