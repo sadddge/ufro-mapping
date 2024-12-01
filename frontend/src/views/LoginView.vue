@@ -1,5 +1,5 @@
 <template>
-    <div class="container mx-auto pt-64 w-1/4 flex flex-col gap-10">
+    <div class="w-1/4 h-screen m-auto pt-80 flex flex-col gap-10 overflow-hidden">
         <h1 class="text-xl">Login</h1>
         <n-form ref="formRef" :model="model" :rules="rules">
             <n-form-item path="username" label="Username">
@@ -32,11 +32,8 @@ const rules = {
     password: [
         {
             required: true,
-            message: 'Password is required',
-            trigger: ['input']
+            message: 'Password is required'
         }
     ]
 }
 </script>
-
-<style scoped></style>
