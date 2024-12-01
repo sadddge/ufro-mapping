@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class UsuarioDTO {
     private int id;
+    private String rol;
     private String nombre;
     private String correo;
 }

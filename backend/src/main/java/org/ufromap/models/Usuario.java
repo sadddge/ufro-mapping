@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 public class Usuario {
     private int id;
+    private String rol;
     private String nombre;
     private String correo;
     private String contrasenia;

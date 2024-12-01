@@ -71,6 +71,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     public UsuarioDTO entityToDTO(Usuario usuario) {
         return UsuarioDTO.builder()
                 .id(usuario.getId())
+                .rol(usuario.getRol())
                 .nombre(usuario.getNombre())
                 .correo(usuario.getCorreo())
                 .build();
@@ -78,7 +79,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public Usuario dtoToEntity(int id, UsuarioRequestDTO dto) {
-        return new Usuario(id, dto.getNombre(), dto.getCorreo(), dto.getContrasenia());
+        return new Usuario(id, dto.getRol(), dto.getNombre(), dto.getCorreo(), dto.getContrasenia());
     }
 
     @Override
