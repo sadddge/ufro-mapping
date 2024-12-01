@@ -6,22 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
+import lombok.extern.java.Log;
 import org.ufromap.models.Clase;
 import org.ufromap.models.Sala;
-
-/**
- * Repositorio que gestiona las operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para la entidad {@link Sala}.
- * Se conecta a la base de datos y ejecuta consultas SQL para manipular los datos de la tabla "sala".
- */
+@Log
 public class SalaRepository extends BaseRepository<Sala> {
 
     private final ClaseRepository claseRepository;
-
-    /**
-     * Constructor por defecto que inicializa el repositorio con instancias de los servicios
-     * de {@link ClaseRepository}.
-     */
     public SalaRepository() {
         this.claseRepository = new ClaseRepository();
     }
@@ -70,16 +63,15 @@ public class SalaRepository extends BaseRepository<Sala> {
 
     @Override
     public Sala mapToObject(ResultSet resultSet) {
+        Sala sala = new Sala();
         try {
-            int id = resultSet.getInt("id");
-            int edificioId = resultSet.getInt("edificio_id");
-            String nombre = resultSet.getString("nombre_sala");
-            List<Clase> clases = claseRepository.findBySalaId(id);
-            return new Sala(id, edificioId, nombre, clases);
+            sala.setId(resultSet.getInt("id"));
+            sala.setEdificioId(resultSet.getInt("edificio_id"));
+            sala.setNombre(resultSet.getString("nombre_sala"));
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
-            return null;
+            log.log(Level.SEVERE, "Error mapping object", e);
         }
+        return sala;
     }
 
     @Override

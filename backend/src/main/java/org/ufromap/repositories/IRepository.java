@@ -2,11 +2,12 @@ package org.ufromap.repositories;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface IRepository<T> {
     List<T> findAll();
 
-    T findById(int id);
+    Optional<T> findById(int id);
 
     List<T> findByFilter(Map<String, Object> filters);
 

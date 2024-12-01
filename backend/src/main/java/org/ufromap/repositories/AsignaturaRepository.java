@@ -4,11 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 
 import lombok.extern.java.Log;
 import org.ufromap.models.Asignatura;
-import org.ufromap.models.Inscripcion;
+
 @Log
 public class AsignaturaRepository extends BaseRepository<Asignatura> {
 
@@ -72,12 +71,4 @@ public class AsignaturaRepository extends BaseRepository<Asignatura> {
         statement.setInt(4, obj.getSct());
         statement.setInt(5, obj.getId());
     }
-
-    public List<Asignatura> findByInscripciones(List<Inscripcion> inscripciones) {
-        List<Asignatura> asignaturas = findAll();
-        asignaturas.removeIf(asignatura -> inscripciones.stream().noneMatch(inscripcion -> inscripcion.getAsignaturaId() == asignatura.getId()));
-        return asignaturas;
-    }
-
-
 }

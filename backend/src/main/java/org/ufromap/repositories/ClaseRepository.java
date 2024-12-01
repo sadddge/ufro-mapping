@@ -72,11 +72,6 @@ public class ClaseRepository extends BaseRepository<Clase> {
         return horarios;
     }
 
-    public List<Clase> findByAsignaturaId(int asignaturaId) {
-        String query = "SELECT id, sala_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo FROM clase WHERE asignatura_id = ?";
-        return findByParameter(query, asignaturaId);
-    }
-
     public List<Clase> findBySalaId(int id) {
         String query = "SELECT id, sala_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo FROM clase WHERE sala_id = ?";
         return findByParameter(query, id);
