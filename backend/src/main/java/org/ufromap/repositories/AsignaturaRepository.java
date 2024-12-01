@@ -6,31 +6,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import lombok.extern.java.Log;
 import org.ufromap.models.Asignatura;
-import org.ufromap.models.Clase;
 import org.ufromap.models.Inscripcion;
-
-
-/**
- * Clase repositorio para manejar las operaciones relacionadas con la entidad "Asignatura" en la base de datos.
- * Proporciona métodos para recuperar, agregar, actualizar y eliminar registros de "Asignatura",
- * así como para obtener las "Clase" relacionadas.
- */
+@Log
 public class AsignaturaRepository extends BaseRepository<Asignatura> {
 
-    private final ClaseRepository clasesRepository;
-
-    /**
-     * Constructor por defecto que inicializa el repositorio con una nueva instancia de ClaseRepository.
-     */
     public AsignaturaRepository() {
         super();
-        this.clasesRepository = new ClaseRepository();
     }
 
-    public AsignaturaRepository(Connection connection, ClaseRepository clasesRepository) {
+    public AsignaturaRepository(Connection connection) {
         super(connection);
-        this.clasesRepository = clasesRepository;
     }
 
 
@@ -56,17 +43,17 @@ public class AsignaturaRepository extends BaseRepository<Asignatura> {
 
     @Override
     public Asignatura mapToObject(ResultSet resultSet) {
+        Asignatura asignatura = new Asignatura();
         try {
-            int id = resultSet.getInt("id");
-            String nombre = resultSet.getString("nombre_asignatura");
-            String codigo = resultSet.getString("codigo");
-            String descripcion = resultSet.getString("descripcion");
-            int sct = resultSet.getInt("sct");
-            List<Clase> clases = clasesRepository.findByAsignaturaId(id);
-            return new Asignatura(id, nombre, codigo, descripcion, sct, clases);
+            asignatura.setId(resultSet.getInt("id"));
+            asignatura.setNombre(resultSet.getString("nombre_asignatura"));
+            asignatura.setCodigo(resultSet.getString("codigo"));
+            asignatura.setDescripcion(resultSet.getString("descripcion"));
+            asignatura.setSct(resultSet.getInt("sct"));
         } catch (SQLException e) {
-            return null;
+            log.log(java.util.logging.Level.SEVERE, "Error mapping object", e);
         }
+        return asignatura;
     }
 
     @Override
