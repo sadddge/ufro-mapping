@@ -4,7 +4,6 @@ package org.ufromap.services.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
 import org.ufromap.dto.request.AsignaturaRequestDTO;
 import org.ufromap.dto.response.AsignaturaDTO;
 import org.ufromap.exceptions.BadRequestException;
@@ -45,23 +44,17 @@ public class AsignaturaServiceImpl implements IAsignaturaService {
 
     @Override
     public AsignaturaDTO update(int id, AsignaturaRequestDTO asignatura) {
-        validateEntity(asignatura);
-        Asignatura asignaturaEntity = dtoToEntity(id, asignatura);
+        Asignatura entity = asignaturaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Asignatura no encontrada con la id: " + id));
+        AsignaturaRequestDTO requestdDTO = AsignaturaRequestDTO.builder()
+                .nombre(asignatura.getNombre() != null ? asignatura.getNombre() : entity.getNombre())
+                .codigo(asignatura.getCodigo() != null ? asignatura.getCodigo() : entity.getCodigo())
+                .descripcion(asignatura.getDescripcion() != null ? asignatura.getDescripcion() : entity.getDescripcion())
+                .sct(asignatura.getSct() != null ? asignatura.getSct() : entity.getSct())
+                .build();
+        validateEntity(requestdDTO);
+        Asignatura asignaturaEntity = dtoToEntity(id, requestdDTO);
         return entityToDTO(asignaturaRepository.update(asignaturaEntity));
     }
-
-    @Override
-    public AsignaturaDTO patch(int id, JSONObject jsonObject) throws EntityNotFoundException {
-        Asignatura asignatura = asignaturaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Asignatura no encontrada con la id: " + id));
-        AsignaturaRequestDTO requestdDTO = AsignaturaRequestDTO.builder()
-                .nombre(jsonObject.optString("nombre", asignatura.getNombre()))
-                .codigo(jsonObject.optString("codigo", asignatura.getCodigo()))
-                .descripcion(jsonObject.optString("descripcion", asignatura.getDescripcion()))
-                .sct(jsonObject.optInt("sct", asignatura.getSct()))
-                .build();
-        return update(id, requestdDTO);
-    }
-
 
     @Override
     public void delete(int id) throws EntityNotFoundException {

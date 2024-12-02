@@ -3,7 +3,6 @@ package org.ufromap.services.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONObject;
 import org.ufromap.dto.request.EdificioRequestDTO;
 import org.ufromap.dto.response.EdificioDTO;
 import org.ufromap.dto.response.LocationDTO;
@@ -47,22 +46,17 @@ public class EdificioServiceImpl implements IEdificioService {
 
     @Override
     public EdificioDTO update(int id, EdificioRequestDTO edificioRequestDTO) throws EntityNotFoundException {
-        validateEntity(edificioRequestDTO);
-        Edificio edificio = dtoToEntity(id, edificioRequestDTO);
-        return entityToDTO(edificioRepository.update(edificio));
-    }
-
-    @Override
-    public EdificioDTO patch(int id, JSONObject jsonObject) throws EntityNotFoundException {
-        Edificio edificio = edificioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Edificio no encontrado con la id: " + id));
+        Edificio entity = edificioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Edificio no encontrado con la id: " + id));
         EdificioRequestDTO requestdDTO = EdificioRequestDTO.builder()
-                .nombre(jsonObject.optString("nombre", edificio.getNombre()))
-                .alias(jsonObject.optString("alias", edificio.getAlias()))
-                .tipo(jsonObject.optString("tipo", edificio.getTipo()))
-                .latitud(jsonObject.optFloat("latitud", edificio.getLatitud()))
-                .longitud(jsonObject.optFloat("longitud", edificio.getLongitud()))
+                .nombre(edificioRequestDTO.getNombre() != null ? edificioRequestDTO.getNombre() : entity.getNombre())
+                .alias(edificioRequestDTO.getAlias() != null ? edificioRequestDTO.getAlias() : entity.getAlias())
+                .tipo(edificioRequestDTO.getTipo() != null ? edificioRequestDTO.getTipo() : entity.getTipo())
+                .latitud(edificioRequestDTO.getLatitud() != -1 ? edificioRequestDTO.getLatitud() : entity.getLatitud())
+                .longitud(edificioRequestDTO.getLongitud() != -1 ? edificioRequestDTO.getLongitud() : entity.getLongitud())
                 .build();
-        return update(id, requestdDTO);
+        validateEntity(requestdDTO);
+        Edificio edificio = dtoToEntity(id, requestdDTO);
+        return entityToDTO(edificioRepository.update(edificio));
     }
 
 
