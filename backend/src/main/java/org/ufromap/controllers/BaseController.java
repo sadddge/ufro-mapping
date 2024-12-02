@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
 import org.json.JSONObject;
 
 public abstract class BaseController extends HttpServlet {
@@ -14,9 +15,9 @@ public abstract class BaseController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
     }
 
-    protected void writeJsonResponse(HttpServletResponse response, String jsonResponse) throws IOException {
+    protected void writeJsonResponse(HttpServletResponse response, Object object) throws IOException {
         setJsonResponse(response);
-        response.getWriter().write(jsonResponse);
+        response.getWriter().write(new Gson().toJson(object));
     }
 
     protected void sendError(HttpServletResponse response, int statusCode, String message) {

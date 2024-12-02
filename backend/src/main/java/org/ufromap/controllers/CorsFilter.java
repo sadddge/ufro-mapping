@@ -1,9 +1,11 @@
 package org.ufromap.controllers;
 
+import javax.annotation.Priority;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+@Priority(1)
 @WebFilter("/*")
 public class CorsFilter implements Filter {
     @Override

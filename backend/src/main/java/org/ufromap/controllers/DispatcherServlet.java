@@ -27,8 +27,12 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         try {
-            registerRoutes(new UsuarioController());
+            registerRoutes(new AuthController());
+            registerRoutes(new SalaController());
             registerRoutes(new AsignaturaController());
+            registerRoutes(new EdificioController());
+            registerRoutes(new UsuarioController());
+            registerRoutes(new ClaseController());
         } catch (Exception e) {
             throw new ServletException("Failed to register routes", e);
         }
