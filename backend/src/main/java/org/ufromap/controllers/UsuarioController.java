@@ -30,11 +30,13 @@ public class UsuarioController extends BaseController {
     }
 
     @GetMapping("")
+    @Protected(roles = {"ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
         writeJsonResponse(response, usuarioService.findAll());
     }
 
     @GetMapping("/{id}")
+    @Protected(roles = {"USER", "ADMIN"})
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         UsuarioDTO usuario = usuarioService.findById(userId);
@@ -42,18 +44,21 @@ public class UsuarioController extends BaseController {
     }
 
     @GetMapping("/{id}/asignaturas")
+    @Protected(roles = {"USER", "ADMIN"})
     public void getAsignaturasByUsuarioId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         writeJsonResponse(response, inscripcionService.getAsignaturasByUsuarioId(userId));
     }
 
     @GetMapping("/{id}/horario")
+    @Protected(roles = {"USER", "ADMIN"})
     public void getHorario(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         writeJsonResponse(response, horarioService.getHorarioByUserId(userId));
     }
 
     @PostMapping("")
+    @Protected(roles = {"ADMIN"})
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         UsuarioRequestDTO usuarioRequestDTO = mapJsonToEntity(jsonObject);
@@ -62,6 +67,7 @@ public class UsuarioController extends BaseController {
     }
 
     @PostMapping("/{id}/asignaturas/{asignaturaId}")
+    @Protected(roles = {"USER", "ADMIN"})
     public void addInscripcion(@PathParam("id") String id, @PathParam("asignaturaId") String asignaturaId, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         int asignaturaIdInt = Integer.parseInt(asignaturaId);
@@ -70,6 +76,7 @@ public class UsuarioController extends BaseController {
     }
 
     @PutMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         UsuarioRequestDTO usuarioRequestDTO = mapJsonToEntity(jsonObject);
@@ -79,6 +86,7 @@ public class UsuarioController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         usuarioService.delete(userId);
@@ -86,6 +94,7 @@ public class UsuarioController extends BaseController {
     }
 
     @DeleteMapping("/{id}/asignaturas/{asignaturaId}")
+    @Protected(roles = {"USER", "ADMIN"})
     public void deleteInscripcion(@PathParam("id") String id, @PathParam("asignaturaId") String asignaturaId, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         int asignaturaIdInt = Integer.parseInt(asignaturaId);

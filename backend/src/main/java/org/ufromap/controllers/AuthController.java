@@ -2,11 +2,8 @@ package org.ufromap.controllers;
 
 import org.json.JSONObject;
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.ufromap.annotation.PostMapping;
@@ -32,7 +29,7 @@ public class AuthController extends BaseController {
         if (token != null) {
             JSONObject jsonResponse = new JSONObject();
             jsonResponse.put("token", token);
-            writeJsonResponse(response, jsonResponse.toString());
+            writeJsonResponse(response, jsonResponse);
         } else {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
         }

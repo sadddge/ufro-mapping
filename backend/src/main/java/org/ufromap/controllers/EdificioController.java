@@ -45,6 +45,7 @@ public class EdificioController extends BaseController {
     }
 
     @GetMapping("/{id}/salas")
+    @Protected(roles = {"USER", "ADMIN"})
     public void getSalasByEdificioId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         List<SalaDTO> salasDTO = salaService.getSalasByEdificioId(idInt);
@@ -52,6 +53,7 @@ public class EdificioController extends BaseController {
     }
 
     @PostMapping("")
+    @Protected(roles = {"ADMIN"})
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         EdificioRequestDTO edificioRequestDTO = mapJsonToEntity(jsonObject);
@@ -60,6 +62,7 @@ public class EdificioController extends BaseController {
     }
 
     @PutMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         EdificioRequestDTO edificioRequestDTO = mapJsonToEntity(jsonObject);
@@ -69,6 +72,7 @@ public class EdificioController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         edificioService.delete(idInt);

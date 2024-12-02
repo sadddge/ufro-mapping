@@ -2,6 +2,7 @@ package org.ufromap.controllers;
 
 import lombok.extern.java.Log;
 import org.ufromap.annotation.*;
+import org.ufromap.auth.JwtUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -71,7 +73,11 @@ public class DispatcherServlet extends HttpServlet {
 
         if (handler != null) {
             try {
-                // Obtener argumentos para el método
+                if (!isAuthorized(handler, req)) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    resp.getWriter().write("Forbidden");
+                    return;
+                }
                 Object[] args = resolveMethodArguments(handler, path, req, resp);
                 handler.invoke(handler.getDeclaringClass().getConstructor().newInstance(), args);
             } catch (Exception e) {
@@ -138,7 +144,7 @@ public class DispatcherServlet extends HttpServlet {
     private Method matchRouteWithParams(String key) {
         try {
             for (String routeKey : routeHandlers.keySet()) {
-                if (routeKey.startsWith(key.split(":")[0])) { // Match method (e.g., GET)
+                if (routeKey.startsWith(key.split(":")[0])) {
                     String routePath = routeKey.split(":")[1];
                     Pattern pattern = Pattern.compile(routePath.replaceAll("\\{([^}]+)}", "[^/]+"));
                     Matcher matcher = pattern.matcher(key.split(":")[1]);
@@ -160,5 +166,29 @@ public class DispatcherServlet extends HttpServlet {
             }
         }
         return null;
+    }
+
+    private boolean isAuthorized(Method handler, HttpServletRequest req) {
+        if (handler.isAnnotationPresent(Protected.class)) {
+            String[] roles = handler.getAnnotation(Protected.class).roles();
+            String authHeader = req.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return false;
+            }
+            String token = authHeader.substring(7);
+            String role = JwtUtil.validateTokenAndGetRole(token);
+            System.out.println(role);
+            System.out.println(Arrays.toString(roles));
+            if (role == null) {
+                return false;
+            }
+            for (String allowedRole : roles) {
+                if (allowedRole.equals(role)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
     }
 }

@@ -26,23 +26,27 @@ public class SalaController extends BaseController {
     }
 
     @GetMapping("")
+    @Protected(roles = {"USER", "ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
         writeJsonResponse(response, salaService.findAll());
     }
 
     @GetMapping("/{id}")
+    @Protected(roles = {"USER", "ADMIN"})
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         writeJsonResponse(response, salaService.findById(idInt));
     }
 
     @GetMapping("/{id}/horario")
+    @Protected(roles = {"USER", "ADMIN"})
     public void getHorarioBySalaId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         writeJsonResponse(response, horarioService.getHorarioBySalaId(idInt));
     }
 
     @PostMapping("")
+    @Protected(roles = {"ADMIN"})
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         SalaRequestDTO salaRequestDTO = mapJsonToEntity(jsonObject);
@@ -50,6 +54,7 @@ public class SalaController extends BaseController {
     }
 
     @PutMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         SalaRequestDTO salaRequestDTO = mapJsonToEntity(jsonObject);
@@ -58,6 +63,7 @@ public class SalaController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         salaService.delete(idInt);

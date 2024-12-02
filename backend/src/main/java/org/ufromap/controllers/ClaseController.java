@@ -20,17 +20,20 @@ public class ClaseController extends BaseController {
     }
 
     @GetMapping("")
+    @Protected(roles = {"USER", "ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
         writeJsonResponse(response, claseService.findAll());
     }
 
     @GetMapping("/{id}")
+    @Protected(roles = {"USER", "ADMIN"})
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         writeJsonResponse(response, claseService.findById(idInt));
     }
 
     @PostMapping("")
+    @Protected(roles = {"ADMIN"})
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         ClaseRequestDTO claseRequestDTO = mapJsonToEntity(jsonObject);
@@ -38,6 +41,7 @@ public class ClaseController extends BaseController {
     }
 
     @PutMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         ClaseRequestDTO claseRequestDTO = mapJsonToEntity(jsonObject);
@@ -46,6 +50,7 @@ public class ClaseController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         claseService.delete(idInt);

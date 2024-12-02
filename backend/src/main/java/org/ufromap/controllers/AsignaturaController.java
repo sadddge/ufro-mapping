@@ -25,12 +25,14 @@ public class AsignaturaController extends BaseController {
     }
 
     @GetMapping("")
+    @Protected(roles = {"USER", "ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
         List<AsignaturaDTO> asignaturas = asignaturaService.findAll();
         writeJsonResponse(response, asignaturas);
     }
 
     @GetMapping("/{id}")
+    @Protected(roles = {"USER", "ADMIN"})
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idAsignatura = Integer.parseInt(id);
         AsignaturaDTO asignatura = asignaturaService.findById(idAsignatura);
@@ -38,6 +40,7 @@ public class AsignaturaController extends BaseController {
     }
 
     @GetMapping("/{id}/horario")
+    @Protected(roles = {"USER", "ADMIN"})
     public void getHorarioByAsignaturaId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idAsignatura = Integer.parseInt(id);
         List<HorarioClaseDTO> asignaturas = horarioService.getHorarioByAsignaturaId(idAsignatura);
@@ -45,6 +48,7 @@ public class AsignaturaController extends BaseController {
     }
 
     @PostMapping("")
+    @Protected(roles = {"ADMIN"})
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         AsignaturaRequestDTO asignaturaRequestDTO = mapJsonToEntity(jsonObject);
@@ -53,6 +57,7 @@ public class AsignaturaController extends BaseController {
     }
 
     @PutMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         AsignaturaRequestDTO asignaturaRequestDTO = mapJsonToEntity(jsonObject);
@@ -62,6 +67,7 @@ public class AsignaturaController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idAsignatura = Integer.parseInt(id);
         asignaturaService.delete(idAsignatura);
