@@ -1,14 +1,11 @@
 package org.ufromap.controllers;
 
-import com.google.gson.Gson;
 import org.json.JSONObject;
 import org.ufromap.annotation.*;
 import org.ufromap.dto.request.InscripcionRequestDTO;
 import org.ufromap.dto.request.UsuarioRequestDTO;
 import org.ufromap.dto.response.InscripcionDTO;
 import org.ufromap.dto.response.UsuarioDTO;
-import org.ufromap.exceptions.EntityNotFoundException;
-import org.ufromap.models.Usuario;
 import org.ufromap.services.IHorarioService;
 import org.ufromap.services.IInscripcionService;
 import org.ufromap.services.IUsuarioService;
@@ -16,7 +13,6 @@ import org.ufromap.services.impl.HorarioServiceImpl;
 import org.ufromap.services.impl.InscripcionServiceImpl;
 import org.ufromap.services.impl.UsuarioServiceImpl;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

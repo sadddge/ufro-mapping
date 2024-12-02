@@ -2,10 +2,7 @@ package org.ufromap.controllers;
 
 import org.ufromap.annotation.*;
 import org.ufromap.dto.request.ClaseRequestDTO;
-import org.ufromap.dto.response.ClaseDTO;
-import org.ufromap.models.Clase;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

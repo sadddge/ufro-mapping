@@ -7,8 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
+import lombok.extern.java.Log;
 import org.json.JSONObject;
-
+@Log
 public abstract class BaseController extends HttpServlet {
     protected void setJsonResponse(HttpServletResponse response) {
         response.setContentType("application/json");
@@ -27,7 +28,7 @@ public abstract class BaseController extends HttpServlet {
         try {
             writeJsonResponse(response, jsonResponse.toString());
         } catch (IOException e) {
-            System.out.println("Error writing error response");
+            log.log(java.util.logging.Level.SEVERE, "Error sending error response", e);
         }
     }
 

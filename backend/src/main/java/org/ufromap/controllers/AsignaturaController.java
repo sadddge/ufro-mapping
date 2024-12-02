@@ -1,19 +1,15 @@
 package org.ufromap.controllers;
 
-import com.google.gson.Gson;
 import org.json.JSONObject;
 import org.ufromap.annotation.*;
 import org.ufromap.dto.request.AsignaturaRequestDTO;
 import org.ufromap.dto.response.AsignaturaDTO;
 import org.ufromap.dto.response.HorarioClaseDTO;
-import org.ufromap.exceptions.EntityNotFoundException;
-import org.ufromap.models.Asignatura;
 import org.ufromap.services.IAsignaturaService;
 import org.ufromap.services.IHorarioService;
 import org.ufromap.services.impl.AsignaturaServiceImpl;
 import org.ufromap.services.impl.HorarioServiceImpl;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,13 +25,13 @@ public class AsignaturaController extends BaseController {
     }
 
     @GetMapping("")
-    public void findAll(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void findAll(HttpServletResponse response) throws IOException {
         List<AsignaturaDTO> asignaturas = asignaturaService.findAll();
         writeJsonResponse(response, asignaturas);
     }
 
     @GetMapping("/{id}")
-    public void findById(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idAsignatura = Integer.parseInt(id);
         AsignaturaDTO asignatura = asignaturaService.findById(idAsignatura);
         writeJsonResponse(response, asignatura);
@@ -66,7 +62,7 @@ public class AsignaturaController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idAsignatura = Integer.parseInt(id);
         asignaturaService.delete(idAsignatura);
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);

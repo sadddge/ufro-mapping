@@ -3,7 +3,6 @@ package org.ufromap.controllers;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,8 +12,6 @@ import org.ufromap.dto.request.EdificioRequestDTO;
 import org.ufromap.dto.response.EdificioDTO;
 import org.ufromap.dto.response.LocationDTO;
 import org.ufromap.dto.response.SalaDTO;
-import org.ufromap.exceptions.EntityNotFoundException;
-import org.ufromap.models.Edificio;
 import org.ufromap.services.IEdificioService;
 import org.ufromap.services.ISalaService;
 import org.ufromap.services.impl.EdificioServiceImpl;

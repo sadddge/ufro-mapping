@@ -1,7 +1,5 @@
 package org.ufromap.controllers;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.java.Log;
 import org.ufromap.annotation.*;
 
@@ -38,7 +36,7 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private void registerRoutes(Object controller) throws Exception {
+    private void registerRoutes(Object controller) {
         Class<?> clazz = controller.getClass();
         String basePath = "";
 
@@ -77,7 +75,6 @@ public class DispatcherServlet extends HttpServlet {
                 Object[] args = resolveMethodArguments(handler, path, req, resp);
                 handler.invoke(handler.getDeclaringClass().getConstructor().newInstance(), args);
             } catch (Exception e) {
-                e.printStackTrace();
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 resp.getWriter().write("Error processing request: " + e.getMessage());
             }
@@ -120,8 +117,6 @@ public class DispatcherServlet extends HttpServlet {
     private Map<String, String> extractPathParams(Method handler, String path) {
         Map<String, String> params = new HashMap<>();
         String routePath = getRoutePath(handler);
-        System.out.println("Route path: " + routePath); // /api/asignaturas/{id}
-        System.out.println("Path: " + path); // /api/asignaturas/1
         if (routePath == null) {
             return params;
         }
@@ -130,13 +125,10 @@ public class DispatcherServlet extends HttpServlet {
         Matcher matcher = pattern.matcher(path);
 
         if (matcher.matches()) {
-            System.out.println("Matches");
             Pattern namedGroupPattern = Pattern.compile("\\{([^}]+)}");
             Matcher namedGroupMatcher = namedGroupPattern.matcher(routePath);
             while (namedGroupMatcher.find()) {
                 String name = namedGroupMatcher.group(1);
-                System.out.println("Name: " + name);
-                System.out.println("Value: " + matcher.group(name));
                 params.put(name, matcher.group(name));
             }
         }
