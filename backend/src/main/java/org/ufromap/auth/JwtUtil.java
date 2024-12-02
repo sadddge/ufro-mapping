@@ -2,6 +2,7 @@ package org.ufromap.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.ufromap.models.Usuario;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -12,9 +13,10 @@ public class JwtUtil {
     private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY);
     private static final long EXPIRATION_TIME = 3600000;
 
-    public static String generateToken(int userId) {
+    public static String generateToken(Usuario user) {
         return Jwts.builder()
-                .subject(String.valueOf(userId))
+                .subject(user.getNombre())
+                .claim("role", user.getRol())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
@@ -23,7 +25,7 @@ public class JwtUtil {
 
 
 
-    public static int validateTokenAndGetUserId(String token) {
+    public static String validateTokenAndGetRole(String token) {
         try {
             Claims claims = Jwts.parser()
                     .verifyWith((SecretKey) key)
@@ -31,9 +33,9 @@ public class JwtUtil {
                     .parseSignedClaims(token)
                     .getPayload();
 
-            return Integer.parseInt(claims.getSubject());
+            return claims.get("role", String.class);
         } catch (Exception e) {
-            return 0;
+            return null;
         }
     }
 }

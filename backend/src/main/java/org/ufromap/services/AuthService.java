@@ -17,15 +17,12 @@ public class AuthService {
     }
 
     public Usuario validarCredenciales(String correo, String contrasenia){
-        Usuario usuario = usuarioRepository.findByCorreoYContrasenia(correo, contrasenia);
-        if (usuario == null) {
-            throw new EntityNotFoundException("Invalid credentials");
-        }
-        return usuario;
+        return usuarioRepository.findByCorreoYContrasenia(correo, contrasenia)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
     }
 
     public String login (String correo, String contrasenia){
         Usuario usuario = validarCredenciales(correo, contrasenia);
-        return JwtUtil.generateToken(usuario.getId());
+        return JwtUtil.generateToken(usuario);
     }
 }
