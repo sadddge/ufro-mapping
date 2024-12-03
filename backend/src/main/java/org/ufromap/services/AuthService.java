@@ -25,4 +25,8 @@ public class AuthService {
         Usuario usuario = validarCredenciales(correo, contrasenia);
         return JwtUtil.generateToken(usuario);
     }
+
+    public boolean validateSession(String token){
+        return JwtUtil.validateToken(token);
+    }
 }
