@@ -18,7 +18,7 @@ const menuOptions = [
     
     {
         key: 'usuarios',
-        label: () => h(RouterLink, { to: '/usuarios' }, 'Usuarios'),
+        label: () => h(RouterLink, { to : { name: 'Usuarios' } }, 'Usuarios'),
         icon: () => h(Person20Filled)
     },
     {
@@ -27,7 +27,7 @@ const menuOptions = [
     },
     { 
         key: 'edificios',
-        label: () => h(RouterLink, { to: '/edificios' }, 'Edificios'),
+        label: () => h(RouterLink, { to : { name: 'Edificios' } }, 'Edificios'),
         icon: () => h(Building16Filled)
     },
     {
@@ -36,7 +36,7 @@ const menuOptions = [
     },
     {
         key: 'salas',
-        label: () => h(RouterLink, { to: '/salas' }, 'Salas'),
+        label: () => h(RouterLink, { to : { name: 'Salas' } }, 'Salas'),
         icon: () => h(ConferenceRoom20Filled)
     },
     {
@@ -45,7 +45,7 @@ const menuOptions = [
     },
     {
         key: 'asignaturas',
-        label: () => h(RouterLink, { to: '/asignaturas' }, 'Asignaturas'),
+        label: () => h(RouterLink, { to : { name: 'Asignaturas' } }, 'Asignaturas'),
         icon: () => h(Book20Filled)
     },
     {
@@ -54,7 +54,7 @@ const menuOptions = [
     },
     {
         key: 'clases',
-        label: () => h(RouterLink, { to: '/clases' }, 'Clases'),
+        label: () => h(RouterLink, { to : { name: 'Clases' } }, 'Clases'),
         icon: () => h(Class24Filled)
     },
 ]
