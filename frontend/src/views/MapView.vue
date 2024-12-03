@@ -38,7 +38,7 @@ const saveEdit = () => {
   markers.value.forEach((marker) => {
     console.log(marker)
     const lnglat = marker.marker.getLngLat();
-    BuildingsService.patchBuilding(marker.id, {latitud: lnglat.lat, longitud: lnglat.lng})
+    BuildingsService.updateBuilding(marker.id, {latitud: lnglat.lat, longitud: lnglat.lng})
   })
 }
 
