@@ -30,7 +30,7 @@ import ClassroomService from '@/services/ClassroomService';
 import {NButton, NText, useDialog} from 'naive-ui';
 import {onMounted, ref} from 'vue';
 import Buttons from '@/components/jsComp/Buttons.js';
-import {openEditDialog, openNewEntityDialog} from "@/components/jsComp/Dialogs.js";
+import {openDeleteDialog, openEditDialog, openNewEntityDialog} from "@/components/jsComp/Dialogs.js";
 import BuildingsService from "@/services/BuildingsService.js";
 import {lectureContent} from "@/components/jsComp/Contents.js";
 import SelectCalendar from "@/components/SelectCalendar.vue";
@@ -137,6 +137,16 @@ const editDialog = (lecture) => {
 const newDialog = () => {
   openNewEntityDialog(dialog, lecture, "Crear clases", () => lectureContent(lecture, getCourseOptions(), getBuildingOptions(), getClassroomOptions), selectCalendar);
 }
+
+const deleteDialog = (lecture) => {
+  openDeleteDialog(dialog, lecture, "Clase", deleteLecture);
+}
+
+const deleteLecture = async (lecture) => {
+  await LecturesService.deleteLecture(lecture.id);
+  await fetchAll();
+}
+
 const saveEdit = async (lecture) => {
   const entity = LecturesService.lectureToRequest(lecture);
   await LecturesService.updateLecture(lecture.id, entity);
@@ -177,7 +187,7 @@ const columns = ref([
       if (!row.id) {
         return null;
       }
-      return [Buttons.editButton(row, editDialog), Buttons.deleteButton(row, null)];
+      return [Buttons.editButton(row, editDialog), Buttons.deleteButton(row, deleteDialog)];
     },
   }
 ]);
