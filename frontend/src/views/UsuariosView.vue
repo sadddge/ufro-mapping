@@ -1,14 +1,14 @@
 <template>
-    <MainLayout>
+    <AdminLayout>
         <div class="flex flex-row mx-auto pt-24 gap-10">
             <UsersTable @update:userId="handleUserSelected" />
             <RegisteredCoursesTable :id="userId" />
         </div>
-    </MainLayout>
+    </AdminLayout>
 </template>
 
 <script setup>
-import MainLayout from '@/layouts/MainLayout.vue';
+import AdminLayout from '@/layouts/AdminLayout.vue';
 import UsersTable from '@/components/UsersTable.vue';
 import RegisteredCoursesTable from '@/components/RegisteredCoursesTable.vue';
 import { ref } from 'vue';

@@ -1,18 +1,20 @@
 <template>
     <div class="flex flex-row px-52">
         <div class="w-52 h-screen flex p-0 items-center">
-            <n-menu v-model:value="activeKey" :options="menuOptions" responsive class="w-full"/>
+            <n-menu :options="menuOptions" responsive class="w-full"/>
         </div>
         <slot></slot>
     </div>
 </template>
 
 <script setup>
-import { h, ref } from 'vue'
-import { Person20Filled, Building16Filled, Class24Filled, Book20Filled, ConferenceRoom20Filled } from '@vicons/fluent';
-import { RouterLink, useRoute } from 'vue-router';
-const route = useRoute()
-const activeKey = ref(route.name)
+import { h } from 'vue'
+import { Person20Filled, Building16Filled, Class24Filled, Book20Filled, ConferenceRoom20Filled, SignOut20Filled } from '@vicons/fluent';
+import { RouterLink, useRouter } from 'vue-router';
+import {useAuthStore} from "@/stores/auth.js";
+
+const router = useRouter()
+const store = useAuthStore()
 
 const menuOptions = [
     
@@ -57,5 +59,18 @@ const menuOptions = [
         label: () => h(RouterLink, { to : { name: 'Clases' } }, 'Clases'),
         icon: () => h(Class24Filled)
     },
+    {
+        type: 'divider',
+        key: 'divider'
+    },
+    {
+        key: 'logout',
+        label: 'Logout',
+        icon: () => h(SignOut20Filled),
+        onClick: () => {
+            store.logout()
+            router.push('/login')
+        }
+    }
 ]
 </script>

@@ -1,12 +1,11 @@
 <template>
     <AdminLayout>
-        <div class="flex flex-row w-fit m-auto gap-10">
-            <ClassroomTable />
+        <div class="flex flex-col items-center justify-center h-screen w-1/2 mx-auto">
+            <img src="../assets/images/ufro_logo.png" alt="logo">
         </div>
     </AdminLayout>
 </template>
 
 <script setup>
-import ClassroomTable from '@/components/ClassroomTable.vue';
 import AdminLayout from '@/layouts/AdminLayout.vue';
 </script>

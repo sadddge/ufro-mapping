@@ -1,5 +1,5 @@
 <template>
-  <MainLayout>
+  <AdminLayout>
     <div class="flex flex-col gap-4 w-4/5 h-[90vh] m-auto items-end">
       <MapUfro :markers="markers" :edit="edit"/>
       <div v-if="edit" class="flex flex-row gap-2">
@@ -17,11 +17,11 @@
 
       </div>
     </div>
-  </MainLayout>
+  </AdminLayout>
 </template>
 
 <script setup>
-import MainLayout from "@/layouts/MainLayout.vue";
+import AdminLayout from "@/layouts/AdminLayout.vue";
 import BuildingsService from "@/services/BuildingsService.js";
 import MapUfro from "@/components/MapUfro.vue";
 
