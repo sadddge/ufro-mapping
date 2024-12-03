@@ -6,6 +6,7 @@ import org.ufromap.auth.JwtUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -66,6 +67,12 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String method = req.getMethod();
+
+        if ("OPTIONS".equals(method)) {
+            handleOptions(req, resp);
+            return;
+        }
+
         String path = req.getPathInfo();
         String key = method + ":" + path;
 
@@ -81,6 +88,7 @@ public class DispatcherServlet extends HttpServlet {
                 Object[] args = resolveMethodArguments(handler, path, req, resp);
                 handler.invoke(handler.getDeclaringClass().getConstructor().newInstance(), args);
             } catch (Exception e) {
+                e.printStackTrace();
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 resp.getWriter().write("Error processing request: " + e.getMessage());
             }
@@ -88,6 +96,14 @@ public class DispatcherServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             resp.getWriter().write("Route not found");
         }
+    }
+
+    private void handleOptions(HttpServletRequest req, HttpServletResponse resp) {
+        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+        resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+        resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        resp.setHeader("Access-Control-Allow-Credentials", "true");
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     private Object[] resolveMethodArguments(Method handler, String path, HttpServletRequest req, HttpServletResponse res) {
@@ -169,26 +185,25 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private boolean isAuthorized(Method handler, HttpServletRequest req) {
-        if (handler.isAnnotationPresent(Protected.class)) {
-            String[] roles = handler.getAnnotation(Protected.class).roles();
-            String authHeader = req.getHeader("Authorization");
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return false;
-            }
-            String token = authHeader.substring(7);
-            String role = JwtUtil.validateTokenAndGetRole(token);
-            System.out.println(role);
-            System.out.println(Arrays.toString(roles));
-            if (role == null) {
-                return false;
-            }
-            for (String allowedRole : roles) {
-                if (allowedRole.equals(role)) {
-                    return true;
-                }
-            }
+        if (!handler.isAnnotationPresent(Protected.class)) {
+            return true;
+        }
+
+        String token = Arrays.stream(req.getCookies())
+                .filter(cookie -> "token".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
+
+        if (token == null) {
             return false;
         }
-        return true;
+
+        String role = JwtUtil.validateTokenAndGetRole(token);
+        if (role == null) {
+            return false;
+        }
+
+        return Arrays.asList(handler.getAnnotation(Protected.class).roles()).contains(role);
     }
 }
