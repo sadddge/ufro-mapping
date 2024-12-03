@@ -69,7 +69,7 @@ public class DispatcherServlet extends HttpServlet {
         String method = req.getMethod();
 
         if ("OPTIONS".equals(method)) {
-            handleOptions(req, resp);
+            handleOptions(resp);
             return;
         }
 
@@ -98,7 +98,7 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
-    private void handleOptions(HttpServletRequest req, HttpServletResponse resp) {
+    private void handleOptions(HttpServletResponse resp) {
         resp.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
         resp.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
         resp.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
@@ -199,7 +199,7 @@ public class DispatcherServlet extends HttpServlet {
             return false;
         }
 
-        String role = JwtUtil.validateTokenAndGetRole(token);
+        String role = JwtUtil.getUserRole(token);
         if (role == null) {
             return false;
         }

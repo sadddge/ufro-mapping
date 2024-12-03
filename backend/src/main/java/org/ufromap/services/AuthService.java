@@ -1,6 +1,8 @@
 package org.ufromap.services;
 
 import org.ufromap.auth.JwtUtil;
+import org.ufromap.dto.response.UserInfoDTO;
+import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Usuario;
 import org.ufromap.repositories.UsuarioRepository;
@@ -28,5 +30,15 @@ public class AuthService {
 
     public boolean validateSession(String token){
         return JwtUtil.validateToken(token);
+    }
+
+    public UserInfoDTO getUserInfo(String value) {
+        if (!validateSession(value)) {
+            throw new BadRequestException("Invalid session");
+        }
+        return UserInfoDTO.builder()
+                .id(JwtUtil.getUserId(value))
+                .rol(JwtUtil.getUserRole(value))
+                .build();
     }
 }

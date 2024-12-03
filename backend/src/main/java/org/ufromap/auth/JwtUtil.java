@@ -23,9 +23,21 @@ public class JwtUtil {
                 .compact();
     }
 
+    public static int getUserId(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith((SecretKey) key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
 
+            return Integer.parseInt(claims.getSubject());
+        } catch (Exception e) {
+            return -1;
+        }
+    }
 
-    public static String validateTokenAndGetRole(String token) {
+    public static String getUserRole(String token) {
         try {
             Claims claims = Jwts.parser()
                     .verifyWith((SecretKey) key)

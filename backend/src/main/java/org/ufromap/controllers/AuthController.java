@@ -11,15 +11,16 @@ import java.util.Arrays;
 import org.ufromap.annotation.GetMapping;
 import org.ufromap.annotation.PostMapping;
 import org.ufromap.annotation.RequestMapping;
+import org.ufromap.dto.response.UserInfoDTO;
 import org.ufromap.services.AuthService;
 
 @RequestMapping("/api/auth")
 public class AuthController extends BaseController {
 
-    private final AuthService usuarioService;
+    private final AuthService authService;
 
     public AuthController() {
-        this.usuarioService = new AuthService();
+        this.authService = new AuthService();
     }
 
     @PostMapping("/login")
@@ -28,38 +29,69 @@ public class AuthController extends BaseController {
         String correo = jsonObject.optString("correo", null);
         String contrasenia = jsonObject.optString("contrasenia", null);
 
-        String token = usuarioService.login(correo, contrasenia);
+        String token = authService.login(correo, contrasenia);
         if (token != null) {
-            Cookie cookie = new Cookie("token", token);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(3600);
-            response.addHeader("Set-Cookie", cookie.getName() + "=" + cookie.getValue()
-                    + "; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=" + cookie.getMaxAge());
-            response.addCookie(cookie);
+            addTokenCookie(response, token);
             writeJsonResponse(response, "Login successful");
         } else {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid credentials");
         }
     }
 
+    @PostMapping("/logout")
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        Cookie tokenCookie = getTokenCookie(request);
+        if (tokenCookie != null) {
+            System.out.println("Removing token cookie");
+            System.out.println(tokenCookie.getName());
+            System.out.println(tokenCookie.getValue());
+            tokenCookie.setValue("");
+            tokenCookie.setPath("/");
+            tokenCookie.setMaxAge(0);
+            response.addCookie(tokenCookie);
+        }
+    }
+
     @GetMapping("/validate-session")
     public void validateSession(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (request.getCookies() == null) {
+        Cookie tokenCookie = getTokenCookie(request);
+        if (tokenCookie == null) {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
             return;
         }
-        Arrays.stream(request.getCookies()).filter(cookie -> cookie.getName().equals("token")).findFirst().ifPresent(cookie -> {
-            if (usuarioService.validateSession(cookie.getValue())) {
-                try {
-                    writeJsonResponse(response, "Session is valid");
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
-            }
-        });
+        if (authService.validateSession(tokenCookie.getValue())) {
+            writeJsonResponse(response, "Session is valid");
+        } else {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
+        }
+    }
+
+    @GetMapping("/user-info")
+    public void getUserInfo(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Cookie tokenCookie = getTokenCookie(request);
+        if (tokenCookie == null) {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
+            return;
+        }
+        UserInfoDTO userInfo = authService.getUserInfo(tokenCookie.getValue());
+        writeJsonResponse(response, userInfo);
+    }
+
+    private Cookie getTokenCookie(HttpServletRequest request) {
+        return request.getCookies() == null ? null : Arrays.stream(request.getCookies())
+                .filter(cookie -> "token".equals(cookie.getName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void addTokenCookie(HttpServletResponse response, String token) {
+        Cookie cookie = new Cookie("token", token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600);
+        response.addHeader("Set-Cookie", cookie.getName() + "=" + cookie.getValue()
+                + "; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=" + cookie.getMaxAge());
+        response.addCookie(cookie);
     }
 }
