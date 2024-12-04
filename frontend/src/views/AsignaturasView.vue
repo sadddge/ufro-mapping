@@ -1,12 +1,12 @@
 <template>
-  <MainLayout>
+  <AdminLayout>
     <div class="m-auto">
       <CourseTable/>
     </div>
-  </MainLayout>
+  </AdminLayout>
 </template>
 
 <script setup>
 import CourseTable from '@/components/CourseTable.vue';
-import MainLayout from '@/layouts/MainLayout.vue';
+import AdminLayout from '@/layouts/AdminLayout.vue';
 </script>

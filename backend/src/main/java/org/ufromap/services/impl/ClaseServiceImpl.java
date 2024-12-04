@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
-import org.json.JSONObject;
 import org.ufromap.dto.request.ClaseRequestDTO;
 import org.ufromap.dto.response.AsignaturaDTO;
 import org.ufromap.dto.response.ClaseDTO;
@@ -61,23 +60,18 @@ public class ClaseServiceImpl implements IClaseService {
 
     @Override
     public ClaseDTO update(int id, ClaseRequestDTO clase) {
-        validateEntity(clase);
-        Clase claseEntity = dtoToEntity(id, clase);
-        return entityToDTO(claseRepository.update(claseEntity));
-    }
-
-    @Override
-    public ClaseDTO patch(int id, JSONObject jsonObject) throws EntityNotFoundException {
-        Clase clase = claseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Clase no encontrada con la id: " + id));
+        Clase entity = claseRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Clase no encontrada con la id: " + id));
         ClaseRequestDTO requestDTO = ClaseRequestDTO.builder()
-                .salaId(jsonObject.optInt("salaId", clase.getSalaId()))
-                .asignaturaId(jsonObject.optInt("asignaturaId", clase.getAsignaturaId()))
-                .diaSemana(jsonObject.optInt("diaSemana", clase.getDiaSemana()))
-                .periodo(jsonObject.optInt("periodo", clase.getPeriodo()))
-                .docente(jsonObject.optString("docente", clase.getDocente()))
-                .modulo(jsonObject.optInt("modulo", clase.getModulo()))
+                .salaId(clase.getSalaId() != -1 ? clase.getSalaId() : entity.getSalaId())
+                .asignaturaId(clase.getAsignaturaId() != -1 ? clase.getAsignaturaId() : entity.getAsignaturaId())
+                .diaSemana(clase.getDiaSemana() != -1 ? clase.getDiaSemana() : entity.getDiaSemana())
+                .periodo(clase.getPeriodo() != -1 ? clase.getPeriodo() : entity.getPeriodo())
+                .docente(clase.getDocente() != null ? clase.getDocente() : entity.getDocente())
+                .modulo(clase.getModulo() != -1 ? clase.getModulo() : entity.getModulo())
                 .build();
-        return update(id, requestDTO);
+        validateEntity(requestDTO);
+        Clase claseEntity = dtoToEntity(id, requestDTO);
+        return entityToDTO(claseRepository.update(claseEntity));
     }
 
     @Override

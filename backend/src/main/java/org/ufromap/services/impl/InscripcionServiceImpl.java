@@ -1,7 +1,6 @@
 package org.ufromap.services.impl;
 
 import lombok.AllArgsConstructor;
-import org.json.JSONObject;
 import org.ufromap.dto.request.InscripcionRequestDTO;
 import org.ufromap.dto.response.AsignaturaDTO;
 import org.ufromap.dto.response.InscripcionDTO;
@@ -55,19 +54,14 @@ public class InscripcionServiceImpl implements IInscripcionService {
 
     @Override
     public InscripcionDTO update(int id, InscripcionRequestDTO inscripcionRequestDTO) throws EntityNotFoundException {
-        validateEntity(inscripcionRequestDTO);
-        Inscripcion inscripcion = dtoToEntity(id, inscripcionRequestDTO);
-        return entityToDTO(inscripcionRepository.update(inscripcion));
-    }
-
-    @Override
-    public InscripcionDTO patch(int id, JSONObject jsonObject) throws EntityNotFoundException {
-        Inscripcion inscripcion = inscripcionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Inscripcion no encontrada con la id: " + id));
+        Inscripcion entity = inscripcionRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Inscripcion no encontrada con la id: " + id));
         InscripcionRequestDTO requestdDTO = InscripcionRequestDTO.builder()
-                .asignaturaId(jsonObject.optInt("asignaturaId", inscripcion.getAsignaturaId()))
-                .usuarioId(jsonObject.optInt("usuarioId", inscripcion.getUsuarioId()))
+                .asignaturaId(inscripcionRequestDTO.getAsignaturaId() != -1 ? inscripcionRequestDTO.getAsignaturaId() : entity.getAsignaturaId())
+                .usuarioId(inscripcionRequestDTO.getUsuarioId() != -1 ? inscripcionRequestDTO.getUsuarioId() : entity.getUsuarioId())
                 .build();
-        return update(id, requestdDTO);
+        validateEntity(requestdDTO);
+        Inscripcion inscripcion = dtoToEntity(id, requestdDTO);
+        return entityToDTO(inscripcionRepository.update(inscripcion));
     }
 
     @Override

@@ -6,17 +6,19 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.gson.Gson;
+import lombok.extern.java.Log;
 import org.json.JSONObject;
-
+@Log
 public abstract class BaseController extends HttpServlet {
     protected void setJsonResponse(HttpServletResponse response) {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
     }
 
-    protected void writeJsonResponse(HttpServletResponse response, String jsonResponse) throws IOException {
+    protected void writeJsonResponse(HttpServletResponse response, Object object) throws IOException {
         setJsonResponse(response);
-        response.getWriter().write(jsonResponse);
+        response.getWriter().write(new Gson().toJson(object));
     }
 
     protected void sendError(HttpServletResponse response, int statusCode, String message) {
@@ -26,7 +28,7 @@ public abstract class BaseController extends HttpServlet {
         try {
             writeJsonResponse(response, jsonResponse.toString());
         } catch (IOException e) {
-            System.out.println("Error writing error response");
+            log.log(java.util.logging.Level.SEVERE, "Error sending error response", e);
         }
     }
 

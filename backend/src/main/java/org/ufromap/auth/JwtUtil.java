@@ -2,6 +2,7 @@ package org.ufromap.auth;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.ufromap.models.Usuario;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
@@ -12,18 +13,17 @@ public class JwtUtil {
     private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY);
     private static final long EXPIRATION_TIME = 3600000;
 
-    public static String generateToken(int userId) {
+    public static String generateToken(Usuario user) {
         return Jwts.builder()
-                .subject(String.valueOf(userId))
+                .subject(String.valueOf(user.getId()))
+                .claim("role", user.getRol())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
                 .compact();
     }
 
-
-
-    public static int validateTokenAndGetUserId(String token) {
+    public static int getUserId(String token) {
         try {
             Claims claims = Jwts.parser()
                     .verifyWith((SecretKey) key)
@@ -33,7 +33,33 @@ public class JwtUtil {
 
             return Integer.parseInt(claims.getSubject());
         } catch (Exception e) {
-            return 0;
+            return -1;
+        }
+    }
+
+    public static String getUserRole(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith((SecretKey) key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+
+            return claims.get("role", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static boolean validateToken(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith((SecretKey) key)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 }

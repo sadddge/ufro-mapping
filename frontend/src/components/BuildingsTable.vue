@@ -82,7 +82,7 @@ const deleteDialog = (building) => openDeleteDialog(dialog, building, "edificio"
 
 //ConfirmDialogs     
 const confirmEditDialog = async (building) => {
-    await BuildingsService.patchBuilding(building.id, building);
+    await BuildingsService.updateBuilding(building.id, building);
     data.value = await BuildingsService.getBuildings();
 };
 

@@ -1,11 +1,16 @@
 <template>
-    <MainLayout>
-        <div class="flex flex-col items-center justify-center h-screen w-1/2 mx-auto">
-            <img src="../assets/images/ufro_logo.png">
-        </div>
-    </MainLayout>
+  <h1>USERS VIEW</h1>
+  <n-button type="primary" secondary @click="logout">Logout</n-button>
 </template>
 
 <script setup>
-import MainLayout from '@/layouts/MainLayout.vue';
+import { useAuthStore } from "@/stores/auth.js";
+import { useRouter } from "vue-router";
+
+const store = useAuthStore()
+const router = useRouter()
+const logout = () => {
+  store.logout()
+  router.push('/login')
+}
 </script>

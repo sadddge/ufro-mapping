@@ -19,8 +19,6 @@ public interface ICrudService<DTO, DTORequest, Entity> {
 
     DTO update(int id, DTORequest dtoRequest) throws EntityNotFoundException;
 
-    DTO patch(int id, JSONObject jsonObject) throws EntityNotFoundException;
-
     void delete(int id) throws EntityNotFoundException;
     DTO entityToDTO(Entity entity);
     Entity dtoToEntity(int id, DTORequest dto);

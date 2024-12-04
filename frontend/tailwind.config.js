@@ -4,7 +4,11 @@ export default {
   darkMode: 'class', // or 'media' or 'class'
   content: [],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        "lato" : ["Lato", "sans-serif"]
+      }
+    },
   },
   plugins: [],
 }

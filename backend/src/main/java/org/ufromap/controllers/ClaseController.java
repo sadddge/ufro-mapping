@@ -1,22 +1,61 @@
 package org.ufromap.controllers;
 
+import org.ufromap.annotation.*;
 import org.ufromap.dto.request.ClaseRequestDTO;
-import org.ufromap.dto.response.ClaseDTO;
-import org.ufromap.models.Clase;
 
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONObject;
+import org.ufromap.services.IClaseService;
 import org.ufromap.services.impl.ClaseServiceImpl;
 
-@WebServlet("/api/clases/*")
-public class ClaseController extends CrudController<ClaseDTO, ClaseRequestDTO, Clase> {
+import java.io.IOException;
 
+@RequestMapping("/api/clases")
+public class ClaseController extends BaseController {
+    private final IClaseService claseService;
     public ClaseController() {
-        super(new ClaseServiceImpl());
+        this.claseService = new ClaseServiceImpl();
     }
 
-    @Override
+    @GetMapping("")
+    @Protected(roles = {"USER", "ADMIN"})
+    public void findAll(HttpServletResponse response) throws IOException {
+        writeJsonResponse(response, claseService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    @Protected(roles = {"USER", "ADMIN"})
+    public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+        int idInt = Integer.parseInt(id);
+        writeJsonResponse(response, claseService.findById(idInt));
+    }
+
+    @PostMapping("")
+    @Protected(roles = {"ADMIN"})
+    public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = getJson(request);
+        ClaseRequestDTO claseRequestDTO = mapJsonToEntity(jsonObject);
+        writeJsonResponse(response, claseService.add(claseRequestDTO));
+    }
+
+    @PutMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
+    public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = getJson(request);
+        ClaseRequestDTO claseRequestDTO = mapJsonToEntity(jsonObject);
+        int idInt = Integer.parseInt(id);
+        writeJsonResponse(response, claseService.update(idInt, claseRequestDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
+    public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+        int idInt = Integer.parseInt(id);
+        claseService.delete(idInt);
+        writeJsonResponse(response, null);
+    }
     protected ClaseRequestDTO mapJsonToEntity(JSONObject jsonObject) {
         return new ClaseRequestDTO(
                 jsonObject.optInt("salaId", -1),
@@ -28,8 +67,5 @@ public class ClaseController extends CrudController<ClaseDTO, ClaseRequestDTO, C
         );
     }
 
-    @Override
-    protected String[] getValidFilters() {
-        return new String[]{"salaId", "edificioId", "asignaturaId", "diaSemana", "periodo", "docente", "modulo"};
-    }
+
 }

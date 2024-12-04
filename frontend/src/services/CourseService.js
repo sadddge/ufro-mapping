@@ -1,33 +1,33 @@
-import axios from 'axios';
+import axiosInstance from '../plugins/axios.js'
 class CourseService {
 
     async getCourses() {
-        const response = await axios.get('http://localhost:8080/ufro_mapping/api/asignaturas');
+        const response = await axiosInstance.get('/asignaturas');
         return response.data;
     }
 
     async getCourseById(id) {
-        const response = await axios.get(`http://localhost:8080/ufro_mapping/api/asignaturas/${id}`);
+        const response = await axiosInstance.get(`/asignaturas/${id}`);
         return response.data;
     }
 
     async createCourse(course) {
-        const response = await axios.post('http://localhost:8080/ufro_mapping/api/asignaturas', course);
+        const response = await axiosInstance.post('/asignaturas', course);
         return response.data;
     }
 
     async updateCourse(id, course) {
-        const response = await axios.put(`http://localhost:8080/ufro_mapping/api/asignaturas/${id}`, course);
+        const response = await axiosInstance.put(`/asignaturas/${id}`, course);
         return response.data;
     }
 
     async deleteCourse(id) {
-        const response = await axios.delete(`http://localhost:8080/ufro_mapping/api/asignaturas/${id}`);
+        const response = await axiosInstance.delete(`/asignaturas/${id}`);
         return response.data;
     }
 
     async getHorarioByCourseId(id) {
-        const response = await axios.get(`http://localhost:8080/ufro_mapping/api/asignaturas/${id}/horario`)
+        const response = await axiosInstance.get(`/asignaturas/${id}/horarios`);
         return response.data;
     }
 

@@ -1,53 +1,79 @@
 package org.ufromap.controllers;
 
 import org.json.JSONObject;
+import org.ufromap.annotation.*;
 import org.ufromap.dto.request.AsignaturaRequestDTO;
 import org.ufromap.dto.response.AsignaturaDTO;
-import org.ufromap.exceptions.EntityNotFoundException;
-import org.ufromap.models.Asignatura;
+import org.ufromap.dto.response.HorarioClaseDTO;
+import org.ufromap.services.IAsignaturaService;
 import org.ufromap.services.IHorarioService;
 import org.ufromap.services.impl.AsignaturaServiceImpl;
 import org.ufromap.services.impl.HorarioServiceImpl;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
-@WebServlet("/api/asignaturas/*")
-public class AsignaturaController extends CrudController<AsignaturaDTO, AsignaturaRequestDTO, Asignatura> {
-
+@RequestMapping("/api/asignaturas")
+public class AsignaturaController extends BaseController {
+    private final IAsignaturaService asignaturaService;
     private final IHorarioService horarioService;
     public AsignaturaController() {
-        super(new AsignaturaServiceImpl());
+        this.asignaturaService = new AsignaturaServiceImpl();
         this.horarioService = new HorarioServiceImpl();
     }
 
-    @Override
-    protected void handleExtraGetRequests(String[] pathParts, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (pathParts.length != 3) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
-            return;
-        }
-        if (pathParts[2].equals("horario")) {
-            handleGetHorario(pathParts, response);
-        } else {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid path");
-        }
+    @GetMapping("")
+    @Protected(roles = {"USER", "ADMIN"})
+    public void findAll(HttpServletResponse response) throws IOException {
+        List<AsignaturaDTO> asignaturas = asignaturaService.findAll();
+        writeJsonResponse(response, asignaturas);
     }
 
-    private void handleGetHorario(String[] pathParts, HttpServletResponse response) throws IOException {
-        try {
-            int id = Integer.parseInt(pathParts[1]);
-            writeJsonResponse(response, gson.toJson(horarioService.getHorarioByAsignaturaId(id)));
-        } catch (NumberFormatException e) {
-            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "ID inválido");
-        } catch (EntityNotFoundException e) {
-            sendError(response, HttpServletResponse.SC_NOT_FOUND, e.getMessage());
-        }
+    @GetMapping("/{id}")
+    @Protected(roles = {"USER", "ADMIN"})
+    public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+        int idAsignatura = Integer.parseInt(id);
+        AsignaturaDTO asignatura = asignaturaService.findById(idAsignatura);
+        writeJsonResponse(response, asignatura);
     }
 
-    @Override
+    @GetMapping("/{id}/horario")
+    @Protected(roles = {"USER", "ADMIN"})
+    public void getHorarioByAsignaturaId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+        int idAsignatura = Integer.parseInt(id);
+        List<HorarioClaseDTO> asignaturas = horarioService.getHorarioByAsignaturaId(idAsignatura);
+        writeJsonResponse(response, asignaturas);
+    }
+
+    @PostMapping("")
+    @Protected(roles = {"ADMIN"})
+    public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = getJson(request);
+        AsignaturaRequestDTO asignaturaRequestDTO = mapJsonToEntity(jsonObject);
+        AsignaturaDTO asignatura = asignaturaService.add(asignaturaRequestDTO);
+        writeJsonResponse(response, asignatura);
+    }
+
+    @PutMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
+    public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = getJson(request);
+        AsignaturaRequestDTO asignaturaRequestDTO = mapJsonToEntity(jsonObject);
+        int idAsignatura = Integer.parseInt(id);
+        AsignaturaDTO asignatura = asignaturaService.update(idAsignatura, asignaturaRequestDTO);
+        writeJsonResponse(response, asignatura);
+    }
+
+    @DeleteMapping("/{id}")
+    @Protected(roles = {"ADMIN"})
+    public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+        int idAsignatura = Integer.parseInt(id);
+        asignaturaService.delete(idAsignatura);
+        response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
     protected AsignaturaRequestDTO mapJsonToEntity(JSONObject jsonObject) {
         return new AsignaturaRequestDTO(
                 jsonObject.optString("nombre", null),
@@ -55,10 +81,5 @@ public class AsignaturaController extends CrudController<AsignaturaDTO, Asignatu
                 jsonObject.optString("descripcion", null),
                 jsonObject.optIntegerObject("sct", null)
         );
-    }
-
-    @Override
-    protected String[] getValidFilters() {
-        return new String[]{"nombre", "codigo", "sct"};
     }
 }

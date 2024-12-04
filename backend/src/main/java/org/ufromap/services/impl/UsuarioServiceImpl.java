@@ -45,20 +45,15 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public UsuarioDTO update(int id, UsuarioRequestDTO usuarioRequestDTO) throws EntityNotFoundException {
-        validateEntity(usuarioRequestDTO);
-        Usuario usuario = dtoToEntity(id, usuarioRequestDTO);
-        return entityToDTO(usuarioRepository.update(usuario));
-    }
-
-    @Override
-    public UsuarioDTO patch(int id, JSONObject jsonObject) throws EntityNotFoundException {
-        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con la id: " + id));
+        Usuario entity = usuarioRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con la id: " + id));
         UsuarioRequestDTO requestdDTO = UsuarioRequestDTO.builder()
-                .nombre(jsonObject.optString("nombre", usuario.getNombre()))
-                .correo(jsonObject.optString("email", usuario.getCorreo()))
-                .contrasenia(jsonObject.optString("password", usuario.getContrasenia()))
+                .nombre(usuarioRequestDTO.getNombre() != null ? usuarioRequestDTO.getNombre() : entity.getNombre())
+                .correo(usuarioRequestDTO.getCorreo() != null ? usuarioRequestDTO.getCorreo() : entity.getCorreo())
+                .contrasenia(usuarioRequestDTO.getContrasenia() != null ? usuarioRequestDTO.getContrasenia() : entity.getContrasenia())
                 .build();
-        return update(id, requestdDTO);
+        validateEntity(requestdDTO);
+        Usuario usuario = dtoToEntity(id, requestdDTO);
+        return entityToDTO(usuarioRepository.update(usuario));
     }
 
     @Override
@@ -71,6 +66,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     public UsuarioDTO entityToDTO(Usuario usuario) {
         return UsuarioDTO.builder()
                 .id(usuario.getId())
+                .rol(usuario.getRol())
                 .nombre(usuario.getNombre())
                 .correo(usuario.getCorreo())
                 .build();
@@ -78,7 +74,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public Usuario dtoToEntity(int id, UsuarioRequestDTO dto) {
-        return new Usuario(id, dto.getNombre(), dto.getCorreo(), dto.getContrasenia());
+        return new Usuario(id, dto.getRol(), dto.getNombre(), dto.getCorreo(), dto.getContrasenia());
     }
 
     @Override

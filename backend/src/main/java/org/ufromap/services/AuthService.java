@@ -1,6 +1,8 @@
 package org.ufromap.services;
 
 import org.ufromap.auth.JwtUtil;
+import org.ufromap.dto.response.UserInfoDTO;
+import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Usuario;
 import org.ufromap.repositories.UsuarioRepository;
@@ -17,15 +19,26 @@ public class AuthService {
     }
 
     public Usuario validarCredenciales(String correo, String contrasenia){
-        Usuario usuario = usuarioRepository.findByCorreoYContrasenia(correo, contrasenia);
-        if (usuario == null) {
-            throw new EntityNotFoundException("Invalid credentials");
-        }
-        return usuario;
+        return usuarioRepository.findByCorreoYContrasenia(correo, contrasenia)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
     }
 
     public String login (String correo, String contrasenia){
         Usuario usuario = validarCredenciales(correo, contrasenia);
-        return JwtUtil.generateToken(usuario.getId());
+        return JwtUtil.generateToken(usuario);
+    }
+
+    public boolean validateSession(String token){
+        return JwtUtil.validateToken(token);
+    }
+
+    public UserInfoDTO getUserInfo(String value) {
+        if (!validateSession(value)) {
+            throw new BadRequestException("Invalid session");
+        }
+        return UserInfoDTO.builder()
+                .id(JwtUtil.getUserId(value))
+                .rol(JwtUtil.getUserRole(value))
+                .build();
     }
 }

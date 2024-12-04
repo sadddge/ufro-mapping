@@ -1,15 +1,12 @@
 package org.ufromap.services.impl;
 
-import org.json.JSONObject;
 import org.ufromap.dto.request.SalaRequestDTO;
-import org.ufromap.dto.response.ClaseDTO;
 import org.ufromap.dto.response.EdificioDTO;
 import org.ufromap.dto.response.SalaDTO;
 import org.ufromap.exceptions.BadRequestException;
 import org.ufromap.exceptions.EntityNotFoundException;
 import org.ufromap.models.Edificio;
 import org.ufromap.models.Sala;
-import org.ufromap.repositories.ClaseRepository;
 import org.ufromap.repositories.EdificioRepository;
 import org.ufromap.repositories.SalaRepository;
 import org.ufromap.services.ISalaService;
@@ -53,19 +50,14 @@ public class SalaServiceImpl implements ISalaService {
 
     @Override
     public SalaDTO update(int id, SalaRequestDTO salaRequestDTO) throws EntityNotFoundException {
-        validateEntity(salaRequestDTO);
-        Sala sala = dtoToEntity(id, salaRequestDTO);
-        return entityToDTO(salaRepository.update(sala));
-    }
-
-    @Override
-    public SalaDTO patch(int id, JSONObject jsonObject) throws EntityNotFoundException {
-        Sala sala = salaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Sala no encontrada con la id: " + id));
+        Sala entity = salaRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Sala no encontrada con la id: " + id));
         SalaRequestDTO requestdDTO = SalaRequestDTO.builder()
-                .nombre(jsonObject.optString("nombre", sala.getNombre()))
-                .edificioId(jsonObject.optInt("edificioId", sala.getEdificioId()))
+                .nombre(salaRequestDTO.getNombre() != null ? salaRequestDTO.getNombre() : entity.getNombre())
+                .edificioId(salaRequestDTO.getEdificioId() != -1 ? salaRequestDTO.getEdificioId() : entity.getEdificioId())
                 .build();
-        return update(id, requestdDTO);
+        validateEntity(requestdDTO);
+        Sala sala = dtoToEntity(id, requestdDTO);
+        return entityToDTO(salaRepository.update(sala));
     }
 
     @Override

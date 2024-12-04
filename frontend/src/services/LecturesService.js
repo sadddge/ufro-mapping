@@ -1,28 +1,28 @@
-import axios from 'axios';
+import axiosInstance from '../plugins/axios';
 
 class LecturesService {
 
     async getLectures() {
-        const response = await axios.get('http://localhost:8080/ufro_mapping/api/clases');
+        const response = await axiosInstance.get('/clases');
         return response.data;
     }
 
     async getLectureById(id) {
-        const response = await axios.get(`http://localhost:8080/ufro_mapping/api/clases/${id}`);
+        const response = await axiosInstance.get(`/clases/${id}`);
         return response.data;
     }
 
     async createLecture(lecture) {
-        const response = await axios.post('http://localhost:8080/ufro_mapping/api/clases', lecture);
+        const response = await axiosInstance.post('/clases', lecture);
         return response.data;
     }
 
     async updateLecture(id, lecture) {
-        const response = await axios.put(`http://localhost:8080/ufro_mapping/api/clases/${id}`, lecture);
+        const response = await axiosInstance.put(`/clases/${id}`, lecture);
         return response.data;
     }
     async deleteLecture(id) {
-        const response = await axios.delete(`http://localhost:8080/ufro_mapping/api/clases/${id}`);
+        const response = await axiosInstance.delete(`/clases/${id}`);
         return response.data;
     }
 

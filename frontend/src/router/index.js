@@ -1,57 +1,96 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
-import HomeView from '@/views/HomeView.vue'
+import AdminHomeView from '@/views/AdminHomeView.vue'
 import UsuariosView from '@/views/UsuariosView.vue'
 import EdificiosView from '@/views/EdificiosView.vue'
 import SalasView from '@/views/SalasView.vue'
 import AsignaturasView from '@/views/AsignaturasView.vue'
 import ClasesView from '@/views/ClasesView.vue'
 import MapView from "@/views/MapView.vue";
+import HomeView from "@/views/HomeView.vue";
+import { useAuthStore} from "@/stores/auth.js";
+import PageNotFoundView from "@/views/PageNotFoundView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'login',
+      redirect : '/home'
+    },
+    {
+      path: '/login',
+      name: 'Login',
       component: LoginView,
     },
     {
       path: '/home',
-      name: 'home',
+      name: 'Home',
       component: HomeView,
+        meta: { requiresAuth: true },
     },
     {
-      path: '/edificios',
-      name: 'edificios',
+      path: '/admin',
+      name: 'AdminHome',
+      component: AdminHomeView,
+      meta: { requiresAuth: true,  role : 'ADMIN' },
+    },
+    {
+      path: '/admin/edificios',
+      name: 'Edificios',
       component: EdificiosView,
+      meta: { requiresAuth: true,  role : 'ADMIN' },
     },
     {
-      path: '/salas',
-      name: 'salas',
+      path: '/admin/salas',
+      name: 'Salas',
       component: SalasView,
+      meta: { requiresAuth: true,  role : 'ADMIN' },
     },
     {
-      path: '/usuarios',
-      name: 'usuarios',
+      path: '/admin/usuarios',
+      name: 'Usuarios',
       component: UsuariosView,
+      meta: { requiresAuth: true, role : 'ADMIN' },
     },
     {
-      path: '/asignaturas',
-      name: 'asignaturas',
+      path: '/admin/asignaturas',
+      name: 'Asignaturas',
       component: AsignaturasView,
+      meta: { requiresAuth: true, role : 'ADMIN' },
     },
     {
-      path: '/clases',
-      name: 'clases',
+      path: '/admin/clases',
+      name: 'Clases',
       component: ClasesView,
+      meta: { requiresAuth: true },
     },
     {
-      path: "/mapa",
+      path: "/admin/mapa",
       name: "Map",
       component: MapView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: PageNotFoundView,
     }
   ],
 })
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore();
+  await new Promise((resolve) => setTimeout(resolve, 50));
+  if (to.name === 'Login' && authStore.isAuthenticated) {
+    next({ name: 'AdminHome'});
+  } else if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next({ name: 'Login' });
+  } else if (to.meta.role && to.meta.role !== authStore.userRole) {
+    next({ name: 'Home' });
+  } else {
+    next();
+  }
+});
 
 export default router
