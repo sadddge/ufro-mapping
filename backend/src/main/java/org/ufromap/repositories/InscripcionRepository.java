@@ -1,9 +1,10 @@
 package org.ufromap.repositories;
 
 import lombok.extern.java.Log;
-import org.ufromap.config.DatabaseConnection;
-import org.ufromap.models.Asignatura;
-import org.ufromap.models.Inscripcion;
+import org.ufromap.core.base.BaseRepository;
+import org.ufromap.core.config.DatabaseConnection;
+import org.ufromap.feature.courses.models.Asignatura;
+import org.ufromap.feature.users.models.Inscripcion;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

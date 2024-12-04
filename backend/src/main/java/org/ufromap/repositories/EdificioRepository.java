@@ -7,7 +7,8 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 
 import lombok.extern.java.Log;
-import org.ufromap.models.Edificio;
+import org.ufromap.core.base.BaseRepository;
+import org.ufromap.feature.buildings.models.Edificio;
 @Log
 public class EdificioRepository extends BaseRepository<Edificio> {
 

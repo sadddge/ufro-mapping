@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 import lombok.extern.java.Log;
-import org.ufromap.dto.response.HorarioClaseDTO;
-import org.ufromap.models.Clase;
+import org.ufromap.core.base.BaseRepository;
+import org.ufromap.feature.lectures.dto.HorarioClaseDTO;
+import org.ufromap.feature.lectures.models.Clase;
 
 @Log
 public class ClaseRepository extends BaseRepository<Clase> {

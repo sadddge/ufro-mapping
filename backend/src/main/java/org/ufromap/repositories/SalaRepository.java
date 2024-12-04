@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.logging.Level;
 
 import lombok.extern.java.Log;
-import org.ufromap.models.Clase;
-import org.ufromap.models.Sala;
+import org.ufromap.core.base.BaseRepository;
+import org.ufromap.feature.classrooms.models.Sala;
 @Log
 public class SalaRepository extends BaseRepository<Sala> {
 
