@@ -2,6 +2,10 @@ package org.ufromap.core.dispatcher;
 
 import lombok.extern.java.Log;
 import org.ufromap.core.annotations.*;
+import org.ufromap.core.exceptions.BadRequestException;
+import org.ufromap.core.exceptions.ExceptionHandlers;
+import org.ufromap.core.exceptions.GlobalExceptionHandler;
+import org.ufromap.core.exceptions.UnauthorizedException;
 import org.ufromap.core.utils.JwtUtil;
 import org.ufromap.feature.auth.controllers.AuthController;
 import org.ufromap.feature.buildings.controllers.EdificioController;
@@ -30,6 +34,7 @@ import java.util.regex.Pattern;
 @WebServlet(urlPatterns = "/*")
 public class DispatcherServlet extends HttpServlet {
     private final Map<String, Method> routeHandlers = new HashMap<>();
+    private final GlobalExceptionHandler globalExceptionHandler = new GlobalExceptionHandler();
 
     @Override
     public void init() throws ServletException {
@@ -40,6 +45,7 @@ public class DispatcherServlet extends HttpServlet {
             registerRoutes(new EdificioController());
             registerRoutes(new UsuarioController());
             registerRoutes(new ClaseController());
+            registerExceptionHandlers(new ExceptionHandlers());
         } catch (Exception e) {
             throw new ServletException("Failed to register routes", e);
         }
@@ -70,37 +76,53 @@ public class DispatcherServlet extends HttpServlet {
         }
     }
 
+    private void registerExceptionHandlers(Object handlerClass) {
+        for (Method method : handlerClass.getClass().getDeclaredMethods()) {
+            if (method.isAnnotationPresent(ExceptionHandler.class)) {
+                ExceptionHandler annotation = method.getAnnotation(ExceptionHandler.class);
+                globalExceptionHandler.registerExceptionHandler(annotation.value(), method);
+            }
+        }
+    }
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String method = req.getMethod();
-
         if ("OPTIONS".equals(method)) {
             handleOptions(resp);
             return;
         }
-
         String path = req.getPathInfo();
         String key = method + ":" + path;
 
-        Method handler = matchRouteWithParams(key);
-
-        if (handler != null) {
-            try {
-                if (!isAuthorized(handler, req)) {
-                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    resp.getWriter().write("Forbidden");
-                    return;
-                }
-                Object[] args = resolveMethodArguments(handler, path, req, resp);
-                handler.invoke(handler.getDeclaringClass().getConstructor().newInstance(), args);
-            } catch (Exception e) {
-                e.printStackTrace();
-                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                resp.getWriter().write("Error processing request: " + e.getMessage());
+        try {
+            Method handler = matchRouteWithParams(key);
+            if (!isAuthorized(handler, req)) {
+                throw new UnauthorizedException("Unauthorized");
             }
-        } else {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            resp.getWriter().write("Route not found");
+            Object[] args = resolveMethodArguments(handler, path, req, resp);
+            handler.invoke(handler.getDeclaringClass().getConstructor().newInstance(), args);
+        } catch (Exception e) {
+            handleException(e, resp);
+        }
+
+    }
+
+    private void handleException(Throwable ex, HttpServletResponse resp) {
+        try {
+            Method handler = globalExceptionHandler.getHandler(ex.getClass());
+            if (handler != null) {
+                handler.invoke(new ExceptionHandlers(), ex, resp);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("Unhandled exception: " + ex.getMessage());
+            }
+        } catch (Exception e) {
+            try {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().write("Error while handling exception: " + e.getMessage());
+            } catch (IOException ignored) {
+            }
         }
     }
 
@@ -178,7 +200,7 @@ public class DispatcherServlet extends HttpServlet {
         } catch (Exception e) {
             log.severe("Error matching route: " + e.getMessage());
         }
-        return null;
+        throw new BadRequestException("Route not found");
     }
 
     private String getRoutePath(Method value) {
@@ -187,7 +209,7 @@ public class DispatcherServlet extends HttpServlet {
                 return entry.getKey().split(":")[1];
             }
         }
-        return null;
+        throw new BadRequestException("Route not found");
     }
 
     private boolean isAuthorized(Method handler, HttpServletRequest req) {
@@ -199,17 +221,9 @@ public class DispatcherServlet extends HttpServlet {
                 .filter(cookie -> "token".equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findFirst()
-                .orElse(null);
-
-        if (token == null) {
-            return false;
-        }
+                .orElseThrow(() -> new UnauthorizedException("Token not found"));
 
         String role = JwtUtil.getUserRole(token);
-        if (role == null) {
-            return false;
-        }
-
         return Arrays.asList(handler.getAnnotation(Protected.class).roles()).contains(role);
     }
 }

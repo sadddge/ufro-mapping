@@ -33,7 +33,7 @@ public class UsuarioController extends BaseController {
     @GetMapping("")
     @Protected(roles = {"ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
-        writeJsonResponse(response, usuarioService.findAll());
+        sendObject(response, usuarioService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -41,21 +41,21 @@ public class UsuarioController extends BaseController {
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         UsuarioDTO usuario = usuarioService.findById(userId);
-        writeJsonResponse(response, usuario);
+        sendObject(response, usuario);
     }
 
     @GetMapping("/{id}/asignaturas")
     @Protected(roles = {"USER", "ADMIN"})
     public void getAsignaturasByUsuarioId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
-        writeJsonResponse(response, inscripcionService.getAsignaturasByUsuarioId(userId));
+        sendObject(response, inscripcionService.getAsignaturasByUsuarioId(userId));
     }
 
     @GetMapping("/{id}/horario")
     @Protected(roles = {"USER", "ADMIN"})
     public void getHorario(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
-        writeJsonResponse(response, horarioService.getHorarioByUserId(userId));
+        sendObject(response, horarioService.getHorarioByUserId(userId));
     }
 
     @PostMapping("")
@@ -64,7 +64,7 @@ public class UsuarioController extends BaseController {
         JSONObject jsonObject = getJson(request);
         UsuarioRequestDTO usuarioRequestDTO = mapJsonToEntity(jsonObject);
         UsuarioDTO usuario = usuarioService.add(usuarioRequestDTO);
-        writeJsonResponse(response, usuario);
+        sendObject(response, usuario);
     }
 
     @PostMapping("/{id}/asignaturas/{asignaturaId}")
@@ -73,7 +73,7 @@ public class UsuarioController extends BaseController {
         int userId = Integer.parseInt(id);
         int asignaturaIdInt = Integer.parseInt(asignaturaId);
         InscripcionDTO responseDTO = inscripcionService.add(new InscripcionRequestDTO(userId, asignaturaIdInt));
-        writeJsonResponse(response, responseDTO);
+        sendObject(response, responseDTO);
     }
 
     @PutMapping("/{id}")
@@ -83,7 +83,7 @@ public class UsuarioController extends BaseController {
         UsuarioRequestDTO usuarioRequestDTO = mapJsonToEntity(jsonObject);
         int userId = Integer.parseInt(id);
         UsuarioDTO usuario = usuarioService.update(userId, usuarioRequestDTO);
-        writeJsonResponse(response, usuario);
+        sendObject(response, usuario);
     }
 
     @DeleteMapping("/{id}")
@@ -91,7 +91,7 @@ public class UsuarioController extends BaseController {
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         usuarioService.delete(userId);
-        writeJsonResponse(response, null);
+        sendObject(response, null);
     }
 
     @DeleteMapping("/{id}/asignaturas/{asignaturaId}")
@@ -100,7 +100,7 @@ public class UsuarioController extends BaseController {
         int userId = Integer.parseInt(id);
         int asignaturaIdInt = Integer.parseInt(asignaturaId);
         inscripcionService.deleteByUsuarioIdAndAsignaturaId(userId, asignaturaIdInt);
-        writeJsonResponse(response, null);
+        sendObject(response, null);
     }
 
 

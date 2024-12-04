@@ -7,6 +7,7 @@ import java.sql.SQLException;
 
 import lombok.extern.java.Log;
 import org.ufromap.core.base.BaseRepository;
+import org.ufromap.core.exceptions.InternalErrorException;
 import org.ufromap.feature.courses.models.Asignatura;
 
 @Log
@@ -52,6 +53,7 @@ public class AsignaturaRepository extends BaseRepository<Asignatura> {
             asignatura.setSct(resultSet.getInt("sct"));
         } catch (SQLException e) {
             log.log(java.util.logging.Level.SEVERE, "Error mapping object", e);
+            throw new InternalErrorException("Error mapping object");
         }
         return asignatura;
     }

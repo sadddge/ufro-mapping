@@ -16,9 +16,14 @@ public abstract class BaseController extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
     }
 
-    protected void writeJsonResponse(HttpServletResponse response, Object object) throws IOException {
+    protected void sendObject(HttpServletResponse response, Object object) throws IOException {
         setJsonResponse(response);
         response.getWriter().write(new Gson().toJson(object));
+    }
+
+    protected void sendMessage(HttpServletResponse response, String message) throws IOException {
+        setJsonResponse(response);
+        response.getWriter().write(new JSONObject().put("message", message).toString());
     }
 
     protected void sendError(HttpServletResponse response, int statusCode, String message) {
@@ -26,7 +31,7 @@ public abstract class BaseController extends HttpServlet {
         JSONObject jsonResponse = new JSONObject();
         jsonResponse.put("error", message);
         try {
-            writeJsonResponse(response, jsonResponse.toString());
+            sendObject(response, jsonResponse);
         } catch (IOException e) {
             log.log(java.util.logging.Level.SEVERE, "Error sending error response", e);
         }

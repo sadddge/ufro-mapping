@@ -10,17 +10,17 @@ import java.util.logging.Level;
 
 import lombok.extern.java.Log;
 import org.ufromap.core.base.BaseRepository;
+import org.ufromap.core.exceptions.InternalErrorException;
 import org.ufromap.feature.classrooms.models.Sala;
 @Log
 public class SalaRepository extends BaseRepository<Sala> {
 
-    private final ClaseRepository claseRepository;
+
     public SalaRepository() {
-        this.claseRepository = new ClaseRepository();
+        super();
     }
-    public SalaRepository(Connection connection, ClaseRepository claseRepository) {
+    public SalaRepository(Connection connection) {
         super(connection);
-        this.claseRepository = claseRepository;
     }
 
 
@@ -36,7 +36,8 @@ public class SalaRepository extends BaseRepository<Sala> {
                 }
             }
         } catch (SQLException e) {
-            System.out.println("Error: " + e.getMessage());
+            log.log(Level.SEVERE, "Error finding by edificio id", e);
+            throw new InternalErrorException("Error finding by edificio id");
         }
         return salas;
     }
@@ -70,6 +71,7 @@ public class SalaRepository extends BaseRepository<Sala> {
             sala.setNombre(resultSet.getString("nombre_sala"));
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error mapping object", e);
+            throw new InternalErrorException("Error mapping object");
         }
         return sala;
     }

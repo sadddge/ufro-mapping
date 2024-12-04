@@ -2,6 +2,7 @@ package org.ufromap.core.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.ufromap.core.exceptions.UnauthorizedException;
 import org.ufromap.feature.users.models.Usuario;
 
 import javax.crypto.SecretKey;
@@ -33,7 +34,7 @@ public class JwtUtil {
 
             return Integer.parseInt(claims.getSubject());
         } catch (Exception e) {
-            return -1;
+            throw new UnauthorizedException("Invalid token");
         }
     }
 
@@ -47,7 +48,7 @@ public class JwtUtil {
 
             return claims.get("role", String.class);
         } catch (Exception e) {
-            return null;
+            throw new UnauthorizedException("Invalid token");
         }
     }
 
@@ -59,7 +60,7 @@ public class JwtUtil {
                     .parseSignedClaims(token);
             return true;
         } catch (Exception e) {
-            return false;
+            throw new UnauthorizedException("Invalid token");
         }
     }
 }

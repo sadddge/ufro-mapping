@@ -25,21 +25,21 @@ public class SalaController extends BaseController {
     @GetMapping("")
     @Protected(roles = {"USER", "ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
-        writeJsonResponse(response, salaService.findAll());
+        sendObject(response, salaService.findAll());
     }
 
     @GetMapping("/{id}")
     @Protected(roles = {"USER", "ADMIN"})
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
-        writeJsonResponse(response, salaService.findById(idInt));
+        sendObject(response, salaService.findById(idInt));
     }
 
     @GetMapping("/{id}/horario")
     @Protected(roles = {"USER", "ADMIN"})
     public void getHorarioBySalaId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
-        writeJsonResponse(response, horarioService.getHorarioBySalaId(idInt));
+        sendObject(response, horarioService.getHorarioBySalaId(idInt));
     }
 
     @PostMapping("")
@@ -47,7 +47,7 @@ public class SalaController extends BaseController {
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         SalaRequestDTO salaRequestDTO = mapJsonToEntity(jsonObject);
-        writeJsonResponse(response, salaService.add(salaRequestDTO));
+        sendObject(response, salaService.add(salaRequestDTO));
     }
 
     @PutMapping("/{id}")
@@ -56,7 +56,7 @@ public class SalaController extends BaseController {
         JSONObject jsonObject = getJson(request);
         SalaRequestDTO salaRequestDTO = mapJsonToEntity(jsonObject);
         int idInt = Integer.parseInt(id);
-        writeJsonResponse(response, salaService.update(idInt, salaRequestDTO));
+        sendObject(response, salaService.update(idInt, salaRequestDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -64,7 +64,7 @@ public class SalaController extends BaseController {
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         salaService.delete(idInt);
-        writeJsonResponse(response, null);
+        sendObject(response, null);
     }
 
     protected SalaRequestDTO mapJsonToEntity(JSONObject jsonObject) {

@@ -29,7 +29,7 @@ public class AsignaturaController extends BaseController {
     @Protected(roles = {"USER", "ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
         List<AsignaturaDTO> asignaturas = asignaturaService.findAll();
-        writeJsonResponse(response, asignaturas);
+        sendObject(response, asignaturas);
     }
 
     @GetMapping("/{id}")
@@ -37,7 +37,7 @@ public class AsignaturaController extends BaseController {
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idAsignatura = Integer.parseInt(id);
         AsignaturaDTO asignatura = asignaturaService.findById(idAsignatura);
-        writeJsonResponse(response, asignatura);
+        sendObject(response, asignatura);
     }
 
     @GetMapping("/{id}/horario")
@@ -45,7 +45,7 @@ public class AsignaturaController extends BaseController {
     public void getHorarioByAsignaturaId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idAsignatura = Integer.parseInt(id);
         List<HorarioClaseDTO> asignaturas = horarioService.getHorarioByAsignaturaId(idAsignatura);
-        writeJsonResponse(response, asignaturas);
+        sendObject(response, asignaturas);
     }
 
     @PostMapping("")
@@ -54,7 +54,7 @@ public class AsignaturaController extends BaseController {
         JSONObject jsonObject = getJson(request);
         AsignaturaRequestDTO asignaturaRequestDTO = mapJsonToEntity(jsonObject);
         AsignaturaDTO asignatura = asignaturaService.add(asignaturaRequestDTO);
-        writeJsonResponse(response, asignatura);
+        sendObject(response, asignatura);
     }
 
     @PutMapping("/{id}")
@@ -64,7 +64,7 @@ public class AsignaturaController extends BaseController {
         AsignaturaRequestDTO asignaturaRequestDTO = mapJsonToEntity(jsonObject);
         int idAsignatura = Integer.parseInt(id);
         AsignaturaDTO asignatura = asignaturaService.update(idAsignatura, asignaturaRequestDTO);
-        writeJsonResponse(response, asignatura);
+        sendObject(response, asignatura);
     }
 
     @DeleteMapping("/{id}")

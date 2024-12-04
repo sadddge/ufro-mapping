@@ -12,8 +12,9 @@ import java.util.logging.Level;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
-import org.ufromap.core.base.IRepository;
 import org.ufromap.core.config.DatabaseConnection;
+import org.ufromap.core.exceptions.InternalErrorException;
+
 @Log
 @AllArgsConstructor
 public abstract class BaseRepository<T> implements IRepository<T> {
@@ -57,7 +58,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             resultSet.close();
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            throw new RuntimeException("Failed to execute get operation", e);
+            throw new InternalErrorException("Failed to execute get operation");
         }
         return result;
     }
@@ -79,7 +80,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             return findById(getLastInsertId()).orElse(null);
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            throw new RuntimeException("Failed to execute insert operation", e);
+            throw new InternalErrorException("Failed to execute insert operation");
         }
     }
 
@@ -92,7 +93,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             return obj;
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            throw new RuntimeException("Failed to execute set operation", e);
+            throw new InternalErrorException("Failed to execute set operation");
         }
     }
 
@@ -105,7 +106,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             return true;
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            throw new RuntimeException("Failed to execute delete operation", e);
+            throw new InternalErrorException("Failed to execute delete operation");
         }
     }
 
@@ -125,7 +126,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             }
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error executing query: " + query, e);
-            throw new RuntimeException("Failed to execute selec operation", e);
+            throw new InternalErrorException("Failed to execute selec operation");
         }
         return results;
     }
@@ -149,7 +150,7 @@ public abstract class BaseRepository<T> implements IRepository<T> {
             }
         } catch (SQLException e) {
             log.severe("Error: " + e.getMessage());
-            throw new RuntimeException("Failed to execute select last_insert_id operation", e);
+            throw new InternalErrorException("Failed to execute select last_insert_id operation");
         }
         return lastId;
     }

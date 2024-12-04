@@ -3,6 +3,7 @@ package org.ufromap.repositories;
 import lombok.extern.java.Log;
 import org.ufromap.core.base.BaseRepository;
 import org.ufromap.core.config.DatabaseConnection;
+import org.ufromap.core.exceptions.InternalErrorException;
 import org.ufromap.feature.courses.models.Asignatura;
 import org.ufromap.feature.users.models.Inscripcion;
 
@@ -24,24 +25,6 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
         super(connection);
     }
 
-    public List<Inscripcion> getInscripcionByUsuarioId(int usuarioId){
-        List<Inscripcion> inscripciones = new ArrayList<>();
-        String query = "SELECT id, usuario_id, asignatura_id FROM inscribe WHERE usuario_id = ?";
-        Connection connection = DatabaseConnection.getConnection();
-        try(PreparedStatement statement = connection.prepareStatement(query)){
-            statement.setInt(1, usuarioId);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Inscripcion inscripcion = mapToObject(resultSet);
-                    inscripciones.add(inscripcion);
-                }
-            }
-        }catch (SQLException e){
-            log.log(Level.SEVERE, "Error executing query: " + query, e);
-        }
-        return inscripciones;
-    }
-
     public void deleteByUsuarioIdAndAsignaturaId(int usuarioId, int asignaturaId){
         String query = "DELETE FROM inscribe WHERE usuario_id = ? AND asignatura_id = ?";
         Connection connection = DatabaseConnection.getConnection();
@@ -51,6 +34,7 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
             statement.executeUpdate();
         }catch (SQLException e){
             log.log(Level.SEVERE, "Error executing query: " + query, e);
+            throw new InternalErrorException("Error deleting inscripcion");
         }
     }
 
@@ -84,6 +68,7 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
             inscripcion.setAsignaturaId(resultSet.getInt("asignatura_id"));
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error mapping object", e);
+            throw new InternalErrorException("Error mapping object");
         }
         return inscripcion;
     }
@@ -119,6 +104,7 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
             }
         }catch (SQLException e){
             log.log(Level.SEVERE, "Error executing query: " + query, e);
+            throw new InternalErrorException("Error getting asignaturas");
         }
         return asignaturas;
     }
@@ -136,6 +122,7 @@ public class InscripcionRepository extends BaseRepository<Inscripcion> {
             }
         }catch (SQLException e){
             log.log(Level.SEVERE, "Error executing query: " + query, e);
+            throw new InternalErrorException("Error getting asignaturas");
         }
         return false;
     }

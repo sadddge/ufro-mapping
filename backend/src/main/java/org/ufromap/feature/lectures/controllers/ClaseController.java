@@ -23,14 +23,14 @@ public class ClaseController extends BaseController {
     @GetMapping("")
     @Protected(roles = {"USER", "ADMIN"})
     public void findAll(HttpServletResponse response) throws IOException {
-        writeJsonResponse(response, claseService.findAll());
+        sendObject(response, claseService.findAll());
     }
 
     @GetMapping("/{id}")
     @Protected(roles = {"USER", "ADMIN"})
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
-        writeJsonResponse(response, claseService.findById(idInt));
+        sendObject(response, claseService.findById(idInt));
     }
 
     @PostMapping("")
@@ -38,7 +38,7 @@ public class ClaseController extends BaseController {
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         ClaseRequestDTO claseRequestDTO = mapJsonToEntity(jsonObject);
-        writeJsonResponse(response, claseService.add(claseRequestDTO));
+        sendObject(response, claseService.add(claseRequestDTO));
     }
 
     @PutMapping("/{id}")
@@ -47,7 +47,7 @@ public class ClaseController extends BaseController {
         JSONObject jsonObject = getJson(request);
         ClaseRequestDTO claseRequestDTO = mapJsonToEntity(jsonObject);
         int idInt = Integer.parseInt(id);
-        writeJsonResponse(response, claseService.update(idInt, claseRequestDTO));
+        sendObject(response, claseService.update(idInt, claseRequestDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -55,7 +55,7 @@ public class ClaseController extends BaseController {
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         claseService.delete(idInt);
-        writeJsonResponse(response, null);
+        sendObject(response, null);
     }
     protected ClaseRequestDTO mapJsonToEntity(JSONObject jsonObject) {
         return new ClaseRequestDTO(

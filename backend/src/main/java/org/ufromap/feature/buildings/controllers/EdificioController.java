@@ -30,19 +30,19 @@ public class EdificioController extends BaseController {
 
     @GetMapping("")
     public void findAll(HttpServletResponse response) throws IOException {
-        writeJsonResponse(response, edificioService.findAll());
+        sendObject(response, edificioService.findAll());
     }
 
     @GetMapping("/{id}")
     public void findById(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
-        writeJsonResponse(response, edificioService.findById(idInt));
+        sendObject(response, edificioService.findById(idInt));
     }
 
     @GetMapping("/locations")
     public void findAllLocations(HttpServletResponse response) throws IOException {
         List<LocationDTO> locations = edificioService.findAllLocations();
-        writeJsonResponse(response, locations);
+        sendObject(response, locations);
     }
 
     @GetMapping("/{id}/salas")
@@ -50,7 +50,7 @@ public class EdificioController extends BaseController {
     public void getSalasByEdificioId(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         List<SalaDTO> salasDTO = salaService.getSalasByEdificioId(idInt);
-        writeJsonResponse(response, salasDTO);
+        sendObject(response, salasDTO);
     }
 
     @PostMapping("")
@@ -59,7 +59,7 @@ public class EdificioController extends BaseController {
         JSONObject jsonObject = getJson(request);
         EdificioRequestDTO edificioRequestDTO = mapJsonToEntity(jsonObject);
         EdificioDTO edificioDTO = edificioService.add(edificioRequestDTO);
-        writeJsonResponse(response, edificioDTO);
+        sendObject(response, edificioDTO);
     }
 
     @PutMapping("/{id}")
@@ -69,7 +69,7 @@ public class EdificioController extends BaseController {
         EdificioRequestDTO edificioRequestDTO = mapJsonToEntity(jsonObject);
         int idInt = Integer.parseInt(id);
         EdificioDTO edificioDTO = edificioService.update(idInt, edificioRequestDTO);
-        writeJsonResponse(response, edificioDTO);
+        sendObject(response, edificioDTO);
     }
 
     @DeleteMapping("/{id}")
@@ -77,7 +77,7 @@ public class EdificioController extends BaseController {
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int idInt = Integer.parseInt(id);
         edificioService.delete(idInt);
-        writeJsonResponse(response, null);
+        sendObject(response, null);
     }
 
     protected EdificioRequestDTO mapJsonToEntity(JSONObject jsonObject) {
