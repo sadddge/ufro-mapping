@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.logging.Level;
 
 import lombok.extern.java.Log;
-import org.ufromap.dto.response.HorarioClaseDTO;
-import org.ufromap.models.Clase;
+import org.ufromap.core.base.BaseRepository;
+import org.ufromap.core.exceptions.InternalErrorException;
+import org.ufromap.feature.lectures.dto.HorarioClaseDTO;
+import org.ufromap.feature.lectures.models.Clase;
 
 @Log
 public class ClaseRepository extends BaseRepository<Clase> {
@@ -67,31 +69,9 @@ public class ClaseRepository extends BaseRepository<Clase> {
             }
         } catch (SQLException e) {
             log.log(Level.SEVERE,"Error executing query: " + query, e);
-            throw new RuntimeException("Failed to execute insert operation", e);
+            throw new InternalErrorException("Failed to execute insert operation");
         }
         return horarios;
-    }
-
-    public List<Clase> findBySalaId(int id) {
-        String query = "SELECT id, sala_id, asignatura_id, dia_semana, periodo, docente_nombre, modulo FROM clase WHERE sala_id = ?";
-        return findByParameter(query, id);
-    }
-
-    private List<Clase> findByParameter(String query, int param) {
-        List<Clase> clases = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, param);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                while (resultSet.next()) {
-                    Clase clase = mapToObject(resultSet);
-                    clases.add(clase);
-                }
-            }
-        } catch (SQLException e) {
-            log.log(Level.SEVERE,"Error executing query: " + query, e);
-            throw new RuntimeException("Failed to execute insert operation", e);
-        }
-        return clases;
     }
 
     @Override
@@ -127,6 +107,7 @@ public class ClaseRepository extends BaseRepository<Clase> {
             clase.setModulo(resultSet.getInt("modulo"));
         } catch (SQLException e) {
             log.log(Level.SEVERE,"Error mapping object", e);
+            throw new InternalErrorException("Failed to map object");
         }
         return clase;
     }
@@ -145,7 +126,6 @@ public class ClaseRepository extends BaseRepository<Clase> {
     protected void setParametersForUpdate(PreparedStatement statement, Clase obj) throws SQLException {
         setParametersForInsert(statement, obj);
         statement.setInt(7, obj.getId());
-        System.out.println(obj);
     }
 
 

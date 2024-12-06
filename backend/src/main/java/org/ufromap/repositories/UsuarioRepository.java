@@ -1,7 +1,9 @@
 package org.ufromap.repositories;
 
 import lombok.extern.java.Log;
-import org.ufromap.models.Usuario;
+import org.ufromap.core.base.BaseRepository;
+import org.ufromap.core.exceptions.InternalErrorException;
+import org.ufromap.feature.users.models.Usuario;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +11,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.Set;
 
 @Log
 public class UsuarioRepository extends BaseRepository<Usuario> {
@@ -18,7 +19,7 @@ public class UsuarioRepository extends BaseRepository<Usuario> {
         super();
     }
 
-    public UsuarioRepository(Connection connection, InscripcionRepository inscripcionRepository) {
+    public UsuarioRepository(Connection connection) {
         super(connection);
     }
 
@@ -53,6 +54,7 @@ public class UsuarioRepository extends BaseRepository<Usuario> {
             usuario.setContrasenia(resultSet.getString("contrasenia"));
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error mapping object", e);
+            throw new InternalErrorException("Error mapping object");
         }
         return usuario;
     }
@@ -85,6 +87,7 @@ public class UsuarioRepository extends BaseRepository<Usuario> {
             }
         } catch (SQLException e) {
             log.log(Level.SEVERE, "Error: " + e.getMessage());
+            throw new InternalErrorException("Error finding object");
         }
         return Optional.empty();
     }
