@@ -81,7 +81,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-  await new Promise((resolve) => setTimeout(resolve, 50));
+  await new Promise((resolve) => setTimeout(resolve, 150));
   if (to.name === 'Login' && authStore.isAuthenticated) {
     next({ name: 'AdminHome'});
   } else if (to.meta.requiresAuth && !authStore.isAuthenticated) {

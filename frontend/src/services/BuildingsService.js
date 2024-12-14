@@ -32,7 +32,7 @@ class BuildingService {
     }
 
     async getLocations() {
-        const response = await axiosInstance.get('/ubicaciones');
+        const response = await axiosInstance.get('/edificios/locations');
         return response.data;
     }
 }
