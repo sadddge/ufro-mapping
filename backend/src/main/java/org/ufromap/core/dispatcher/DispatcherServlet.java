@@ -187,11 +187,19 @@ public class DispatcherServlet extends HttpServlet {
 
     private Method matchRouteWithParams(String key) {
         try {
+            String[] keyParts = key.split(":");
+            String method = keyParts[0];
+            String path = keyParts[1];
+
+            if (routeHandlers.containsKey(key)) {
+                return routeHandlers.get(key);
+            }
+
             for (String routeKey : routeHandlers.keySet()) {
-                if (routeKey.startsWith(key.split(":")[0])) {
+                if (routeKey.startsWith(method)) {
                     String routePath = routeKey.split(":")[1];
                     Pattern pattern = Pattern.compile(routePath.replaceAll("\\{([^}]+)}", "[^/]+"));
-                    Matcher matcher = pattern.matcher(key.split(":")[1]);
+                    Matcher matcher = pattern.matcher(path);
                     if (matcher.matches()) {
                         return routeHandlers.get(routeKey);
                     }
