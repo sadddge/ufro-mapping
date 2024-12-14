@@ -225,6 +225,10 @@ public class DispatcherServlet extends HttpServlet {
             return true;
         }
 
+        if (req.getCookies() == null) {
+            throw new UnauthorizedException("Token cookie not found");
+        }
+
         String token = Arrays.stream(req.getCookies())
                 .filter(cookie -> "token".equals(cookie.getName()))
                 .map(Cookie::getValue)
