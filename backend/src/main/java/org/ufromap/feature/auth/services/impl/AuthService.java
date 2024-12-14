@@ -1,6 +1,8 @@
 package org.ufromap.feature.auth.services.impl;
 
 import org.ufromap.core.utils.JwtUtil;
+import org.ufromap.core.utils.Validator;
+import org.ufromap.feature.auth.dto.RegisterRequestDTO;
 import org.ufromap.feature.auth.services.IAuthService;
 import org.ufromap.feature.users.dto.UserInfoDTO;
 import org.ufromap.core.exceptions.BadRequestException;
@@ -44,5 +46,22 @@ public class AuthService implements IAuthService {
                 .id(JwtUtil.getUserId(value))
                 .rol(JwtUtil.getUserRole(value))
                 .build();
+    }
+
+    @Override
+    public void register(RegisterRequestDTO registerRequestDTO) {
+        validateRegisterRequest(registerRequestDTO);
+        Usuario usuario = new Usuario(0, "USER", registerRequestDTO.getNombre(), registerRequestDTO.getCorreo(), registerRequestDTO.getContrasenia());
+        usuarioRepository.add(usuario);
+    }
+
+    public void validateRegisterRequest(RegisterRequestDTO registerRequestDTO) {
+        Validator.validateEmail(registerRequestDTO.getCorreo());
+        Validator.validatePassword(registerRequestDTO.getContrasenia());
+        if (usuarioRepository.findByCorreo(registerRequestDTO.getCorreo()).isPresent()) {
+            throw new BadRequestException("Correo ya registrado");
+        } else if (usuarioRepository.findByNombre(registerRequestDTO.getNombre()).isPresent()) {
+            throw new BadRequestException("Nombre de usuario ya registrado");
+        }
     }
 }

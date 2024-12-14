@@ -18,6 +18,14 @@ class AuthService {
             const response = await axiosInstance.get('/auth/user-info');
             return response.data;
         }
+
+        register(username, email, password) {
+            return axiosInstance.post('/auth/register', {
+                nombre: username,
+                correo: email,
+                contrasenia: password
+            });
+        }
 }
 
 export default new AuthService();

@@ -13,6 +13,7 @@ import org.ufromap.core.annotations.PostMapping;
 import org.ufromap.core.annotations.RequestMapping;
 import org.ufromap.core.base.BaseController;
 import org.ufromap.core.exceptions.UnauthorizedException;
+import org.ufromap.feature.auth.dto.RegisterRequestDTO;
 import org.ufromap.feature.users.dto.UserInfoDTO;
 import org.ufromap.feature.auth.services.impl.AuthService;
 
@@ -32,7 +33,19 @@ public class AuthController extends BaseController {
         String contrasenia = jsonObject.optString("contrasenia", null);
         String token = authService.login(correo, contrasenia);
         addTokenCookie(response, token);
-        sendObject(response, "Login successful");
+        sendMessage(response, "Login successful");
+    }
+
+    @PostMapping("/register")
+    public void register(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = getJson(request);
+        RegisterRequestDTO registerRequestDTO = RegisterRequestDTO.builder()
+                .nombre(jsonObject.optString("nombre", null))
+                .correo(jsonObject.optString("correo", null))
+                .contrasenia(jsonObject.optString("contrasenia", null))
+                .build();
+        authService.register(registerRequestDTO);
+        sendMessage(response, "Registration successful");
     }
 
     @PostMapping("/logout")
@@ -57,7 +70,7 @@ public class AuthController extends BaseController {
             return;
         }
         if (authService.validateSession(tokenCookie.getValue())) {
-            sendObject(response, "Session is valid");
+            sendMessage(response, "Session is valid");
         } else {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
         }

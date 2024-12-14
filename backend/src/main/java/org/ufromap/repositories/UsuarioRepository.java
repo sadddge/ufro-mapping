@@ -91,4 +91,29 @@ public class UsuarioRepository extends BaseRepository<Usuario> {
         }
         return Optional.empty();
     }
+
+    public Optional<Object> findByCorreo(String correo) {
+        String query = "SELECT id, nombre_rol, nombre_usuario, correo, contrasenia FROM usuario WHERE correo = ?";
+        return getObject(correo, query);
+    }
+
+    public Optional<Object> findByNombre(String nombre) {
+        String query = "SELECT id, nombre_rol, nombre_usuario, correo, contrasenia FROM usuario WHERE nombre_usuario = ?";
+        return getObject(nombre, query);
+    }
+
+    private Optional<Object> getObject(String nombre, String query) {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, nombre);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(mapToObject(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "Error: " + e.getMessage());
+            throw new InternalErrorException("Error finding object");
+        }
+        return Optional.empty();
+    }
 }
