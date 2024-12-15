@@ -19,16 +19,16 @@
   
 <script setup>
 import { ref, onMounted } from "vue";
-import axios from "axios";
+import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import ClassroomService from '@/services/ClassroomService'
 import BuildingsService from '@/services/BuildingsService'
 import CourseService from '@/services/CourseService'
   
+const router = useRouter();
 const showTree = ref(false);
 const pattern = ref("");
 const showIrrelevantNodes = ref(false);
-const selectedKey = ref([]);
 const edificios = ref([]);
 const asignaturas = ref([]);
 const salas = ref([]);
@@ -47,7 +47,19 @@ async function fetchSalas() {
 async function fetchAsignaturas() {
     asignaturas.value = await CourseService.getCourses();
 }
-  
+
+function changeShowTree(isVisible) {
+    showTree.value = isVisible;
+}
+
+function handleSelectionNode(selectedKey) {  
+    const partsKey = selectedKey[0].split("-");
+
+    router.push({
+        path: `/${partsKey[0]}/${partsKey[1]}`
+    });
+}
+
 function updateTreeData() {
     data.value = [
         {
@@ -55,12 +67,12 @@ function updateTreeData() {
             key: "0",
             children: edificios.value.map(edificio => ({
             label: edificio.alias ? edificio.alias : edificio.nombre,
-            key: edificio.nombre.toString(),
+            key: `edificio-${edificio.id}`,
             children: salas.value
-            .filter(sala => sala.edificio.nombre === edificio.nombre)
+            .filter(sala => sala.edificio.id === edificio.id)
                 .map(sala => ({
                     label: sala.nombre,
-                    key: sala.nombre.toString(),
+                    key: `sala-${sala.id}`,
                 }))
             })),
         },
@@ -69,18 +81,10 @@ function updateTreeData() {
             key: "1",
             children: asignaturas.value.map(asignatura => ({
                 label: asignatura.nombre,
-                key: asignatura.nombre
+                key: `asignatura-${asignatura.id}`
             }))
         }
     ];
-}
-  
-function changeShowTree(isVisible) {
-    showTree.value = isVisible;
-}
-  
-function handleSelectionNode(selectedKey) {  
-    selectedKey.value = selectedKey[0];  
 }
 
 onMounted(async () => {
@@ -98,4 +102,3 @@ onMounted(async () => {
   }
 });
 </script>
-  
