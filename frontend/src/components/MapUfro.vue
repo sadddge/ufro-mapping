@@ -56,7 +56,6 @@ const labels = () => {
         },
         properties : {
           description : location.aliasEdificio ? location.aliasEdificio : location.nombreEdificio,
-          icon : 'building'
         }
       }
     })

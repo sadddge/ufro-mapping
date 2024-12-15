@@ -77,7 +77,7 @@ public class UsuarioController extends BaseController {
     }
 
     @PutMapping("/{id}")
-    @Protected(roles = {"ADMIN"})
+    @Protected(roles = {"ADMIN", "USER"})
     public void update(@PathParam("id") String id, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
         UsuarioRequestDTO usuarioRequestDTO = mapJsonToEntity(jsonObject);
