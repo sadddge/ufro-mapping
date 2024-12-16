@@ -131,7 +131,6 @@
           <n-input
               v-model:value="model.password"
               type="password"
-              @input="handlePasswordInput"
               @keydown.enter.prevent
               placeholder="Nueva Contraseña"
           />
@@ -171,7 +170,7 @@ import UserService from "../services/UserService";
 import { useMessage } from "naive-ui";
 import {SignOut20Filled as SignOutIcon} from "@vicons/fluent";
 import { Person20Filled as PersonIcon } from "@vicons/fluent";
-
+import AuthService from "@/services/AuthService.js";
 
 
 const store = useAuthStore();
@@ -246,7 +245,7 @@ const saveChanges = async () => {
     alert('Perfil actualizado correctamente');
   } catch (error) {
     console.error('Error al actualizar el perfil:', error);
-    alert('Hubo un error al actualizar el perfil');
+    alert('Hubo un error al actualizar el perfil, nombre o correo invalido.');
   }
 };
 
@@ -259,7 +258,8 @@ const rules = ref({
   password: [
     {
       required: true,
-      message: "Necesitas ingresar una contraseña"
+      message: "Necesitas ingresar una contraseña",
+      trigger: ["input", "blur"]
     }
   ],
   reenteredPassword: [
@@ -293,7 +293,9 @@ const handleValidateButtonClick = (e) => {
   formRef.value?.validate((errors) => {
     if (!errors) {
       message.success("Valid");
-      UserService.updateUser(store.userId, { contrasenia: model.value.password });
+      AuthService.changePassword(store.userId, model.value.oldpassword, model.value.password).then(() => {
+        message.success("Contraseña cambiada correctamente");
+      });
       showChangePasswordModal.value = false;
 
     } else {
