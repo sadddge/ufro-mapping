@@ -10,7 +10,7 @@ import MapView from "@/views/MapView.vue";
 import HomeView from "@/views/HomeView.vue";
 import { useAuthStore} from "@/stores/auth.js";
 import PageNotFoundView from "@/views/PageNotFoundView.vue";
-
+import RegisterView from "@/views/RegisterView.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -75,6 +75,11 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: PageNotFoundView,
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: RegisterView,
     }
   ],
 })
@@ -82,7 +87,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   await new Promise((resolve) => setTimeout(resolve, 150));
-  if (to.name === 'Login' && authStore.isAuthenticated) {
+  if ((to.name === 'Login' || to.name === 'Register') && authStore.isAuthenticated) {
     next({ name: 'AdminHome'});
   } else if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'Login' });
