@@ -20,16 +20,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
-    @Size(max = 20)
     @Column(name = "nombre_usuario", nullable = false, unique = true, length = 20)
     private String name;
-    @NotBlank
-    @Size(max = 80)
     @Column(name = "correo", nullable = false, unique = true, length = 80)
     private String email;
-    @NotBlank
-    @Size(max = 200)
     @Column(name = "contrasenia", nullable = false, length = 200)
     private String password;
     @ManyToOne
