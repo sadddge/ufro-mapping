@@ -3,7 +3,31 @@
     <div class="absolute inset-0 overflow-auto text-[rgba(255,255,255,0.9)] bg-[rgba(0,0,0,0.5)] z-10 select-none"
          v-if="visible">
       <div class="flex flex-col w-1/2 mx-auto mt-12 items-end gap-4">
-        <div v-if="!add">
+        <div v-if="!add" class="flex space-x-2">
+          <transition name="fade">
+          <n-button strong secondary circle type="error" class="w-fit px-2.5" v-if="modeEdit" @click="handleCancelEdit">
+                <template #icon>
+                    <n-icon><PresenceBlocked16Regular/></n-icon>
+                </template>
+                Cancelar
+            </n-button>
+          </transition>
+          <transition name="fade">
+            <n-button strong secondary circle type="success" class="w-fit px-2.5" v-if="modeEdit" @click="handleSaveEdit">
+                <template #icon>
+                    <n-icon><Save20Regular/></n-icon>
+                </template>
+                Guardar
+            </n-button>
+          </transition>
+                <n-button quaternary circle @click="handleModeEdit">
+                <template #icon>
+                    <n-icon>
+                    <Add12Regular
+                    />
+                    </n-icon>
+                </template>
+                </n-button>
           <n-button quaternary circle @click="close">
             <template #icon>
               <n-icon>
@@ -59,7 +83,7 @@
 </template>
 
 <script setup>
-import {Add20Filled, Dismiss20Regular } from "@vicons/fluent";
+import { Dismiss20Regular, Add12Regular, Save20Regular, PresenceBlocked16Regular  } from "@vicons/fluent";
 import UserService from "@/services/UserService";
 import CourseService from "@/services/CourseService";
 import ClassroomService from "@/services/ClassroomService";
@@ -70,7 +94,7 @@ import CalendarSlot from "@/components/CalendarSlot.vue";
 const props = defineProps({
   id: {
     type: Number,
-    required: true
+    required: false
   },
   type: {
     type: String,
@@ -91,9 +115,13 @@ const props = defineProps({
   visible: {
     type: Boolean,
     required: true
+  },
+  schedule: {
+    type: Array,
+    required: false
   }
 });
-const emits = defineEmits(["close", "save"]);
+const emits = defineEmits(["close", "save", "updateModeEdit", "saveEdit", "initializeIds"]);
 
 const periodos = ref([
   "08:30 - 09:30", "09:40 - 10:40", "10:50 - 11:50",
@@ -105,6 +133,7 @@ const dias = ref(["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado
 const newLectures = ref([]);
 const originalLectures = ref([]);
 const expandedSlot = ref(null);
+const modeEdit = ref(false);
 
 const handleExpand = (slot) => {
   console.log(slot);
@@ -149,18 +178,35 @@ const save = () => {
   close();
 };
 
-watch(() => [props.id, props.visible], async () => {
+function handleModeEdit() {
+  modeEdit.value = !modeEdit.value;
+  emits('updateModeEdit', modeEdit.value);
+} 
+
+function handleCancelEdit(){
+  modeEdit.value = false;
+  emits('updateModeEdit', modeEdit.value);
+}
+
+function handleSaveEdit(){
+  emits("saveEdit");
+}
+
+watch(() => [props.id, props.visible, props.schedule], async () => {
   newLectures.value = [];
   if (!props.visible) return;
   switch (props.type) {
     case "course":
-      originalLectures.value = await CourseService.getHorarioByCourseId(props.id);
+      originalLectures.value = await ervice.getHorarioByCourseId(props.id);
       break;
     case "classroom":
       originalLectures.value = await ClassroomService.getHorarioByClassroomId(props.id);
       break;
     case "user":
       originalLectures.value = await UserService.getHorarioByUserId(props.id);
+      break;
+    case "schedule":
+      originalLectures.value = props.schedule;
       break;
   }
 });
