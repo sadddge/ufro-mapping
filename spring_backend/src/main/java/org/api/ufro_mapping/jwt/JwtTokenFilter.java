@@ -28,16 +28,12 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
-        log.info("Request to " + request.getRequestURI());
         String token = jwtProvider.getTokenFromCookie(request);
         if (token != null && jwtProvider.validateToken(token)) {
-            log.info("Token is valid");
             String username = jwtProvider.getUserName(token);
             String role = jwtProvider.getUserRole(token);
-            log.info("User: " + username + " Role: " + role);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null,
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" +role)));
-
             SecurityContextHolder.getContext().setAuthentication(auth);
         } else {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("anonymous", null,
