@@ -3,7 +3,9 @@ package org.api.ufro_mapping.services.impl;
 import org.api.ufro_mapping.dto.request.UserRegisterDTO;
 import org.api.ufro_mapping.dto.response.CourseDTO;
 import org.api.ufro_mapping.dto.response.UserDTO;
+import org.api.ufro_mapping.models.Course;
 import org.api.ufro_mapping.models.User;
+import org.api.ufro_mapping.repositories.CourseRepository;
 import org.api.ufro_mapping.repositories.UserRepository;
 import org.api.ufro_mapping.services.IUserService;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,9 +19,11 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
+    private final CourseRepository courseRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, CourseRepository courseRepository) {
         this.userRepository = userRepository;
+        this.courseRepository = courseRepository;
     }
 
     @Override
@@ -35,18 +39,6 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Optional<UserDTO> update(Long id, UserRegisterDTO userRegisterDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String authenticatedUsername = authentication.getName(); // Nombre del usuario autenticado
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) {
-            User authenticatedUser = userRepository.findByName(authenticatedUsername)
-                    .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
-
-            if (!authenticatedUser.getId().equals(id)) {
-                throw new AccessDeniedException("You do not have permission to update this user.");
-            }
-        }
         return userRepository.findById(id).map(user -> {
             user.setName(userRegisterDTO.getName());
             user.setEmail(userRegisterDTO.getEmail());
@@ -66,12 +58,44 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public List<CourseDTO> getCoursesByUserId(Long id) {
-        return null;
+        return userRepository.findById(id)
+                .map(user -> user.getCourses().stream().map(course -> CourseDTO.builder()
+                        .id(course.getId())
+                        .name(course.getName())
+                        .build()).toList())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public void addInscription(Long userId, Long courseId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+        user.getCourses().add(course);
+        userRepository.save(user);
     }
 
     @Override
     public boolean deleteInscription(Long userId, Long courseId) {
-        return false;
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new RuntimeException("Course not found"));
+        user.getCourses().remove(course);
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public boolean validateUser(Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String authenticatedUsername = authentication.getName(); // Nombre del usuario autenticado
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return true;
+        }
+        User authenticatedUser = userRepository.findByName(authenticatedUsername)
+                .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+        return authenticatedUser.getId().equals(userId);
     }
 
     private UserDTO entityToDTO(User user) {

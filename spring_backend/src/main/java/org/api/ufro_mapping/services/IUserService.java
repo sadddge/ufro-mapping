@@ -13,5 +13,7 @@ public interface IUserService {
     Optional<UserDTO> update(Long id, UserRegisterDTO userRegisterDTO);
     boolean delete(Long id);
     List<CourseDTO> getCoursesByUserId(Long id);
+    void addInscription(Long userId, Long courseId);
     boolean deleteInscription(Long userId, Long courseId);
+    boolean validateUser(Long userId);
 }
