@@ -2,6 +2,7 @@ package org.api.ufro_mapping.controllers;
 
 import jakarta.validation.Valid;
 import org.api.ufro_mapping.dto.request.CourseRequestDTO;
+import org.api.ufro_mapping.dto.request.update.CourseUpdateDTO;
 import org.api.ufro_mapping.dto.response.CourseDTO;
 import org.api.ufro_mapping.dto.response.ScheduleClassDTO;
 import org.api.ufro_mapping.services.ICourseService;
@@ -53,7 +54,7 @@ public class CourseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CourseDTO> update(@PathVariable Long id, @Valid @RequestBody CourseRequestDTO courseDTO) {
+    public ResponseEntity<CourseDTO> update(@PathVariable Long id, @Valid @RequestBody CourseUpdateDTO courseDTO) {
         return courseService.update(id, courseDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

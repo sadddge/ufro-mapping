@@ -1,7 +1,7 @@
 package org.api.ufro_mapping.controllers;
 
 import jakarta.validation.Valid;
-import org.api.ufro_mapping.dto.request.UserRegisterDTO;
+import org.api.ufro_mapping.dto.request.update.UserUpdateDTO;
 import org.api.ufro_mapping.dto.response.CourseDTO;
 import org.api.ufro_mapping.dto.response.UserDTO;
 import org.api.ufro_mapping.services.IUserService;
@@ -37,9 +37,9 @@ public class UserController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserRegisterDTO userRegisterDTO) {
+    public ResponseEntity<UserDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userUpdateDTO) {
         if (userService.validateUser(id)) {
-            return userService.update(id, userRegisterDTO)
+            return userService.update(id, userUpdateDTO)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
         }

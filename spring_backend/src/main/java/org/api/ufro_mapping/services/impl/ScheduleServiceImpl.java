@@ -74,7 +74,7 @@ public class ScheduleServiceImpl implements IScheduleService {
                 .courseName(lecture.getCourse().getName())
                 .classroomName(lecture.getClassroom().getName())
                 .code(lecture.getCourse().getCode())
-                .day(lecture.getDay())
+                .day(lecture.getDayOfWeek())
                 .period(lecture.getPeriod())
                 .module(lecture.getModule())
                 .build();

@@ -3,6 +3,7 @@ package org.api.ufro_mapping.controllers;
 import jakarta.validation.Valid;
 import lombok.extern.java.Log;
 import org.api.ufro_mapping.dto.request.BuildingRequestDTO;
+import org.api.ufro_mapping.dto.request.update.BuildingUpdateDTO;
 import org.api.ufro_mapping.dto.response.BuildingDTO;
 import org.api.ufro_mapping.dto.response.ClassroomDTO;
 import org.api.ufro_mapping.services.IBuildingService;
@@ -51,7 +52,7 @@ public class BuildingController {
     }
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BuildingDTO> update(@PathVariable Long id, @Valid @RequestBody BuildingRequestDTO buildingDTO) {
+    public ResponseEntity<BuildingDTO> update(@PathVariable Long id, @Valid @RequestBody BuildingUpdateDTO buildingDTO) {
         return buildingService.update(id, buildingDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

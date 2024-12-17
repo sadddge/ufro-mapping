@@ -1,9 +1,11 @@
 package org.api.ufro_mapping.services.impl;
 
 import org.api.ufro_mapping.dto.request.LectureRequestDTO;
+import org.api.ufro_mapping.dto.request.update.LectureUpdateDTO;
 import org.api.ufro_mapping.dto.response.ClassroomDTO;
 import org.api.ufro_mapping.dto.response.CourseDTO;
 import org.api.ufro_mapping.dto.response.LectureDTO;
+import org.api.ufro_mapping.mappers.LectureMapper;
 import org.api.ufro_mapping.models.Classroom;
 import org.api.ufro_mapping.models.Course;
 import org.api.ufro_mapping.models.Lecture;
@@ -21,10 +23,12 @@ public class LectureServiceImpl implements ILectureService {
     private final LectureRepository lectureRepository;
     private final ClassroomRepository classroomRepository;
     private final CourseRepository courseRepository;
-    public LectureServiceImpl(LectureRepository lectureRepository, ClassroomRepository classroomRepository, CourseRepository courseRepository) {
+    private final LectureMapper lectureMapper;
+    public LectureServiceImpl(LectureRepository lectureRepository, ClassroomRepository classroomRepository, CourseRepository courseRepository, LectureMapper lectureMapper) {
         this.lectureRepository = lectureRepository;
         this.classroomRepository = classroomRepository;
         this.courseRepository = courseRepository;
+        this.lectureMapper = lectureMapper;
     }
 
     @Override
@@ -51,19 +55,14 @@ public class LectureServiceImpl implements ILectureService {
     }
 
     @Override
-    public Optional<LectureDTO> update(Long id, LectureRequestDTO lectureDTO) {
+    public Optional<LectureDTO> update(Long id, LectureUpdateDTO lectureDTO) {
         return lectureRepository.findById(id).map(lecture -> {
             Optional<Classroom> classroom = classroomRepository.findById(lectureDTO.getClassroomId());
             Optional<Course> course = courseRepository.findById(lectureDTO.getCourseId());
             if (classroom.isEmpty() || course.isEmpty()) {
                 throw new RuntimeException("Classroom or Course not found");
             }
-            lecture.setDay(lectureDTO.getDayOfWeek());
-            lecture.setPeriod(lectureDTO.getPeriod());
-            lecture.setTeacherName(lectureDTO.getTeacher());
-            lecture.setModule(lectureDTO.getModule());
-            lecture.setClassroom(classroom.get());
-            lecture.setCourse(course.get());
+            lectureMapper.updateEntityFromDTO(lectureDTO, lecture);
             return entityToDTO(lectureRepository.save(lecture));
         });
     }
@@ -80,7 +79,7 @@ public class LectureServiceImpl implements ILectureService {
     private LectureDTO entityToDTO(Lecture lecture) {
         return LectureDTO.builder()
                 .id(lecture.getId())
-                .dayOfWeek(lecture.getDay())
+                .dayOfWeek(lecture.getDayOfWeek())
                 .period(lecture.getPeriod())
                 .teacher(lecture.getTeacherName())
                 .module(lecture.getModule())
@@ -95,7 +94,7 @@ public class LectureServiceImpl implements ILectureService {
 
     private Lecture requestToEntity(LectureRequestDTO lectureDTO, Classroom classroom, Course course) {
         Lecture lecture = new Lecture();
-        lecture.setDay(lectureDTO.getDayOfWeek());
+        lecture.setDayOfWeek(lectureDTO.getDayOfWeek());
         lecture.setPeriod(lectureDTO.getPeriod());
         lecture.setTeacherName(lectureDTO.getTeacher());
         lecture.setModule(lectureDTO.getModule());

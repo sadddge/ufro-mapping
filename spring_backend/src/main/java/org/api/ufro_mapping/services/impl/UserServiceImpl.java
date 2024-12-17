@@ -1,14 +1,14 @@
 package org.api.ufro_mapping.services.impl;
 
-import org.api.ufro_mapping.dto.request.UserRegisterDTO;
+import org.api.ufro_mapping.dto.request.update.UserUpdateDTO;
 import org.api.ufro_mapping.dto.response.CourseDTO;
 import org.api.ufro_mapping.dto.response.UserDTO;
+import org.api.ufro_mapping.mappers.UserMapper;
 import org.api.ufro_mapping.models.Course;
 import org.api.ufro_mapping.models.User;
 import org.api.ufro_mapping.repositories.CourseRepository;
 import org.api.ufro_mapping.repositories.UserRepository;
 import org.api.ufro_mapping.services.IUserService;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,12 @@ import java.util.Optional;
 public class UserServiceImpl implements IUserService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
+    private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository, CourseRepository courseRepository) {
+    public UserServiceImpl(UserRepository userRepository, CourseRepository courseRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.courseRepository = courseRepository;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -38,11 +40,9 @@ public class UserServiceImpl implements IUserService {
 
 
     @Override
-    public Optional<UserDTO> update(Long id, UserRegisterDTO userRegisterDTO) {
+    public Optional<UserDTO> update(Long id, UserUpdateDTO userRegisterDTO) {
         return userRepository.findById(id).map(user -> {
-            user.setName(userRegisterDTO.getName());
-            user.setEmail(userRegisterDTO.getEmail());
-            user.setPassword(userRegisterDTO.getPassword());
+            userMapper.updateEntityFromDTO(userRegisterDTO, user);
             return entityToDTO(userRepository.save(user));
         });
     }

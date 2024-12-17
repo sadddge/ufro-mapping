@@ -1,6 +1,7 @@
 package org.api.ufro_mapping.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,8 @@ public class BuildingRequestDTO {
     private String name;
     private String alias;
     private String type;
-    private float latitude;
-    private float longitude;
+    @NotNull(message = "Latitude cannot be null")
+    private Double latitude;
+    @NotNull(message = "Longitude cannot be null")
+    private Double longitude;
 }

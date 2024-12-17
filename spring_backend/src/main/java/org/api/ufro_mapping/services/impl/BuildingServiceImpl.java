@@ -1,10 +1,12 @@
 package org.api.ufro_mapping.services.impl;
 
 import org.api.ufro_mapping.dto.request.BuildingRequestDTO;
+import org.api.ufro_mapping.dto.request.update.BuildingUpdateDTO;
 import org.api.ufro_mapping.dto.response.BuildingDTO;
 import org.api.ufro_mapping.dto.response.ClassroomDTO;
 import org.api.ufro_mapping.dto.response.LectureDTO;
 import org.api.ufro_mapping.dto.response.LocationDTO;
+import org.api.ufro_mapping.mappers.BuildingMapper;
 import org.api.ufro_mapping.models.Building;
 import org.api.ufro_mapping.repositories.BuildingRepository;
 import org.api.ufro_mapping.services.IBuildingService;
@@ -17,9 +19,10 @@ import java.util.stream.Collectors;
 @Service
 public class BuildingServiceImpl implements IBuildingService {
     private final BuildingRepository buildingRepository;
-
-    public BuildingServiceImpl(BuildingRepository buildingRepository) {
+    private final BuildingMapper buildingMapper;
+    public BuildingServiceImpl(BuildingRepository buildingRepository, BuildingMapper buildingMapper) {
         this.buildingRepository = buildingRepository;
+        this.buildingMapper = buildingMapper;
     }
     @Override
     public List<BuildingDTO> findAll() {
@@ -43,13 +46,9 @@ public class BuildingServiceImpl implements IBuildingService {
     }
 
     @Override
-    public Optional<BuildingDTO> update(Long id, BuildingRequestDTO buildingRequestDTO) {
+    public Optional<BuildingDTO> update(Long id, BuildingUpdateDTO buildingRequestDTO) {
         return buildingRepository.findById(id).map(building -> {
-            building.setName(buildingRequestDTO.getName());
-            building.setAlias(buildingRequestDTO.getAlias());
-            building.setType(buildingRequestDTO.getType());
-            building.setLatitude(buildingRequestDTO.getLatitude());
-            building.setLongitude(buildingRequestDTO.getLongitude());
+            buildingMapper.updateEntityFromDTO(buildingRequestDTO, building);
             return entityToDTO(buildingRepository.save(building));
         });
     }
@@ -91,7 +90,7 @@ public class BuildingServiceImpl implements IBuildingService {
                                 .orElse(Collections.emptySet())
                                 .stream().map(lecture -> LectureDTO.builder()
                                 .id(lecture.getId())
-                                .dayOfWeek(lecture.getDay())
+                                .dayOfWeek(lecture.getDayOfWeek())
                                 .period(lecture.getPeriod())
                                 .module(lecture.getModule())
                                 .build()).collect(Collectors.toSet()))

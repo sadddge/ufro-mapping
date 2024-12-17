@@ -17,7 +17,7 @@ public class Lecture {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "dia_semana", nullable = false)
-    private int day;
+    private int dayOfWeek;
     @Column(name = "periodo", nullable = false)
     private int period;
     @Column(name = "docente_nombre")

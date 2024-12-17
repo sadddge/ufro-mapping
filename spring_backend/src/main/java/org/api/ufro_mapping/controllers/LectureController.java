@@ -2,6 +2,7 @@ package org.api.ufro_mapping.controllers;
 
 import jakarta.validation.Valid;
 import org.api.ufro_mapping.dto.request.LectureRequestDTO;
+import org.api.ufro_mapping.dto.request.update.LectureUpdateDTO;
 import org.api.ufro_mapping.dto.response.LectureDTO;
 import org.api.ufro_mapping.services.ILectureService;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class LectureController {
     }
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<LectureDTO> update(@PathVariable Long id, @Valid @RequestBody LectureRequestDTO lectureRequestDTO) {
+    public ResponseEntity<LectureDTO> update(@PathVariable Long id, @Valid @RequestBody LectureUpdateDTO lectureRequestDTO) {
         return lectureService.update(id, lectureRequestDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

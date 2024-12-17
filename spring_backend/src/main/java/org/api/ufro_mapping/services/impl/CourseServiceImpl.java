@@ -1,9 +1,11 @@
 package org.api.ufro_mapping.services.impl;
 
 import org.api.ufro_mapping.dto.request.CourseRequestDTO;
+import org.api.ufro_mapping.dto.request.update.CourseUpdateDTO;
 import org.api.ufro_mapping.dto.response.ClassroomDTO;
 import org.api.ufro_mapping.dto.response.CourseDTO;
 import org.api.ufro_mapping.dto.response.LectureDTO;
+import org.api.ufro_mapping.mappers.CourseMapper;
 import org.api.ufro_mapping.models.Course;
 import org.api.ufro_mapping.repositories.CourseRepository;
 import org.api.ufro_mapping.services.ICourseService;
@@ -16,8 +18,10 @@ import java.util.stream.Collectors;
 @Service
 public class CourseServiceImpl implements ICourseService {
     private final CourseRepository courseRepository;
-    public CourseServiceImpl(CourseRepository courseRepository) {
+    private final CourseMapper courseMapper;
+    public CourseServiceImpl(CourseRepository courseRepository, CourseMapper courseMapper) {
         this.courseRepository = courseRepository;
+        this.courseMapper = courseMapper;
     }
     @Override
     public List<CourseDTO> findAll() {
@@ -40,12 +44,9 @@ public class CourseServiceImpl implements ICourseService {
     }
 
     @Override
-    public Optional<CourseDTO> update(Long id, CourseRequestDTO courseRequestDTO) {
+    public Optional<CourseDTO> update(Long id, CourseUpdateDTO courseRequestDTO) {
         return courseRepository.findById(id).map(course -> {
-            course.setName(courseRequestDTO.getName());
-            course.setCode(courseRequestDTO.getCode());
-            course.setDescription(courseRequestDTO.getDescription());
-            course.setSct(courseRequestDTO.getSct());
+            courseMapper.updateEntityFromDTO(courseRequestDTO, course);
             return entityToDTO(courseRepository.save(course));
         });
     }
@@ -68,7 +69,7 @@ public class CourseServiceImpl implements ICourseService {
                 sct(course.getSct()).
                 lectures(course.getLectures().stream().map(lecture -> LectureDTO.builder().
                         id(lecture.getId()).
-                        dayOfWeek(lecture.getDay()).
+                        dayOfWeek(lecture.getDayOfWeek()).
                         module(lecture.getModule()).
                         classroom(ClassroomDTO.builder()
                                 .name(lecture.getClassroom().getName())
