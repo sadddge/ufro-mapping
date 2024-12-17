@@ -3,7 +3,6 @@ package org.api.ufro_mapping.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.api.ufro_mapping.annotations.Public;
 import org.api.ufro_mapping.dto.request.LoginRequestDTO;
 import org.api.ufro_mapping.dto.request.UserRegisterDTO;
 import org.api.ufro_mapping.jwt.JwtProvider;

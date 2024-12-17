@@ -4,15 +4,19 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.java.Log;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
 @Log
+@Component
 public class JwtTokenFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
 
@@ -21,9 +25,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain) throws ServletException, IOException {
         log.info("Request to " + request.getRequestURI());
         String token = jwtProvider.getTokenFromCookie(request);
         if (token != null && jwtProvider.validateToken(token)) {
@@ -34,6 +38,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null,
                     Collections.singletonList(new SimpleGrantedAuthority("ROLE_" +role)));
 
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        } else {
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("anonymous", null,
+                    Collections.singletonList(new SimpleGrantedAuthority("ROLE_ANONYMOUS")));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 
