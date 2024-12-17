@@ -103,6 +103,7 @@ public class DispatcherServlet extends HttpServlet {
             Object[] args = resolveMethodArguments(handler, path, req, resp);
             handler.invoke(handler.getDeclaringClass().getConstructor().newInstance(), args);
         } catch (Exception e) {
+            e.printStackTrace();
             handleException(e, resp);
         }
 
