@@ -18,8 +18,10 @@ import {ref} from 'vue'
 import {useRouter} from 'vue-router'
 import AuthService from "@/services/AuthService.js";
 import { useAuthStore } from "@/stores/auth.js";
+import { useMapStore } from "@/stores/map.js";
 
 const store = useAuthStore()
+const mapStore = useMapStore()
 const router = useRouter()
 const formRef = ref(null)
 const model = ref({
@@ -57,4 +59,9 @@ const login = () => {
     console.log(error)
   }
 }
+onMounted(() => {
+  if (mapStore.showMap) {
+    mapStore.showMap = false
+  }
+})
 </script>
