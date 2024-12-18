@@ -16,7 +16,7 @@ public class BuildingDTO {
     private String name;
     private String alias;
     private String type;
-    private double latitude;
-    private double longitude;
+    private Double latitude;
+    private Double longitude;
     private Set<ClassroomDTO> classrooms;
 }

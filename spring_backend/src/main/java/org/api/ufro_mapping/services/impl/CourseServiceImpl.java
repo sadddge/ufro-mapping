@@ -11,6 +11,7 @@ import org.api.ufro_mapping.repositories.CourseRepository;
 import org.api.ufro_mapping.services.ICourseService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,7 +68,9 @@ public class CourseServiceImpl implements ICourseService {
                 code(course.getCode()).
                 description(course.getDescription()).
                 sct(course.getSct()).
-                lectures(course.getLectures().stream().map(lecture -> LectureDTO.builder().
+                lectures(Optional.ofNullable(course.getLectures())
+                        .orElse(Collections.emptySet())
+                        .stream().map(lecture -> LectureDTO.builder().
                         id(lecture.getId()).
                         dayOfWeek(lecture.getDayOfWeek()).
                         module(lecture.getModule()).

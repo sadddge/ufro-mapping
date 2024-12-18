@@ -13,6 +13,7 @@ import org.api.ufro_mapping.repositories.ClassroomRepository;
 import org.api.ufro_mapping.services.IClassroomService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,10 +61,8 @@ public class ClassroomServiceImpl implements IClassroomService {
     @Override
     public Optional<ClassroomDTO> update(Long id, ClassroomUpdateDTO classroomDTO) {
         return classroomRepository.findById(id).map(classroom -> {
-            Optional<Building> building = buildingRepository.findById(classroomDTO.getBuildingId());
-            if (building.isEmpty()) {
-                throw new RuntimeException("Building not found");
-            }
+            Optional<Building> building = validateBuilding(classroomDTO.getBuildingId());
+            building.ifPresent(classroom::setBuilding);
             classroomMapper.updateEntityFromDTO(classroomDTO, classroom);
             return entityToDTO(classroomRepository.save(classroom));
         });
@@ -78,6 +77,17 @@ public class ClassroomServiceImpl implements IClassroomService {
         return false;
     }
 
+    private Optional<Building> validateBuilding(Long buildingId) {
+        if (buildingId == null) {
+            return Optional.empty();
+        }
+        Optional<Building> building = buildingRepository.findById(buildingId);
+        if (building.isEmpty()) {
+            throw new RuntimeException("Building not found");
+        }
+        return building;
+    }
+
     private ClassroomDTO entityToDTO(Classroom classroom) {
         return ClassroomDTO.builder()
                 .id(classroom.getId())
@@ -87,7 +97,9 @@ public class ClassroomServiceImpl implements IClassroomService {
                         .name(classroom.getBuilding().getName())
                         .alias(classroom.getBuilding().getAlias())
                         .build())
-                .lectures(classroom.getLectures().stream().map(lecture -> LectureDTO.builder()
+                .lectures(Optional.ofNullable(classroom.getLectures())
+                        .orElse(Collections.emptySet())
+                        .stream().map(lecture -> LectureDTO.builder()
                         .id(lecture.getId())
                         .dayOfWeek(lecture.getDayOfWeek())
                         .period(lecture.getPeriod())
