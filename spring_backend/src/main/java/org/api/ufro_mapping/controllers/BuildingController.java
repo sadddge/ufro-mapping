@@ -47,7 +47,6 @@ public class BuildingController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BuildingDTO> save(@Valid @RequestBody BuildingRequestDTO buildingDTO) {
-        log.info("BuildingDTO: " + buildingDTO);
         return ResponseEntity.ok(buildingService.save(buildingDTO));
     }
     @PutMapping("/{id}")
