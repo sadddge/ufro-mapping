@@ -6,6 +6,7 @@
         'transition-all h-full duration-300 flex flex-col items-center justify-center',
         moreThanOne  ? 'bg-yellow-300 bg-opacity-20 cursor-pointer' : '',
         moreThanOne && isExpanded  ? 'opacity-50' : '',
+        !moreThanOne && lectures[0].isPreview ? 'bg-green-300 bg-opacity-50' : '',
         ]"
         @click="toggleExpand"
     >
@@ -39,13 +40,17 @@
           v-if="isExpanded"
           v-for="(lecture, i) in lectures"
           :key="i"
-          class="mt-1 relative border-zinc-600 border bg-zinc-800 transition-transform duration-300 h-full z-10 flex flex-col items-center justify-center"
+          class="mt-1 relative transition-transform duration-300 h-full z-10"
           :style="{ '--delay': `${i * 100}ms` }"
-          :class="['hover:scale-110']"
+
       >
-        <div>{{ getCode(lecture) }}</div>
-        <div>{{ lecture.nombreAsignatura }}</div>
-        <div>{{ lecture.nombreSala }}</div>
+        <div class="hover:scale-110 border-zinc-600 border w-full duration-300"
+             :class="[lecture.isPreview ? 'bg-green-300 bg-opacity-50' : 'bg-zinc-800']"
+        >
+          <div>{{ getCode(lecture) }}</div>
+          <div>{{ lecture.nombreAsignatura }}</div>
+          <div>{{ lecture.nombreSala }}</div>
+        </div>
       </div>
     </transition-group>
   </div>
@@ -102,7 +107,6 @@ const moreThanOne = computed(() => {
 </script>
 
 <style scoped>
-/* Custom transition for staggered effect */
 .staggered-expand-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -131,7 +135,6 @@ const moreThanOne = computed(() => {
   transform: translateY(-20px);
 }
 
-/* Individual delays for each item */
 div[style*="--delay"] {
   transition-delay: var(--delay);
 }
