@@ -5,13 +5,12 @@
   >
     <div class="absolute inset-0 backdrop-blur-sm"></div>
     <div class="bg-zinc-800  dark:bg-gray-800 rounded-lg p-6 w-[90%] max-w-sm relative z-10">
-      <router-link :to = "{name: 'Home'}">
-        <button
-
-            class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-        >
-          ✖
-        </button>
+      <router-link :to = "{name: 'Home'}" class="absolute top-4 right-4">
+        <n-button text>
+          <n-icon size="20">
+            <Dismiss20Regular/>
+          </n-icon>
+        </n-button>
       </router-link>
       <h2 class="text-xl font-bold mb-4">Opciones</h2>
       <div class="flex flex-col space-y-4">
@@ -33,12 +32,11 @@
   >
     <div class="absolute inset-0 backdrop-blur-sm"></div>
     <div class="bg-zinc-800 dark:bg-gray-800 rounded-lg p-6 w-[90%] max-w-lg relative z-10">
-      <button
-          @click="closeModal"
-          class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-      >
-        ✖
-      </button>
+      <n-button text class="absolute top-4 right-4" @click="closeModal">
+        <n-icon size="20">
+          <Dismiss20Regular/>
+        </n-icon>
+      </n-button>
       <div class="flex items-center mb-4">
         <h2 class="text-xl font-bold">Perfil</h2>
         <div class="ml-5 flex space-x-4">
@@ -110,12 +108,11 @@
   >
     <div class="absolute inset-0 backdrop-blur-sm"></div>
     <div class="bg-zinc-800 dark:bg-gray-800 rounded-lg p-6 w-[90%] max-w-lg relative z-10">
-      <button
-          @click="showChangePasswordModal = false"
-          class="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
-      >
-        ✖
-      </button>
+      <n-button text class="absolute top-4 right-4" @click="showChangePasswordModal = false">
+        <n-icon size="20">
+          <Dismiss20Regular/>
+        </n-icon>
+      </n-button>
       <h2 class="text-xl font-bold mb-4">Cambiar Contraseña</h2>
       <n-form ref="formRef" :model="model" :rules="rules">
         <n-form-item path="oldpassword" label="Contraseña Actual">
@@ -168,7 +165,7 @@ import { useAuthStore } from "@/stores/auth.js";
 import { useRouter } from "vue-router";
 import UserService from "../services/UserService";
 import { useMessage } from "naive-ui";
-import {SignOut20Filled as SignOutIcon} from "@vicons/fluent";
+import {Dismiss20Regular, SignOut20Filled as SignOutIcon} from "@vicons/fluent";
 import { Person20Filled as PersonIcon } from "@vicons/fluent";
 import AuthService from "@/services/AuthService.js";
 
