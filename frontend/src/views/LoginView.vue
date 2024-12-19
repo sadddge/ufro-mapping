@@ -42,9 +42,11 @@ import {useRouter} from 'vue-router'
 import AuthService from "@/services/AuthService.js";
 import { useAuthStore } from "@/stores/auth.js";
 import { LockClosed16Filled , Person12Filled} from '@vicons/fluent';
+import { useMapStore } from "@/stores/map.js";
 
 const error = ref(null)
 const store = useAuthStore()
+const mapStore = useMapStore()
 const router = useRouter()
 const formRef = ref(null)
 const model = ref({
@@ -83,4 +85,9 @@ const login = () => {
     error.value = err.data.error
   }
 }
+onMounted(() => {
+  if (mapStore.showMap) {
+    mapStore.showMap = false
+  }
+})
 </script>

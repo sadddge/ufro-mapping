@@ -27,7 +27,7 @@ class CourseService {
     }
 
     async getHorarioByCourseId(id) {
-        const response = await axiosInstance.get(`/asignaturas/${id}/horarios`);
+        const response = await axiosInstance.get(`/asignaturas/${id}/horario`);
         return response.data;
     }
 
