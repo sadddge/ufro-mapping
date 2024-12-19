@@ -306,4 +306,3 @@ const handleValidateButtonClick = (e) => {
 };
 
 </script>
-
