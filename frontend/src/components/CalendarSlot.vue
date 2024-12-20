@@ -6,7 +6,7 @@
         'transition-all h-full duration-300 flex flex-col items-center justify-center',
         moreThanOne  ? 'bg-yellow-300 bg-opacity-20 cursor-pointer' : '',
         moreThanOne && isExpanded  ? 'opacity-50' : '',
-        !moreThanOne && lectures[0].isPreview ? 'bg-green-300 bg-opacity-50' : '',
+        !moreThanOne && lectures[0].isPreview ? 'bg-[#62e3b2] text-black' : '',
         ]"
         @click="toggleExpand"
     >
@@ -45,7 +45,7 @@
 
       >
         <div class="hover:scale-110 border-zinc-600 border w-full duration-300"
-             :class="[lecture.isPreview ? 'bg-green-300 bg-opacity-50' : 'bg-zinc-800']"
+             :class="[lecture.isPreview ? 'bg-[#62e3b2] text-black' : 'bg-zinc-800']"
         >
           <div>{{ getCode(lecture) }}</div>
           <div>{{ lecture.nombreAsignatura }}</div>
