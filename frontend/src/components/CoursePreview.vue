@@ -60,7 +60,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['inscribir'])
+const emit = defineEmits(['inscribir', 'desinscribir'])
 const router = useRouter()
 const dialog = useDialog()
 const authStore = useAuthStore()
@@ -74,6 +74,7 @@ const confirmDesinscribir = async () => {
   try {
     await UserService.deleteAsignatura(authStore.userId, props.id)
     await fetchData()
+    emit('desinscribir')
   } catch (e) {
     console.error(e)
   }
