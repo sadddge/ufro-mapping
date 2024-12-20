@@ -87,7 +87,7 @@ public class UsuarioController extends BaseController {
     }
 
     @DeleteMapping("/{id}")
-    @Protected(roles = {"ADMIN"})
+    @Protected(roles = {"ADMIN", "USER"})
     public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         usuarioService.delete(userId);
