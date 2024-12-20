@@ -86,6 +86,16 @@ const router = createRouter({
       path: "/profile",
       name: "Profile",
       component: ProfileView,
+    },
+    {
+      path: "/user/schedule",
+      name: "Schedule",
+      component: ScheduleView,
+    },
+    {
+      path: "/user/schedule/edit",
+      name: "scheduleEdit",
+      component: ScheduleView
     }
   ],
 })
