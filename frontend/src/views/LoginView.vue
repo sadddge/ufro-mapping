@@ -1,6 +1,6 @@
 <template>
-  <div class="h-screen m-auto pt-80 flex flex-col gap-10 overflow-hidden items-center ">
-    <div class="bg accent-gray-800 shadow-lg border border-gray-800 rounded-xl w-1/3 p-10 flex flex-col gap-6">
+  <div class="h-screen flex flex-col gap-10 overflow-hidden items-center justify-center">
+    <div class="shadow-lg border border-[rgb(48,47,52)] rounded-xl w-1/3 p-10 flex flex-col gap-6">
       <h1 class="text-3xl text-center">Login</h1>
       <n-form ref="formRef" :model="model" :rules="rules">
         <n-form-item path="correo" label="Correo">
@@ -91,3 +91,9 @@ onMounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.xd {
+  box-shadow: rgba(48,47,52, 1) 0 0 6px;
+}
+</style>
