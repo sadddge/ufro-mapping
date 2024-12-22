@@ -8,6 +8,7 @@ import AsignaturasView from '@/views/AsignaturasView.vue'
 import ClasesView from '@/views/ClasesView.vue'
 import MapView from "@/views/MapView.vue";
 import HomeView from "@/views/HomeView.vue";
+import BuildingInfoView from '@/views/BuildingInfoView.vue';
 import PageNotFoundView from "@/views/PageNotFoundView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import ProfileView from "@/views/ProfileView.vue";
@@ -30,7 +31,13 @@ const router = createRouter({
       path: '/home',
       name: 'Home',
       component: HomeView,
-        meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/edificio/:id',
+      name: 'Edificio',
+      component: BuildingInfoView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin',
