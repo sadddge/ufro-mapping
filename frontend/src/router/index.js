@@ -12,9 +12,11 @@ import BuildingInfoView from '@/views/BuildingInfoView.vue';
 import PageNotFoundView from "@/views/PageNotFoundView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import ScheduleView from '@/views/ScheduleView.vue'
 import CoursePreviewView from "@/views/CoursePreviewView.vue";
 import { useAuthStore} from "@/stores/auth.js";
 import CourseScheduleView from "@/views/CourseScheduleView.vue";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -73,13 +75,13 @@ const router = createRouter({
       path: '/admin/clases',
       name: 'Clases',
       component: ClasesView,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, role : 'ADMIN' },
     },
     {
       path: "/admin/mapa",
       name: "Map",
       component: MapView,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, role : 'ADMIN' },
     },
     {
       path: '/:pathMatch(.*)*',
@@ -95,6 +97,18 @@ const router = createRouter({
       path: "/profile",
       name: "Profile",
       component: ProfileView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/user/schedule",
+      name: "Schedule",
+      component: ScheduleView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/user/schedule/edit",
+      name: "scheduleEdit",
+      component: ScheduleView,
       meta: { requiresAuth: true },
     },
     {

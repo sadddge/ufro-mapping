@@ -1,31 +1,40 @@
 <template>
-    <div class="relative mr-72">
+    <div class="absolute w-full h-screen flex">
+        <div>
         <transition name="fade">
-            <SubjectList v-if="modeEdit" class="absolute z-20" @updateCourses="handleUpdateCourses" @initializeIds="handleInitializeIds"/>
+            <SubjectList v-if="modeEdit" class="z-20" @updateCourses="handleUpdateCourses" @initializeIds="handleInitializeIds" />
         </transition>
-    </div>
+        </div>
    
-    <SelectCalendar :visible="visible" type="schedule" :schedule="selectedCourses" @updateModeEdit="handleUpdateModeEdit" @saveEdit="handleSaveEdit"/>
+        <SelectCalendar :visible="visible" type="schedule" :schedule="selectedCourses" @updateModeEdit="handleUpdateModeEdit" @saveEdit="handleSaveEdit"
+        />
+    </div>
 </template>
   
 <script setup>
-import { onMounted, ref } from "vue";
-import SubjectList from "./SubjectList.vue";
-import SelectCalendar from "./SelectCalendar.vue";
+import { onMounted, ref, watch } from "vue";
+import SubjectList from "@/components/SubjectList.vue";
+import SelectCalendar from "@/components/SelectCalendar.vue";
 import UserService from "@/services/UserService";
 import CourseService from "@/services/CourseService";
 import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
 
-const modeEdit = ref(false);
 const authStore = useAuthStore();
 const visible = ref(false);
 const selectedCoursesIds = ref([]);
 const selectedCourses = ref([]);
 const originalCoursesIds = ref([]);
 const originalCourses = ref([]);
+const router = useRouter();
+const modeEdit = ref(router.currentRoute.value.path.includes('edit'));
 
 function handleUpdateModeEdit(newMode){
-    modeEdit.value = newMode;
+    if (newMode) {
+        router.push('/user/schedule/edit')
+    } else {
+        router.push('/user/schedule')
+    }
 }
 
 function handleInitializeIds(initializeCoursesIds){
@@ -43,21 +52,24 @@ async function handleUpdateCourses(coursesSelectedIdsData) {
 function handleSaveEdit() {
     originalCoursesIds.value.forEach(originalCourseId => {
         if(!selectedCoursesIds.value.includes(originalCourseId)) {
-            console.log("Se elimino la asignatura con el ID:", originalCourseId);
             originalCoursesIds.value = originalCoursesIds.value.filter(originalCourseIdFilter => originalCourseIdFilter !== originalCourseId);
-            
             UserService.deleteAsignatura(authStore.userId ,originalCourseId);
         }
     });
     selectedCoursesIds.value.forEach(selectedCourseId => {
         if (!originalCoursesIds.value.includes(selectedCourseId)) {
-            console.log("Se agrego la asignatura con el ID:", selectedCourseId);
             originalCoursesIds.value.push(selectedCourseId);
-
             UserService.registerAsignatura(authStore.userId , selectedCourseId);
         }
     })
 };
+
+watch(() => router.currentRoute.value.path, (newPath) => {
+    console.log('modeEdit actual:', modeEdit.value);
+    console.log('Ruta actual:', newPath);  
+    modeEdit.value = newPath.includes('edit');
+    console.log('modeEdit:', modeEdit.value);  
+})
 
 onMounted(async () => {
     originalCourses.value = await UserService.getHorarioByUserId(authStore.userId);
