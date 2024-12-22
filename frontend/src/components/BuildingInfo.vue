@@ -1,5 +1,5 @@
 <template>
-  <n-card :title="building.nombre" class="mb-0 min-w-[300px] max-w-[350px] h-screen pb-[40px]">
+  <n-card :title="building.nombre" class="min-w-[300px] max-w-[350px] h-screen rounded-none" :bordered="false">
     {{ building.alias }}
     <n-tabs type="line" animated>
       <n-tab-pane name="descripcion general" tab="Descripción general">
