@@ -1,6 +1,7 @@
 package org.ufromap.feature.auth.services.impl;
 
 import org.ufromap.core.utils.JwtUtil;
+import org.ufromap.core.utils.PasswordUtil;
 import org.ufromap.core.utils.Validator;
 import org.ufromap.feature.auth.dto.RegisterRequestDTO;
 import org.ufromap.feature.auth.services.IAuthService;
@@ -20,15 +21,12 @@ public class AuthService implements IAuthService {
     public AuthService() {
         this.usuarioRepository = new UsuarioRepository();
     }
-    @Override
-    public Usuario validarCredenciales(String correo, String contrasenia){
-        return usuarioRepository.findByCorreoYContrasenia(correo, contrasenia)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
-    }
 
     @Override
     public String login (String correo, String contrasenia){
-        Usuario usuario = validarCredenciales(correo, contrasenia);
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .filter(u -> PasswordUtil.matchesPassword(contrasenia, u.getContrasenia()))
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         return JwtUtil.generateToken(usuario);
     }
 
@@ -51,7 +49,8 @@ public class AuthService implements IAuthService {
     @Override
     public void register(RegisterRequestDTO registerRequestDTO) {
         validateRegisterRequest(registerRequestDTO);
-        Usuario usuario = new Usuario(0, "USER", registerRequestDTO.getNombre(), registerRequestDTO.getCorreo(), registerRequestDTO.getContrasenia());
+        String passwordHash = PasswordUtil.encodePassword(registerRequestDTO.getContrasenia());
+        Usuario usuario = new Usuario(0, "USER", registerRequestDTO.getNombre(), registerRequestDTO.getCorreo(), passwordHash);
         usuarioRepository.add(usuario);
     }
 

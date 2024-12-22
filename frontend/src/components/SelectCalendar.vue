@@ -4,30 +4,38 @@
          v-if="visible">
       <div class="flex flex-col w-1/2 mx-auto mt-12 items-end gap-4">
         <div v-if="!add" class="flex space-x-2">
-          <transition name="fade">
-          <n-button strong secondary circle type="error" class="w-fit px-2.5" v-if="modeEdit" @click="handleCancelEdit">
+          <div class="flex space-x-2" v-if="type==='schedule'">
+            <transition name="fade">
+              <n-button strong secondary circle type="error" class="w-fit px-2.5" v-if="modeEdit"
+                        @click="handleCancelEdit">
                 <template #icon>
-                    <n-icon><PresenceBlocked16Regular/></n-icon>
+                  <n-icon>
+                    <PresenceBlocked16Regular/>
+                  </n-icon>
                 </template>
                 Cancelar
-            </n-button>
-          </transition>
-          <transition name="fade">
-            <n-button strong secondary circle type="success" class="w-fit px-2.5" v-if="modeEdit" @click="handleSaveEdit">
+              </n-button>
+            </transition>
+            <transition name="fade">
+              <n-button strong secondary circle type="success" class="w-fit px-2.5" v-if="modeEdit"
+                        @click="handleSaveEdit">
                 <template #icon>
-                    <n-icon><Save20Regular/></n-icon>
+                  <n-icon>
+                    <Save20Regular/>
+                  </n-icon>
                 </template>
                 Guardar
+              </n-button>
+            </transition>
+            <n-button quaternary circle @click="handleModeEdit">
+              <template #icon>
+                <n-icon>
+                  <Add12Regular
+                  />
+                </n-icon>
+              </template>
             </n-button>
-          </transition>
-                <n-button quaternary circle @click="handleModeEdit">
-                <template #icon>
-                    <n-icon>
-                    <Add12Regular
-                    />
-                    </n-icon>
-                </template>
-                </n-button>
+          </div>
           <n-button quaternary circle @click="close">
             <template #icon>
               <n-icon>
@@ -83,7 +91,7 @@
 </template>
 
 <script setup>
-import { Dismiss20Regular, Add12Regular, Save20Regular, PresenceBlocked16Regular  } from "@vicons/fluent";
+import {Dismiss20Regular, Add12Regular, Save20Regular, PresenceBlocked16Regular} from "@vicons/fluent";
 import UserService from "@/services/UserService";
 import CourseService from "@/services/CourseService";
 import ClassroomService from "@/services/ClassroomService";
@@ -100,11 +108,11 @@ const props = defineProps({
     type: String,
     required: true
   },
-  add : {
+  add: {
     type: Boolean,
     default: false
   },
-  edit : {
+  edit: {
     type: Boolean,
     default: false
   },
@@ -119,7 +127,7 @@ const props = defineProps({
   schedule: {
     type: Array,
     required: false
-  }
+  },
 });
 const emits = defineEmits(["close", "save", "updateModeEdit", "saveEdit", "initializeIds"]);
 
@@ -157,7 +165,7 @@ const addLecture = (array) => {
     ...LecturesService.lectureToHorarioLecture(props.lecture),
     periodo: array[0],
     diaSemana: array[1],
-    newLecture : true
+    newLecture: true
   });
 };
 const delLecture = (array) => {
@@ -181,14 +189,14 @@ const save = () => {
 function handleModeEdit() {
   modeEdit.value = !modeEdit.value;
   emits('updateModeEdit', modeEdit.value);
-} 
+}
 
-function handleCancelEdit(){
+function handleCancelEdit() {
   modeEdit.value = false;
   emits('updateModeEdit', modeEdit.value);
 }
 
-function handleSaveEdit(){
+function handleSaveEdit() {
   emits("saveEdit");
 }
 
@@ -197,7 +205,7 @@ watch(() => [props.id, props.visible, props.schedule], async () => {
   if (!props.visible) return;
   switch (props.type) {
     case "course":
-      originalLectures.value = await ervice.getHorarioByCourseId(props.id);
+      originalLectures.value = await CourseService.getHorarioByCourseId(props.id);
       break;
     case "classroom":
       originalLectures.value = await ClassroomService.getHorarioByClassroomId(props.id);
