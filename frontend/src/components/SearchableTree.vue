@@ -1,5 +1,6 @@
 <template>
-    <div class="w-80 space-y-3 p-3 rounded-xl opacity-90 overflow-x-auto"
+    <div 
+    class="w-80 space-y-3 p-3 rounded-xl opacity-90 overflow-x-auto"
     @mouseleave="changeShowTree(false)"
     @click="changeShowTree(true)"
     >
@@ -12,7 +13,7 @@
             :data="data"
             block-line
             @update:selected-keys="handleSelectionNode"
-            class="rounded-xl p-2"
+            class="rounded-xl p-2 bg-zinc-800"
         />
     </div>
 </template>
@@ -67,12 +68,12 @@ function updateTreeData() {
             key: "0",
             children: edificios.value.map(edificio => ({
             label: edificio.alias ? edificio.alias : edificio.nombre,
-            key: `edificio-${edificio.id}`,
+            key: `building-${edificio.id}`,
             children: salas.value
             .filter(sala => sala.edificio.id === edificio.id)
                 .map(sala => ({
                     label: sala.nombre,
-                    key: `sala-${sala.id}`,
+                    key: `building-${edificio.id}`,
                 }))
             })),
         },
@@ -81,7 +82,7 @@ function updateTreeData() {
             key: "1",
             children: asignaturas.value.map(asignatura => ({
                 label: asignatura.nombre,
-                key: `asignatura-${asignatura.id}`
+                key: `course-${asignatura.id}`
             }))
         }
     ];
