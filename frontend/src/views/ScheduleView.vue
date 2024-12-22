@@ -1,5 +1,5 @@
 <template>
-    <div class="absolute w-full h-screen flex z-10">
+    <div class="absolute w-full h-screen flex">
         <div>
         <transition name="fade">
             <SubjectList v-if="modeEdit" class="z-20" @updateCourses="handleUpdateCourses" @initializeIds="handleInitializeIds" />

@@ -12,6 +12,8 @@ import { useAuthStore} from "@/stores/auth.js";
 import PageNotFoundView from "@/views/PageNotFoundView.vue";
 import RegisterView from "@/views/RegisterView.vue";
 import ProfileView from "@/views/ProfileView.vue";
+import ScheduleView from '@/views/ScheduleView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

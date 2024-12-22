@@ -12,9 +12,13 @@
       </n-button>
     </router-link>
   </div>
+  <div class="absolute left-5 top-5">
+    <SearchableTree/>
+  </div>
 </template>
 
 <script setup>
 import {CalendarMonth20Filled as CalendarIcon} from "@vicons/fluent";
 import { Person20Filled as PersonIcon } from "@vicons/fluent";
+import SearchableTree from "@/components/SearchableTree.vue";
 </script>
