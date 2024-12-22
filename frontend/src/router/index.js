@@ -9,9 +9,12 @@ import ClasesView from '@/views/ClasesView.vue'
 import MapView from "@/views/MapView.vue";
 import HomeView from "@/views/HomeView.vue";
 import BuildingInfoView from '@/views/BuildingInfoView.vue';
-import { useAuthStore} from "@/stores/auth.js";
 import PageNotFoundView from "@/views/PageNotFoundView.vue";
-
+import RegisterView from "@/views/RegisterView.vue";
+import ProfileView from "@/views/ProfileView.vue";
+import CoursePreviewView from "@/views/CoursePreviewView.vue";
+import { useAuthStore} from "@/stores/auth.js";
+import CourseScheduleView from "@/views/CourseScheduleView.vue";
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -28,12 +31,13 @@ const router = createRouter({
       path: '/home',
       name: 'Home',
       component: HomeView,
-        meta: { requiresAuth: true },
+      meta: { requiresAuth: true },
     },
     {
       path: '/edificio/:id',
       name: 'Edificio',
-      component: BuildingInfoView
+      component: BuildingInfoView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/admin',
@@ -81,6 +85,29 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       name: 'NotFound',
       component: PageNotFoundView,
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      component: RegisterView,
+    },
+    {
+      path: "/profile",
+      name: "Profile",
+      component: ProfileView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/course/:id",
+      name: "CoursePreview",
+      component: CoursePreviewView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/course/:id/horario",
+      name: "CourseSchedule",
+      component: CourseScheduleView,
+      meta: { requiresAuth: true },
     }
   ],
 })
@@ -88,7 +115,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   await new Promise((resolve) => setTimeout(resolve, 150));
-  if (to.name === 'Login' && authStore.isAuthenticated) {
+  if ((to.name === 'Login' || to.name === 'Register') && authStore.isAuthenticated) {
     next({ name: 'AdminHome'});
   } else if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'Login' });

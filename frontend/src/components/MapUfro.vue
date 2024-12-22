@@ -1,15 +1,21 @@
 <template>
- <div id="map" class="border w-full h-full rounded-xl overflow-hidden"></div>
+    <div id="map" class="w-full h-full overflow-hidden" :class="{'border rounded-xl' : !full}"></div>
 </template>
 
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import BuildingsService from "@/services/BuildingsService.js";
+import { useMapStore } from "@/stores/map.js";
 import 'mapbox-gl/dist/mapbox-gl.css'
 import {onMounted} from 'vue'
 
+const mapStore = useMapStore()
 const props = defineProps({
   edit : {
+    type : Boolean,
+    default : false
+  },
+  full : {
     type : Boolean,
     default : false
   }
@@ -56,7 +62,6 @@ const labels = () => {
         },
         properties : {
           description : location.aliasEdificio ? location.aliasEdificio : location.nombreEdificio,
-          icon : 'building'
         }
       }
     })
@@ -124,6 +129,7 @@ onMounted(async () => {
         loadMarkers()
       }
     })
+    map.resize()
   })
 })
 

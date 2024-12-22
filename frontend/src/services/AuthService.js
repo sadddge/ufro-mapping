@@ -19,6 +19,10 @@ class AuthService {
             return response.data;
         }
 
+        async changePassword(userId, oldPassword, newPassword) {
+
+        }
+
         register(username, email, password) {
             return axiosInstance.post('/auth/register', {
                 nombre: username,

@@ -33,3 +33,17 @@ export const openNewEntityDialog = (dialog, entity, title, content, confirm) => 
         onPositiveClick: () => confirm(entity),
     });
 };
+
+export const openErorrDialog = (dialog, title, content, confirm) => {
+    dialog.error({
+        title: title,
+        content: content,
+        positiveText: 'Aceptar',
+        negativeText: 'Cancelar',
+        onPositiveClick: () => confirm(),
+        showIcon: false,
+        closable: false,
+    });
+}
+export const openConfirmDialog = (dialog, title, content, confirm) => {
+}
