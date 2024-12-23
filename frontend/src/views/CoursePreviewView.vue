@@ -1,5 +1,4 @@
 <template>
-  <MainLayout/>
   <div class="absolute inset-0 overflow-auto backdrop-blur-sm bg-black bg-opacity-50 z-10 select-none flex justify-center items-center">
     <div class="flex flex-col items-start gap-4" v-if="visible">
       <n-button circle quaternary @click="visible = false">
@@ -26,7 +25,6 @@
   import {useAuthStore} from "@/stores/auth.js";
   import CourseService from "@/services/CourseService.js";
   import { useRoute } from "vue-router";
-  import MainLayout from "@/layouts/MainLayout.vue";
 
   const route = useRoute();
   const store = useAuthStore();
