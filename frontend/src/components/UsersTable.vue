@@ -60,7 +60,6 @@ const newUserDialog = () => {
 //ConfirmDialogs
 const saveEditDialog = async (user) => {
   const response = await UserService.updateUser(user.id, user);
-  console.log(response);
 
   if (response.error) {
     dialog.error({

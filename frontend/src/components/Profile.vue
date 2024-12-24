@@ -359,7 +359,6 @@ const handleValidateButtonClick = (e) => {
       showChangePasswordModal.value = false;
 
     } else {
-      console.log(errors);
       message.error("Invalid");
     }
   });

@@ -95,7 +95,6 @@ const rules = {
 const register = () => {
   try {
     if (model.value.contrasenia !== model.value.nuevaContrasenia) {
-      console.log('Las contraseñas no coinciden')
       return
     }
     AuthService.register(model.value.nombre, model.value.correo, model.value.contrasenia).then((response) => {

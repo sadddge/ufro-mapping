@@ -62,10 +62,7 @@ function handleSaveEdit() {
 };
 
 watch(() => router.currentRoute.value.path, (newPath) => {
-  console.log('modeEdit actual:', modeEdit.value);
-  console.log('Ruta actual:', newPath);
   modeEdit.value = newPath.includes('edit');
-  console.log('modeEdit:', modeEdit.value);
 })
 
 onMounted(async () => {
