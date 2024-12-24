@@ -6,8 +6,12 @@
 import mapboxgl from 'mapbox-gl'
 import BuildingsService from "@/services/BuildingsService.js";
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { useMapStore } from "@/stores/map.js";
+import { useRouter } from "vue-router";
 import {onMounted} from 'vue'
 
+
+const router = useRouter()
 const props = defineProps({
   edit : {
     type : Boolean,
@@ -19,8 +23,8 @@ const props = defineProps({
   }
 })
 
+const store = useMapStore()
 const locations = ref([])
-const draggable = ref(true)
 const markers = defineModel('markers', { default: () => [] });
 
 let map
@@ -31,8 +35,6 @@ function loadMapOptions() {
       [-72.618526, -38.749286], // Southwest coordinates
       [-72.616962, -38.747043], // Northeast coordinates
     ]
-    map.setMaxBounds(bounds)
-    map.setMinZoom(16.68)
     map.addControl(new mapboxgl.FullscreenControl(), 'bottom-right')
     map.addControl(new mapboxgl.NavigationControl(), 'bottom-right')
     map.doubleClickZoom.disable()
@@ -42,8 +44,17 @@ function loadMap() {
   map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/sadddge/cm3jf11rm00hr01ry6y6aa2hz',
-    center: [-72.617774, -38.747853],
-    zoom: 16.68,
+    maxBounds: [
+      [
+        -72.62066302172195,
+        -38.74978398069317
+      ], // Southwest coordinates
+      [
+        -72.61417286108734,
+        -38.745525470109335
+      ], // Northeast coordinates
+    ],
+    minZoom: 16.68,
     pitch: 12,
   })
 }
@@ -71,17 +82,29 @@ const loadMarkers = () => {
     const popup = new mapboxgl.Popup({ closeButton: false
     }).setHTML(`<div class="bg-zinc-900 p-4 border rounded-md hover:pointer">${name}</div>`)
     const marker = new mapboxgl.Marker({
-      draggable: draggable.value,
+      draggable: props.edit,
+      scale: 0.75
     })
         .setLngLat([location.longitud, location.latitud])
-        .setPopup(popup)
         .addTo(map)
+
+    if (props.edit) {
+      marker.setPopup(popup)
+      popup.addTo(map)
+    } else {
+
+      marker.getElement().addEventListener('click', () => {
+        router.push({
+          name: 'Edificio',
+          params: { id: location.idEdificio },
+        })
+      })
+    }
+
     markers.value.push({
       marker : marker,
       id : location.idEdificio
     })
-    popup.addTo(map)
-
   })
 }
 
@@ -123,11 +146,10 @@ onMounted(async () => {
           'text-halo-width': 1,
         },
       })
-      if (props.edit) {
-        loadMarkers()
-      }
+      loadMarkers()
     })
     map.resize()
+    store.setMap(map)
   })
 })
 
