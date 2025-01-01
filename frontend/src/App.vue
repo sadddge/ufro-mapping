@@ -3,7 +3,7 @@
     <n-config-provider :theme="darkTheme" class="w-full h-full">
       <n-message-provider>
         <n-dialog-provider>
-          <MapUfro full class="h-screen" v-if="mapStore.showMap"/>
+          <MainLayout v-if="mapStore.showMap"/>
           <RouterView />
         </n-dialog-provider>
       </n-message-provider>
@@ -15,7 +15,7 @@
 import { RouterView } from 'vue-router'
 import { darkTheme } from 'naive-ui'
 import { useMapStore } from "@/stores/map.js";
-import MapUfro from "@/components/MapUfro.vue";
+import MainLayout from "@/layouts/MainLayout.vue";
 const mapStore = useMapStore()
 </script>
 

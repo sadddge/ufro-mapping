@@ -36,7 +36,7 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/edificio/:id',
+      path: '/building/:id',
       name: 'Edificio',
       component: BuildingInfoView,
       meta: { requiresAuth: true },

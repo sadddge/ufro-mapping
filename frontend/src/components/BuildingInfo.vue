@@ -1,6 +1,13 @@
 <template>
   <n-card :title="building.nombre" class="min-w-[300px] max-w-[350px] h-screen rounded-none" :bordered="false">
     {{ building.alias }}
+    <router-link :to="{ name: 'Home' }">
+      <n-button text class="absolute top-4 right-4">
+        <n-icon>
+          <Dismiss20Filled />
+        </n-icon>
+      </n-button>
+    </router-link>
     <n-tabs type="line" animated>
       <n-tab-pane name="descripcion general" tab="Descripción general">
         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid assumenda culpa dolorum est facere harum in
@@ -32,7 +39,7 @@
 <script setup>
 import BuildingsService from '@/services/BuildingsService';
 import { onMounted } from 'vue';
-import {CalendarMonth20Filled as CalendarIcon} from '@vicons/fluent';
+import {Dismiss20Filled, CalendarMonth20Filled as CalendarIcon} from '@vicons/fluent';
 
 const props = defineProps({
   id: {

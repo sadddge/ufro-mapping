@@ -53,8 +53,10 @@ function changeShowTree(isVisible) {
     showTree.value = isVisible;
 }
 
-function handleSelectionNode(selectedKey) {  
+function handleSelectionNode(selectedKey) {
     const partsKey = selectedKey[0].split("-");
+
+    if (partsKey.length === 1) return;
 
     router.push({
         path: `/${partsKey[0]}/${partsKey[1]}`

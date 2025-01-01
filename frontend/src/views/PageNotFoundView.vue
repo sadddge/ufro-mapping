@@ -6,9 +6,13 @@
 </template>
 
 <script setup>
+import { useMapStore } from "@/stores/map.js";
 
+const mapStore = useMapStore()
+onMounted(() => {
+  if (mapStore.showMap) {
+    mapStore.showMap = false
+  }
+})
 </script>
 
-<style scoped>
-
-</style>

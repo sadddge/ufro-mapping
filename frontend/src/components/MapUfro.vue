@@ -5,11 +5,9 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import BuildingsService from "@/services/BuildingsService.js";
-import { useMapStore } from "@/stores/map.js";
 import 'mapbox-gl/dist/mapbox-gl.css'
 import {onMounted} from 'vue'
 
-const mapStore = useMapStore()
 const props = defineProps({
   edit : {
     type : Boolean,
