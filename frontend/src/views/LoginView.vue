@@ -1,6 +1,6 @@
 <template>
   <div class="h-screen flex flex-col gap-10 overflow-hidden items-center justify-center">
-    <div class="shadow-lg border border-[rgb(48,47,52)] rounded-xl w-1/3 p-10 flex flex-col gap-6">
+    <div class="shadow-lg border border-[rgb(48,47,52)] rounded-xl w-1/3 min-w-[350px] p-10 flex flex-col gap-6">
       <h1 class="text-3xl text-center">Login</h1>
       <n-form ref="formRef" :model="model" :rules="rules">
         <n-form-item path="correo" label="Correo">
@@ -13,7 +13,7 @@
           </n-input>
         </n-form-item>
         <n-form-item path="contrasenia" label="Contraseña">
-          <n-input type="password" show-password-on="mousedown" placeholder="Ingrese su contraseña" v-model:value="model.contrasenia">
+          <n-input type="password" show-password-on="click" placeholder="Ingrese su contraseña" v-model:value="model.contrasenia">
             <template #prefix>
               <n-icon size="20">
                 <LockClosed16Filled />
@@ -81,7 +81,6 @@ const login = () => {
       }
     })
   } catch (err) {
-    console.log(err)
     error.value = err.data.error
   }
 }

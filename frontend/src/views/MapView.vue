@@ -36,7 +36,6 @@ const cancelEdit = () => {
 const saveEdit = () => {
   edit.value = false;
   markers.value.forEach((marker) => {
-    console.log(marker)
     const lnglat = marker.marker.getLngLat();
     BuildingsService.updateBuilding(marker.id, {latitud: lnglat.lat, longitud: lnglat.lng})
   })

@@ -144,13 +144,11 @@ const expandedSlot = ref(null);
 const modeEdit = ref(false);
 
 const handleExpand = (slot) => {
-  console.log(slot);
   if (expandedSlot.value) {
     expandedSlot.value = expandedSlot.value[0] === slot[0] && expandedSlot.value[1] === slot[1] ? null : slot;
   } else {
     expandedSlot.value = slot;
   }
-  console.log(expandedSlot.value);
 };
 const isExpanded = (slot) => {
   return expandedSlot.value && expandedSlot.value[0] === slot[0] && expandedSlot.value[1] === slot[1];
