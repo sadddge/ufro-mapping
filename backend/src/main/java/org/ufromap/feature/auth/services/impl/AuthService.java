@@ -47,6 +47,21 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    public void changePassword(String token, String oldPassword, String newPassword) {
+        if (!validateSession(token)) {
+            throw new BadRequestException("Invalid session");
+        }
+        Usuario usuario = usuarioRepository.findById(JwtUtil.getUserId(token))
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+        if (PasswordUtil.matchesPassword(oldPassword, usuario.getContrasenia())) {
+            usuario.setContrasenia(PasswordUtil.encodePassword(newPassword));
+            usuarioRepository.update(usuario);
+        } else {
+            throw new BadRequestException("Contraseña incorrecta");
+        }
+    }
+
+    @Override
     public void register(RegisterRequestDTO registerRequestDTO) {
         validateRegisterRequest(registerRequestDTO);
         String passwordHash = PasswordUtil.encodePassword(registerRequestDTO.getContrasenia());

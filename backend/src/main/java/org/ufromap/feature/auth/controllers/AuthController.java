@@ -37,6 +37,20 @@ public class AuthController extends BaseController {
         sendMessage(response, "Login successful");
     }
 
+    @PostMapping("/change-password")
+    public void changePassword(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        JSONObject jsonObject = getJson(request);
+        Cookie tokenCookie = CookieUtil.getTokenCookie(request);
+        if (tokenCookie == null) {
+            throw new UnauthorizedException("Invalid session");
+        }
+        String token = tokenCookie.getValue();
+        String oldPassword = jsonObject.optString("oldPassword", null);
+        String newPassword = jsonObject.optString("newPassword", null);
+        authService.changePassword(token, oldPassword, newPassword);
+        sendMessage(response, "Password changed successfully");
+    }
+
     @PostMapping("/register")
     public void register(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);

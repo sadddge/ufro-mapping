@@ -8,5 +8,6 @@ public interface IAuthService {
     String login(String correo, String contrasenia);
     boolean validateSession(String token);
     UserInfoDTO getUserInfo(String token);
+    void changePassword(String token, String oldPassword, String newPassword);
     void register(RegisterRequestDTO registerRequestDTO);
 }
