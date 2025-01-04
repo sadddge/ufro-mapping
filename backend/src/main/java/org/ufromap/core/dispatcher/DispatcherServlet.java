@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -102,8 +103,9 @@ public class DispatcherServlet extends HttpServlet {
             }
             Object[] args = resolveMethodArguments(handler, path, req, resp);
             handler.invoke(handler.getDeclaringClass().getConstructor().newInstance(), args);
+        } catch (InvocationTargetException e) {
+            handleException(e.getCause(), resp);
         } catch (Exception e) {
-            e.printStackTrace();
             handleException(e, resp);
         }
 
@@ -112,6 +114,7 @@ public class DispatcherServlet extends HttpServlet {
     private void handleException(Throwable ex, HttpServletResponse resp) {
         try {
             Method handler = globalExceptionHandler.getHandler(ex.getClass());
+            System.out.println(ex.getClass().getName());
             if (handler != null) {
                 handler.invoke(new ExceptionHandlers(), ex, resp);
             } else {

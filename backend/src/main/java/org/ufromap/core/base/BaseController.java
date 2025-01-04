@@ -18,7 +18,8 @@ public abstract class BaseController extends HttpServlet {
 
     protected void sendObject(HttpServletResponse response, Object object) throws IOException {
         setJsonResponse(response);
-        response.getWriter().write(new Gson().toJson(object));
+        Object obj = object instanceof JSONObject ? object : new Gson().toJson(object);
+        response.getWriter().write(obj.toString());
     }
 
     protected void sendMessage(HttpServletResponse response, String message) throws IOException {
