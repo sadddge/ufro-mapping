@@ -54,7 +54,7 @@ public class AuthService implements IAuthService {
         Usuario usuario = usuarioRepository.findById(JwtUtil.getUserId(token))
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         if (PasswordUtil.matchesPassword(oldPassword, usuario.getContrasenia())) {
-            usuario.setContrasenia(PasswordUtil.encodePassword(newPassword));
+                usuario.setContrasenia(PasswordUtil.encodePassword(newPassword));
             usuarioRepository.update(usuario);
         } else {
             throw new BadRequestException("Contraseña incorrecta");

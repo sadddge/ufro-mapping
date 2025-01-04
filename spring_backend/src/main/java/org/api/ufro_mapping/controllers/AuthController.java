@@ -3,6 +3,7 @@ package org.api.ufro_mapping.controllers;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.api.ufro_mapping.dto.request.ChangePasswordDTO;
 import org.api.ufro_mapping.dto.request.LoginRequestDTO;
 import org.api.ufro_mapping.dto.request.UserRegisterDTO;
 import org.api.ufro_mapping.jwt.JwtProvider;
@@ -41,6 +42,15 @@ public class AuthController {
     public ResponseEntity<String> register(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
         authService.register(userRegisterDTO);
         return ResponseEntity.ok("Registration successful");
+    }
+
+    @PostMapping("/change-password")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordDTO changePasswordDTO, HttpServletRequest request) {
+        String token = jwtProvider.getTokenFromCookie(request);
+        Long userId = jwtProvider.getUserId(token);
+        authService.changePassword(userId, changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword());
+        return ResponseEntity.ok("Password changed successfully");
     }
 
     @PostMapping("/validate")

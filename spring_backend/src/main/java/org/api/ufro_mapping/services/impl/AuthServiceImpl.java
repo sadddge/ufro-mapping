@@ -1,5 +1,6 @@
 package org.api.ufro_mapping.services.impl;
 import lombok.extern.java.Log;
+import org.api.ufro_mapping.dto.request.ChangePasswordDTO;
 import org.api.ufro_mapping.dto.request.UserRegisterDTO;
 import org.api.ufro_mapping.dto.response.GeneralUserInfoDTO;
 import org.api.ufro_mapping.jwt.JwtProvider;
@@ -63,4 +64,17 @@ public class AuthServiceImpl implements IAuthService {
         user.setRole(new Role("USER", null));
         userRepository.save(user);
     }
+
+    @Override
+    public void changePassword(Long id, String oldPassword, String newPassword) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        if (passwordEncoder.matches(oldPassword, user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        } else {
+            throw new RuntimeException("Invalid password");
+        }
+    }
+
+
 }
