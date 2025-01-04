@@ -69,11 +69,16 @@ public class UsuarioController extends BaseController {
 
     @PostMapping("/{id}/asignaturas/{asignaturaId}")
     @Protected(roles = {"USER", "ADMIN"})
-    public void addInscripcion(@PathParam("id") String id, @PathParam("asignaturaId") String asignaturaId, HttpServletResponse response) throws IOException {
+    public void addInscripcion(@PathParam("id") String id, @PathParam("asignaturaId") String asignaturaId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         int asignaturaIdInt = Integer.parseInt(asignaturaId);
-        InscripcionDTO responseDTO = inscripcionService.add(new InscripcionRequestDTO(userId, asignaturaIdInt));
-        sendObject(response, responseDTO);
+        if (usuarioService.validateUser(request, userId)) {
+            InscripcionRequestDTO inscripcionRequestDTO = new InscripcionRequestDTO(userId, asignaturaIdInt);
+            InscripcionDTO inscripcion = inscripcionService.add(inscripcionRequestDTO);
+            sendObject(response, inscripcion);
+        } else {
+            sendError(response, HttpServletResponse.SC_BAD_REQUEST, "Ya inscrito en la asignatura");
+        }
     }
 
     @PutMapping("/{id}")
@@ -82,25 +87,37 @@ public class UsuarioController extends BaseController {
         JSONObject jsonObject = getJson(request);
         UsuarioRequestDTO usuarioRequestDTO = mapJsonToEntity(jsonObject);
         int userId = Integer.parseInt(id);
-        UsuarioDTO usuario = usuarioService.update(userId, usuarioRequestDTO);
-        sendObject(response, usuario);
+        if (usuarioService.validateUser(request, userId)) {
+            UsuarioDTO usuario = usuarioService.update(userId, usuarioRequestDTO);
+            sendObject(response, usuario);
+        } else {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
+        }
     }
 
     @DeleteMapping("/{id}")
     @Protected(roles = {"ADMIN", "USER"})
-    public void delete(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+    public void delete(@PathParam("id") String id, HttpServletRequest req, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
-        usuarioService.delete(userId);
-        sendObject(response, null);
+        if (usuarioService.validateUser(req, userId)) {
+            usuarioService.delete(userId);
+            sendMessage(response, "Usuario eliminado");
+        } else {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
+        }
     }
 
     @DeleteMapping("/{id}/asignaturas/{asignaturaId}")
     @Protected(roles = {"USER", "ADMIN"})
-    public void deleteInscripcion(@PathParam("id") String id, @PathParam("asignaturaId") String asignaturaId, HttpServletResponse response) throws IOException {
+    public void deleteInscripcion(@PathParam("id") String id, @PathParam("asignaturaId") String asignaturaId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         int userId = Integer.parseInt(id);
         int asignaturaIdInt = Integer.parseInt(asignaturaId);
-        inscripcionService.deleteByUsuarioIdAndAsignaturaId(userId, asignaturaIdInt);
-        sendObject(response, null);
+        if (usuarioService.validateUser(request, userId)) {
+            inscripcionService.deleteByUsuarioIdAndAsignaturaId(userId, asignaturaIdInt);
+            sendMessage(response, "Inscripcion eliminada");
+        } else {
+            sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "No autorizado");
+        }
     }
 
 

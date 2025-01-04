@@ -13,6 +13,7 @@ import org.ufromap.core.annotations.PostMapping;
 import org.ufromap.core.annotations.RequestMapping;
 import org.ufromap.core.base.BaseController;
 import org.ufromap.core.exceptions.UnauthorizedException;
+import org.ufromap.core.utils.CookieUtil;
 import org.ufromap.feature.auth.dto.RegisterRequestDTO;
 import org.ufromap.feature.users.dto.UserInfoDTO;
 import org.ufromap.feature.auth.services.impl.AuthService;
@@ -32,7 +33,7 @@ public class AuthController extends BaseController {
         String correo = jsonObject.optString("correo", null);
         String contrasenia = jsonObject.optString("contrasenia", null);
         String token = authService.login(correo, contrasenia);
-        addTokenCookie(response, token);
+        CookieUtil.addTokenCookie(response, token);
         sendMessage(response, "Login successful");
     }
 
@@ -50,7 +51,7 @@ public class AuthController extends BaseController {
 
     @PostMapping("/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
-        Cookie tokenCookie = getTokenCookie(request);
+        Cookie tokenCookie = CookieUtil.getTokenCookie(request);
         if (tokenCookie != null) {
             System.out.println("Removing token cookie");
             System.out.println(tokenCookie.getName());
@@ -64,7 +65,7 @@ public class AuthController extends BaseController {
 
     @GetMapping("/validate-session")
     public void validateSession(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Cookie tokenCookie = getTokenCookie(request);
+        Cookie tokenCookie = CookieUtil.getTokenCookie(request);
         if (tokenCookie == null) {
             sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "Invalid session");
             return;
@@ -78,29 +79,10 @@ public class AuthController extends BaseController {
 
     @GetMapping("/user-info")
     public void getUserInfo(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Cookie tokenCookie = getTokenCookie(request);
+        Cookie tokenCookie = CookieUtil.getTokenCookie(request);
         UserInfoDTO userInfo = authService.getUserInfo(tokenCookie.getValue());
         sendObject(response, userInfo);
     }
 
-    private Cookie getTokenCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            throw new UnauthorizedException("Token cookie not found");
-        }
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> "token".equals(cookie.getName()))
-                .findFirst()
-                .orElseThrow(() -> new UnauthorizedException("Token cookie not found"));
-    }
 
-    private void addTokenCookie(HttpServletResponse response, String token) {
-        Cookie cookie = new Cookie("token", token);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(3600);
-        response.addHeader("Set-Cookie", cookie.getName() + "=" + cookie.getValue()
-                + "; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=" + cookie.getMaxAge());
-        response.addCookie(cookie);
-    }
 }

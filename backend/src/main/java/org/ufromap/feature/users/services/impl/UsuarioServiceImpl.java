@@ -1,5 +1,7 @@
 package org.ufromap.feature.users.services.impl;
 
+import org.ufromap.core.utils.CookieUtil;
+import org.ufromap.core.utils.JwtUtil;
 import org.ufromap.core.utils.Validator;
 import org.ufromap.feature.users.dto.UsuarioRequestDTO;
 import org.ufromap.feature.lectures.dto.HorarioClaseDTO;
@@ -10,6 +12,7 @@ import org.ufromap.feature.users.models.Usuario;
 import org.ufromap.repositories.UsuarioRepository;
 import org.ufromap.feature.users.services.IUsuarioService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -85,5 +88,14 @@ public class UsuarioServiceImpl implements IUsuarioService {
     @Override
     public List<HorarioClaseDTO> getHorarioByUsuarioId(int id) {
         return null;
+    }
+
+    @Override
+    public boolean validateUser(HttpServletRequest req, int id) {
+        String token = CookieUtil.getTokenCookie(req).getValue();
+        if ("ADMIN".equals(JwtUtil.getUserRole(token))) {
+            return true;
+        }
+        return id == JwtUtil.getUserId(token);
     }
 }
