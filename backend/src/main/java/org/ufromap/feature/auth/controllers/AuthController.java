@@ -30,9 +30,9 @@ public class AuthController extends BaseController {
     @PostMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject jsonObject = getJson(request);
-        String correo = jsonObject.optString("correo", null);
+        String usernameOrEmail = jsonObject.optString("usernameOrEmail", null);
         String contrasenia = jsonObject.optString("contrasenia", null);
-        String token = authService.login(correo, contrasenia);
+        String token = authService.login(usernameOrEmail, contrasenia);
         CookieUtil.addTokenCookie(response, token);
         sendMessage(response, "Login successful");
     }

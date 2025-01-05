@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 export const useMapStore = defineStore('map', () => {
-    const showMap = ref(true)
+    const showMap = ref(false)
     const mapRef = ref(null)
 
     const setMap = (map) => {

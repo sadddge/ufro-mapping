@@ -23,8 +23,9 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public String login (String correo, String contrasenia){
-        Usuario usuario = usuarioRepository.findByCorreo(correo)
+    public String login (String usernameOrEmail, String contrasenia){
+        Usuario usuario = usuarioRepository.findByCorreo(usernameOrEmail)
+                .or(() -> usuarioRepository.findByNombre(usernameOrEmail))
                 .filter(u -> PasswordUtil.matchesPassword(contrasenia, u.getContrasenia()))
                 .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
         return JwtUtil.generateToken(usuario);

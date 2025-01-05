@@ -3,8 +3,8 @@
     <div class="shadow-lg border border-[rgb(48,47,52)] rounded-xl w-1/3 min-w-[350px] p-10 flex flex-col gap-6">
       <h1 class="text-3xl text-center">Login</h1>
       <n-form ref="formRef" :model="model" :rules="rules">
-        <n-form-item path="correo" label="Correo">
-          <n-input v-model:value="model.correo" placeholder="Ingrese su correo">
+        <n-form-item path="correo" label="Nombre de usuario o correo">
+          <n-input v-model:value="model.correo" placeholder="Ingrese su nombre de usuario o correo">
             <template #prefix>
               <n-icon size="20">
                 <Person12Filled />
