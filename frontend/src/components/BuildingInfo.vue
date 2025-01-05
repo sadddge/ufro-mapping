@@ -18,13 +18,15 @@
         <div v-for="room in rooms">
           <div class="flex flex-row items-center justify-between px-[10px]">
             {{ room.nombre }}
-            <n-button secondary circle>
-              <template #icon>
-                <n-icon>
-                  <CalendarIcon />
-                </n-icon>
-              </template>
-            </n-button>
+            <router-link :to="{ name: 'ClassroomSchedule', params: { id: room.id } }">
+              <n-button secondary circle>
+                <template #icon>
+                  <n-icon>
+                    <CalendarIcon />
+                  </n-icon>
+                </template>
+              </n-button>
+            </router-link>
           </div>
           <div class="h-[1px] w-[100%] bg-[#2d2d30] my-[10px]"></div>
         </div>
