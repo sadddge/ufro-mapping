@@ -72,11 +72,7 @@ const login = () => {
     AuthService.login(model.value.correo, model.value.contrasenia).then((response) => {
       if (response.status === 200) {
         store.validateSession().then(() => {
-          if (store.userRole === 'ADMIN') {
-            router.push('/admin')
-          } else {
-            router.push('/home')
-          }
+          router.push('/home')
         })
       }
     })

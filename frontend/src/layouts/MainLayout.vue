@@ -11,6 +11,11 @@
         <n-icon size="30"><calendar-icon class="rounded-full border-2 border-white shadow-lg cursor-pointer p-0.5"/></n-icon>
       </n-button>
     </router-link>
+    <router-link v-if="isAdmin" :to = "{name: 'AdminHome'}">
+      <n-button circle size="medium">
+        <n-icon size="30"><AdminIcon class="rounded-full border-2 border-white shadow-lg cursor-pointer p-0.5"/></n-icon>
+      </n-button>
+    </router-link>
   </div>
   <div class="absolute left-5 top-5">
     <SearchableTree/>
@@ -18,8 +23,10 @@
 </template>
 
 <script setup>
-import {CalendarMonth20Filled as CalendarIcon} from "@vicons/fluent";
-import { Person20Filled as PersonIcon } from "@vicons/fluent";
+import { Person20Filled as PersonIcon, PersonSettings20Filled as AdminIcon, CalendarMonth20Filled as CalendarIcon} from "@vicons/fluent";
 import SearchableTree from "@/components/SearchableTree.vue";
 import MapUfro from "@/components/MapUfro.vue";
+import { useAuthStore } from "@/stores/auth.js";
+const store = useAuthStore();
+const isAdmin =  store.userRole === 'ADMIN';
 </script>

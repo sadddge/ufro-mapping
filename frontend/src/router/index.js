@@ -33,7 +33,6 @@ const router = createRouter({
       path: '/home',
       name: 'Home',
       component: HomeView,
-      meta: { requiresAuth: true },
     },
     {
       path: '/building/:id',
@@ -130,11 +129,11 @@ router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
   await new Promise((resolve) => setTimeout(resolve, 150));
   if ((to.name === 'Login' || to.name === 'Register') && authStore.isAuthenticated) {
-    next({ name: 'AdminHome'});
+    next({ name: 'Home'});
   } else if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ name: 'Login' });
   } else if (to.meta.role && to.meta.role !== authStore.userRole) {
-    next({ name: 'Home' });
+    next({ name: 'NotFound' });
   } else {
     next();
   }
