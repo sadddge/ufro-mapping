@@ -26,7 +26,7 @@ public class AuthController {
 
     @PostMapping("/login") // Public endpoint
     public ResponseEntity<String> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpServletResponse response) {
-        String token = authService.login(loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
+        String token = authService.login(loginRequestDTO.getUsernameOrEmail(), loginRequestDTO.getPassword());
         CookieUtil.createCookie(response, "AuthToken", token, true, 86400, "localhost");
         return ResponseEntity.ok("Login successful");
     }

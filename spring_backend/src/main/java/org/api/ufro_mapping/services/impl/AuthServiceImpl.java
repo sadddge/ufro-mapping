@@ -1,6 +1,5 @@
 package org.api.ufro_mapping.services.impl;
 import lombok.extern.java.Log;
-import org.api.ufro_mapping.dto.request.ChangePasswordDTO;
 import org.api.ufro_mapping.dto.request.UserRegisterDTO;
 import org.api.ufro_mapping.dto.response.GeneralUserInfoDTO;
 import org.api.ufro_mapping.jwt.JwtProvider;
@@ -24,8 +23,10 @@ public class AuthServiceImpl implements IAuthService {
         this.passwordEncoder = passwordEncoder;
     }
     @Override
-    public String login(String email, String password) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+    public String login(String usernameOrEmail, String password) {
+        User user = userRepository.findByEmail(usernameOrEmail)
+                .or(() -> userRepository.findByName(usernameOrEmail))
+                .orElseThrow(() -> new RuntimeException("User not found"));
         if (passwordEncoder.matches(password, user.getPassword())) {
             return jwtProvider.generateToken(user);
         }
