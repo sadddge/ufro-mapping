@@ -27,7 +27,7 @@ class ClassroomService {
     }
 
     async getHorarioByClassroomId(id) {
-        const response = await axiosInstance.get(`/salas/${id}/horarios`);
+        const response = await axiosInstance.get(`/salas/${id}/horario`);
         return response.data;
     }
 

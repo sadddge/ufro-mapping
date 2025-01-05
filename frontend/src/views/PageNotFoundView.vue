@@ -4,15 +4,3 @@
     <h1 class="text-4xl font-lato">Página no encontrada</h1>
   </div>
 </template>
-
-<script setup>
-import { useMapStore } from "@/stores/map.js";
-
-const mapStore = useMapStore()
-onMounted(() => {
-  if (mapStore.showMap) {
-    mapStore.showMap = false
-  }
-})
-</script>
-

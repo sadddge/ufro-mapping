@@ -16,6 +16,8 @@ import ScheduleView from '@/views/ScheduleView.vue'
 import CoursePreviewView from "@/views/CoursePreviewView.vue";
 import { useAuthStore} from "@/stores/auth.js";
 import CourseScheduleView from "@/views/CourseScheduleView.vue";
+import {useMapStore} from "@/stores/map.js";
+import ClassroomScheduleView from "@/views/ClassroomScheduleView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -121,12 +123,19 @@ const router = createRouter({
       name: "CourseSchedule",
       component: CourseScheduleView,
       meta: { requiresAuth: true },
+    },
+    {
+      path: "/classroom/:id/horario",
+      name: "ClassroomSchedule",
+      component: ClassroomScheduleView,
+      meta: { requiresAuth: true },
     }
   ],
 })
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
+  const mapStore = useMapStore();
   await new Promise((resolve) => setTimeout(resolve, 150));
   if ((to.name === 'Login' || to.name === 'Register') && authStore.isAuthenticated) {
     next({ name: 'Home'});
@@ -134,9 +143,10 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'Login' });
   } else if (to.meta.role && to.meta.role !== authStore.userRole) {
     next({ name: 'NotFound' });
-  } else {
-    next();
   }
+
+  mapStore.showMap = !(to.name === 'Login' || to.name === 'Register' || to.name === 'NotFound' || (to.meta.role && to.meta.role === 'ADMIN'));
+  next();
 });
 
 export default router

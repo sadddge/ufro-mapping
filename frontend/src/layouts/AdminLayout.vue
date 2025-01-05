@@ -20,7 +20,6 @@ import {
 } from '@vicons/fluent';
 import {RouterLink, useRouter} from 'vue-router';
 import {useAuthStore} from "@/stores/auth.js";
-import {useMapStore} from "@/stores/map.js";
 
 const router = useRouter()
 const store = useAuthStore()
@@ -90,11 +89,4 @@ const menuOptions = [
     }
   }
 ]
-
-onMounted(() => {
-  const store = useMapStore()
-  if (store.showMap) {
-    store.showMap = false
-  }
-})
 </script>
