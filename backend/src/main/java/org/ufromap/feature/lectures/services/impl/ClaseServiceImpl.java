@@ -1,9 +1,11 @@
 package org.ufromap.feature.lectures.services.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
+import org.ufromap.feature.buildings.dto.LocationDTO;
 import org.ufromap.feature.lectures.dto.ClaseRequestDTO;
 import org.ufromap.feature.courses.dto.AsignaturaDTO;
 import org.ufromap.feature.lectures.dto.ClaseDTO;
@@ -34,6 +36,7 @@ public class ClaseServiceImpl implements IClaseService {
         this.salaRepository = new SalaRepository();
         this.edificioRepository = new EdificioRepository();
         this.asignaturaRepository = new AsignaturaRepository();
+        getNextLocations(1);
     }
     @Override
     public List<ClaseDTO> findAll() {
@@ -127,6 +130,79 @@ public class ClaseServiceImpl implements IClaseService {
         if (clase.getModulo() < 1) {
             throw new BadRequestException("El módulo no puede ser menor a 1");
         }
+    }
+    @Override
+    public LocationDTO[] getNextLocations(int id) {
+        List<Clase> clases = claseRepository.getClasesByUserId(id);
+        LocalDateTime now = LocalDateTime.now();
+        int currentDay = now.getDayOfWeek().getValue();
+        int currentHour = now.getHour();
+        int currentMinute = now.getMinute();
+        int currentPeriod = determinePeriod(currentHour, currentMinute);
 
+        List<Clase> nextClasesList = clases.stream()
+                .filter(clase -> (clase.getDiaSemana() == currentDay) && (clase.getPeriodo() > currentPeriod))
+                .toList();
+
+        int countDistincNextClases = (int) nextClasesList.stream()
+                .map(Clase::getAsignaturaId)
+                .distinct()
+                .count();
+
+        LocationDTO[] locations = new LocationDTO[2];
+        for (int i = 0; i < Math.min(2, countDistincNextClases); i++) {
+            Clase clase;
+            if (i == 0) {
+                clase = nextClasesList.get(i);
+            } else {
+                clase = nextClasesList.stream()
+                        .filter(c -> c.getAsignaturaId() != nextClasesList.get(0).getAsignaturaId())
+                        .findFirst()
+                        .orElse(null);
+            }
+            assert clase != null;
+            Edificio edificio = edificioRepository.findBySalaId(clase.getSalaId());
+            locations[i] = LocationDTO.builder()
+                    .nombreEdificio(edificio.getNombre())
+                    .aliasEdificio(edificio.getAlias())
+                    .latitud(edificio.getLatitud())
+                    .longitud(edificio.getLongitud())
+                    .build();
+        }
+        return locations;
+    }
+
+    public int determinePeriod (int hour, int minute) {
+        int[][] periodos = {
+                {8, 30, 9, 30},
+                {9, 40, 10, 40},
+                {10, 50, 11, 50},
+                {12, 0, 13, 0},
+                {14, 30, 15, 30},
+                {15, 40, 16, 40},
+                {16, 50, 17, 50},
+                {18, 0, 19, 0},
+                {19, 10, 20, 10},
+                {20, 20, 21, 20},
+        };
+        for (int i = 0; i < periodos.length; i++) {
+            int[] periodo = periodos[i];
+            if ((hour > periodo[0] || (hour == periodo[0] && minute >= periodo[1])) && (hour < periodo[2] || (hour == periodo[2] && minute <= periodo[3]))) {
+                return i;
+            }
+        }
+        return 0;
+    }
+    @Override
+    public boolean isInCurrentPeriod(int id) {
+        List<Clase> clases = claseRepository.getClasesByUserId(id);
+        LocalDateTime now = LocalDateTime.now();
+        int currentDay = now.getDayOfWeek().getValue();
+        int currentHour = now.getHour();
+        int currentMinute = now.getMinute();
+        int currentPeriod = determinePeriod(currentHour, currentMinute);
+
+        return clases.stream()
+                .anyMatch(clase -> clase.getDiaSemana() == currentDay && clase.getPeriodo() == currentPeriod);
     }
 }
