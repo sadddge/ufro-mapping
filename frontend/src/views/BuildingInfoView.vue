@@ -10,11 +10,20 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 const store = useMapStore();
-const id = route.params.id;
+const id = ref(route.params.id);
 
-onMounted(() => {
-  BuildingsService.getBuildingById(id).then((building) => {
+const moveMap = () => {
+  BuildingsService.getBuildingById(id.value).then((building) => {
     store.moveMap(building.longitud, building.latitud);
   });
+}
+
+onMounted(() => {
+  moveMap();
+});
+
+watch(() => route.params.id, async (newId) => {
+  id.value = newId;
+  moveMap();
 });
 </script>

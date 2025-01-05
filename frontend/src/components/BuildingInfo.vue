@@ -52,8 +52,7 @@ const props = defineProps({
 
 const building = ref({});
 const rooms = ref([]);
-
-onMounted(async () => {
+const loadData = async () => {
   building.value = await BuildingsService.getBuildingById(props.id);
   rooms.value = await BuildingsService.getRoomsByBuildingId(props.id);
   rooms.value.sort((a, b) => {
@@ -71,6 +70,13 @@ onMounted(async () => {
       return a.nombre.localeCompare(b.nombre); // Orden alfabético
     }
   });
+}
+onMounted(async () => {
+  await loadData();
+});
+
+watch(() => props.id, async () => {
+  await loadData();
 });
 
 </script>
