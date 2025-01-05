@@ -41,6 +41,23 @@ public class EdificioRepository extends BaseRepository<Edificio> {
     protected String getUpdateQuery() {
         return "UPDATE edificio SET nombre_edificio = ?, alias = ?, tipo = ?, latitud = ?, longitud = ? WHERE id = ?";
     }
+    public Edificio findBySalaId(int salaId) {
+        String query = "SELECT e.id, e.nombre_edificio, e.alias, e.tipo, e.latitud, e.longitud FROM edificio e " +
+                "JOIN sala s ON e.id = s.edificio_id " +
+                "WHERE s.id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, salaId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapToObject(resultSet);
+                }
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE,"Error executing query: " + query, e);
+            throw new InternalErrorException("Failed to execute insert operation");
+        }
+        return null;
+    }
 
     @Override
     public Edificio mapToObject(ResultSet resultSet) {

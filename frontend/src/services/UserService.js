@@ -46,6 +46,16 @@ class UserService {
         const response = await axiosInstance.delete(`usuarios/${id}/asignaturas/${asignaturaId}`);
         return response.data;
     }
+
+    async nextLocations(id) {
+        const response = await axiosInstance.get(`clases/${id}/nextLocations`);
+        return response.data;
+    }
+
+    async isInCurrentPeriod(id) {
+        const response = await axiosInstance.get(`clases/${id}/isInCurrentPeriod`);
+        return response.data;
+    }
 }
 
 export default new UserService();

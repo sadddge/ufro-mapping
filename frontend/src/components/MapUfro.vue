@@ -5,6 +5,7 @@
 <script setup>
 import mapboxgl from 'mapbox-gl'
 import BuildingsService from "@/services/BuildingsService.js";
+import UserService from '@/services/UserService';
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { useMapStore } from "@/stores/map.js";
 import { useRouter } from "vue-router";
@@ -23,6 +24,8 @@ const props = defineProps({
   }
 })
 
+const nextLocations = ref([])
+const isInCurrentPeriod = ref(false)
 const store = useMapStore()
 const locations = ref([])
 const markers = defineModel('markers', { default: () => [] });
@@ -76,14 +79,27 @@ const labels = () => {
     })
   }
 }
+
 const loadMarkers = () => {
   locations.value.forEach((location) => {
     const name = location.aliasEdificio ? location.aliasEdificio : location.nombreEdificio
+
+    const isNextLocation = nextLocations.value.some(nextLocation => nextLocation.id === location.idEdificio);
+
     const popup = new mapboxgl.Popup({ closeButton: false
     }).setHTML(`<div class="bg-zinc-900 p-4 border rounded-md hover:pointer">${name}</div>`)
+
+    let markerColor = '';
+    if(isInCurrentPeriod.value) {
+      markerColor = 'green';
+    } else if (isNextLocation) {
+      markerColor = 'yellow';
+    } 
+
     const marker = new mapboxgl.Marker({
       draggable: props.edit,
-      scale: 0.75
+      scale: 0.75,
+      color: markerColor
     })
         .setLngLat([location.longitud, location.latitud])
         .addTo(map)
@@ -151,6 +167,8 @@ onMounted(async () => {
     map.resize()
     store.setMap(map)
   })
+  nextLocations.value = await UserService.getNextLocations();
+  isInCurrentPeriod.value = await UserService.getIsCurrentPeriod();
 })
 
 watch(() => props.edit, (value) => {

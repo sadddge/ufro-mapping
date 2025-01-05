@@ -128,5 +128,23 @@ public class ClaseRepository extends BaseRepository<Clase> {
         statement.setInt(7, obj.getId());
     }
 
+    public List<Clase> getClasesByUserId(int userId) {
+        List<Clase> clases = new ArrayList<>();
+        String query = "SELECT c.id, c.sala_id, c.asignatura_id, c.dia_semana, c.periodo, c.docente_nombre, c.modulo FROM clase c " +
+                "JOIN inscribe i ON c.asignatura_id = i.asignatura_id " +
+                "WHERE i.usuario_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, userId);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    clases.add(mapToObject(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            log.log(Level.SEVERE,"Error executing query: " + query, e);
+            throw new InternalErrorException("Failed to execute insert operation");
+        }
+        return clases;
+    }
 
 }

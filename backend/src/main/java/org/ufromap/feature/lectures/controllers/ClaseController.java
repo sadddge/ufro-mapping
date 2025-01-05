@@ -16,6 +16,7 @@ import java.io.IOException;
 @RequestMapping("/api/clases")
 public class ClaseController extends BaseController {
     private final IClaseService claseService;
+
     public ClaseController() {
         this.claseService = new ClaseServiceImpl();
     }
@@ -68,5 +69,18 @@ public class ClaseController extends BaseController {
         );
     }
 
+    @GetMapping("/{id}/isInCurrentPeriod")
+    @Protected(roles = {"USER", "ADMIN"})
+    public void isInCurrentPeriod(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+        int idInt = Integer.parseInt(id);
+        boolean isInPeriod = claseService.isInCurrentPeriod(idInt);
+        sendObject(response, isInPeriod);
+    }
 
+    @GetMapping("/{id}/nextLocations")
+    @Protected(roles = {"USER", "ADMIN"})
+    public void getNextLocations(@PathParam("id") String id, HttpServletResponse response) throws IOException {
+        int idInt = Integer.parseInt(id);
+        sendObject(response, claseService.getNextLocations(idInt));
+    }
 }
