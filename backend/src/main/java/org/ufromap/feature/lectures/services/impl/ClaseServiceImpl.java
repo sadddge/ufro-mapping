@@ -1,8 +1,7 @@
 package org.ufromap.feature.lectures.services.impl;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import lombok.AllArgsConstructor;
 import org.ufromap.feature.buildings.dto.LocationDTO;
@@ -36,7 +35,6 @@ public class ClaseServiceImpl implements IClaseService {
         this.salaRepository = new SalaRepository();
         this.edificioRepository = new EdificioRepository();
         this.asignaturaRepository = new AsignaturaRepository();
-        getNextLocations(1);
     }
     @Override
     public List<ClaseDTO> findAll() {
@@ -132,44 +130,31 @@ public class ClaseServiceImpl implements IClaseService {
         }
     }
     @Override
-    public LocationDTO[] getNextLocations(int id) {
+    public List<LocationDTO> getNextLocations(int id) {
         List<Clase> clases = claseRepository.getClasesByUserId(id);
         LocalDateTime now = LocalDateTime.now();
         int currentDay = now.getDayOfWeek().getValue();
-        int currentHour = now.getHour();
-        int currentMinute = now.getMinute();
-        int currentPeriod = determinePeriod(currentHour, currentMinute);
+        int currentPeriod = determinePeriod(now.getHour(), now.getMinute());
 
+        Set<Integer> asignaturas = new HashSet<>();
         List<Clase> nextClasesList = clases.stream()
-                .filter(clase -> (clase.getDiaSemana() == currentDay) && (clase.getPeriodo() > currentPeriod))
+                .filter(clase -> (clase.getDiaSemana() == currentDay) && (clase.getPeriodo() > currentPeriod) && asignaturas.add(clase.getAsignaturaId()))
+                .sorted(Comparator.comparing(Clase::getPeriodo))
                 .toList();
 
-        int countDistincNextClases = (int) nextClasesList.stream()
-                .map(Clase::getAsignaturaId)
-                .distinct()
-                .count();
+        List<LocationDTO> locationsList = new ArrayList<>();
 
-        LocationDTO[] locations = new LocationDTO[2];
-        for (int i = 0; i < Math.min(2, countDistincNextClases); i++) {
-            Clase clase;
-            if (i == 0) {
-                clase = nextClasesList.get(i);
-            } else {
-                clase = nextClasesList.stream()
-                        .filter(c -> c.getAsignaturaId() != nextClasesList.get(0).getAsignaturaId())
-                        .findFirst()
-                        .orElse(null);
-            }
-            assert clase != null;
+        for (Clase clase : nextClasesList) {
             Edificio edificio = edificioRepository.findBySalaId(clase.getSalaId());
-            locations[i] = LocationDTO.builder()
+            locationsList.add(LocationDTO.builder()
+                    .idEdificio(edificio.getId())
                     .nombreEdificio(edificio.getNombre())
                     .aliasEdificio(edificio.getAlias())
                     .latitud(edificio.getLatitud())
                     .longitud(edificio.getLongitud())
-                    .build();
+                    .build());
         }
-        return locations;
+        return locationsList.subList(0, Math.min(locationsList.size(), 2));
     }
 
     public int determinePeriod (int hour, int minute) {
@@ -198,9 +183,7 @@ public class ClaseServiceImpl implements IClaseService {
         List<Clase> clases = claseRepository.getClasesByUserId(id);
         LocalDateTime now = LocalDateTime.now();
         int currentDay = now.getDayOfWeek().getValue();
-        int currentHour = now.getHour();
-        int currentMinute = now.getMinute();
-        int currentPeriod = determinePeriod(currentHour, currentMinute);
+        int currentPeriod = determinePeriod(now.getHour(), now.getMinute());
 
         return clases.stream()
                 .anyMatch(clase -> clase.getDiaSemana() == currentDay && clase.getPeriodo() == currentPeriod);

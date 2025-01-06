@@ -258,7 +258,7 @@ const getProfileInfo = async () => {
 
 const logout = () => {
   store.logout();
-  router.push("/login");
+  router.push("/home");
 };
 
 const showProfile = () => {
