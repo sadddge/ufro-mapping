@@ -1,5 +1,5 @@
 <template>
-    <div id="map" class="w-full h-full overflow-hidden" :class="{'border rounded-xl' : !full}"></div>
+  <div id="map" class="w-full h-full overflow-hidden" :class="{'border rounded-xl' : !full}"></div>
 </template>
 
 <script setup>
@@ -7,20 +7,20 @@ import mapboxgl from 'mapbox-gl'
 import BuildingsService from "@/services/BuildingsService.js";
 import UserService from '@/services/UserService';
 import 'mapbox-gl/dist/mapbox-gl.css'
-import { useMapStore } from "@/stores/map.js";
-import { useRouter } from "vue-router";
+import {useMapStore} from "@/stores/map.js";
+import {useRouter} from "vue-router";
 import {onMounted} from 'vue'
-
+import {useAuthStore} from "@/stores/auth.js";
 
 const router = useRouter()
 const props = defineProps({
-  edit : {
-    type : Boolean,
-    default : false
+  edit: {
+    type: Boolean,
+    default: false
   },
-  full : {
-    type : Boolean,
-    default : false
+  full: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -28,10 +28,12 @@ const nextLocations = ref([])
 const isInCurrentPeriod = ref(false)
 const store = useMapStore()
 const locations = ref([])
-const markers = defineModel('markers', { default: () => [] });
+const markers = defineModel('markers', {default: () => []});
+const authStore = useAuthStore();
 
 let map
 mapboxgl.accessToken = 'pk.eyJ1Ijoic2FkZGRnZSIsImEiOiJjbHltOWE4ejUxY21lMmtvY2s3ZG5iN2JiIn0.UtJHjn2nuEqAbHkLSOh4pA'
+
 function loadMapOptions() {
   map.on('load', () => {
     const bounds = [
@@ -43,6 +45,7 @@ function loadMapOptions() {
     map.doubleClickZoom.disable()
   })
 }
+
 function loadMap() {
   map = new mapboxgl.Map({
     container: 'map',
@@ -64,16 +67,16 @@ function loadMap() {
 
 const labels = () => {
   return {
-    type : 'FeatureCollection',
-    features : locations.value.map((location) => {
+    type: 'FeatureCollection',
+    features: locations.value.map((location) => {
       return {
-        type : 'Feature',
-        geometry : {
-          type : 'Point',
-          coordinates : [location.longitud, location.latitud]
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [location.longitud, location.latitud]
         },
-        properties : {
-          description : location.aliasEdificio ? location.aliasEdificio : location.nombreEdificio,
+        properties: {
+          description: location.aliasEdificio ? location.aliasEdificio : location.nombreEdificio,
         }
       }
     })
@@ -81,20 +84,27 @@ const labels = () => {
 }
 
 const loadMarkers = () => {
+  let counter = 0;
   locations.value.forEach((location) => {
     const name = location.aliasEdificio ? location.aliasEdificio : location.nombreEdificio
 
-    const isNextLocation = nextLocations.value.some(nextLocation => nextLocation.id === location.idEdificio);
+    const isNextLocation = nextLocations.value.some(nextLocation => nextLocation.idEdificio === location.idEdificio);
 
-    const popup = new mapboxgl.Popup({ closeButton: false
+    const popup = new mapboxgl.Popup({
+      closeButton: false
     }).setHTML(`<div class="bg-zinc-900 p-4 border rounded-md hover:pointer">${name}</div>`)
 
     let markerColor = '';
-    if(isInCurrentPeriod.value) {
-      markerColor = 'green';
-    } else if (isNextLocation) {
+
+    if (isNextLocation) {
       markerColor = 'yellow';
-    } 
+      if (isInCurrentPeriod.value && counter === 0) {
+        markerColor = 'green';
+      } else if (!isInCurrentPeriod.value && counter === 1) {
+        markerColor = 'red';
+      }
+      counter += 1;
+    }
 
     const marker = new mapboxgl.Marker({
       draggable: props.edit,
@@ -112,14 +122,14 @@ const loadMarkers = () => {
       marker.getElement().addEventListener('click', () => {
         router.push({
           name: 'Edificio',
-          params: { id: location.idEdificio },
+          params: {id: location.idEdificio},
         })
       })
     }
 
     markers.value.push({
-      marker : marker,
-      id : location.idEdificio
+      marker: marker,
+      id: location.idEdificio
     })
   })
 }
@@ -136,6 +146,10 @@ async function loadBuildings() {
 }
 
 onMounted(async () => {
+  if (authStore.isAuthenticated) {
+    nextLocations.value = await UserService.nextLocations(authStore.userId);
+    isInCurrentPeriod.value = await UserService.isInCurrentPeriod(authStore.userId);
+  }
   loadBuildings().then(() => {
     loadMap()
     loadMapOptions()
@@ -167,8 +181,6 @@ onMounted(async () => {
     map.resize()
     store.setMap(map)
   })
-  nextLocations.value = await UserService.getNextLocations();
-  isInCurrentPeriod.value = await UserService.getIsCurrentPeriod();
 })
 
 watch(() => props.edit, (value) => {
