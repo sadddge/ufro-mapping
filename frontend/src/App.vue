@@ -1,30 +1,23 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <div class="h-full w-screen bg-zinc-900">
+    <n-config-provider :theme="darkTheme" class="w-full h-full">
+      <n-message-provider>
+        <n-dialog-provider>
+          <MainLayout v-if="mapStore.showMap"/>
+          <RouterView />
+        </n-dialog-provider>
+      </n-message-provider>
+    </n-config-provider>
+  </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script setup>
+import { RouterView } from 'vue-router'
+import { darkTheme } from 'naive-ui'
+import { useMapStore } from "@/stores/map.js";
+import MainLayout from "@/layouts/MainLayout.vue";
+const mapStore = useMapStore()
+</script>
 
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
+<style scoped>
 </style>
